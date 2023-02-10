@@ -4,7 +4,11 @@
   "description": "Back-end for ELTE IK thesis project.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "npx nodemon server.js",
+        "db": "npx sequelize db:migrate && npx sequelize db:seed:all",
+        "db:fresh": "npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all",
+        "log:clear": "rm -rf logs/*.log",
+        "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -17,6 +21,7 @@
   },
   "homepage": "https://github.com/tlevi101/Function-wars#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
     "date-and-time": "^2.3.1",
