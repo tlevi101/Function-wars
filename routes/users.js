@@ -3,6 +3,22 @@ const router = express.Router();
 const { User, PasswordReset } = require("../models");
 const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize, Op } = require("sequelize");
+const { v4: uuidv4 } = require("uuid");
+
+router.post("/register-guest", function (req, res, next) {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ message: "Name is required" });
+  }
+  const token = jsonwebtoken.sign(
+    { name, guest: true, JWT_createdAt: new Date(), uuid: uuidv4() },
+    process.env.JWT_SECRET,
+    {
+      algorithm: process.env.JWT_ALGO,
+    }
+  );
+  res.status(201).json({ message: "Guest accepted", jwt: token });
+});
 
 router.post("/register", async function (req, res, next) {
   const { name, email, password, passwordAgain } = req.body;
@@ -18,7 +34,7 @@ router.post("/register", async function (req, res, next) {
     return res.status(400).json({ message: "Passwords do not match" });
   }
   const user = await User.create({ name, email, password });
-  const token = jsonwebtoken.sign(user.toJSON(), process.env.JWT_SECRET, {
+  const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
     algorithm: process.env.JWT_ALGO,
   });
   res.status(201).json({ message: "User created", jwt: token });
@@ -34,8 +50,10 @@ router.post("/login", async (req, res) => {
   if (!user) {
     return res.status(404).send({ message: "Incorrect email" });
   }
-  if(user.banned) {
-    return res.status(403).send({ message: "User is banned", banned_reason: user.banned_reason });
+  if (user.banned) {
+    return res
+      .status(403)
+      .send({ message: "User is banned", banned_reason: user.banned_reason });
   }
   if (!password) {
     return res.status(400).send({ message: "Password required" });
@@ -43,7 +61,7 @@ router.post("/login", async (req, res) => {
   if (!user.comparePassword(password)) {
     return res.status(400).send({ message: "Incorrect password" });
   }
-  const token = jsonwebtoken.sign(user.toJSON(), process.env.JWT_SECRET, {
+  const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
     algorithm: process.env.JWT_ALGO,
   });
   return res.status(200).send({ token });
@@ -71,7 +89,9 @@ router.post("/forgot-password", async (req, res) => {
 
 router.put("/password-reset/:uuid", async (req, res) => {
   const { uuid } = req.params;
-  const passwordReset = await PasswordReset.findOne({ where: { unique_id: uuid } });
+  const passwordReset = await PasswordReset.findOne({
+    where: { unique_id: uuid },
+  });
   if (!passwordReset) {
     return res.status(404).send({ message: "Incorrect link" });
   }
@@ -84,7 +104,9 @@ router.put("/password-reset/:uuid", async (req, res) => {
     return res.status(400).send({ message: "Password required" });
   }
   if (!passwordAgain) {
-    return res.status(400).send({ message: "Password confirmation required (passwordAgain)" });
+    return res
+      .status(400)
+      .send({ message: "Password confirmation required (passwordAgain)" });
   }
   if (password !== passwordAgain) {
     return res.status(400).send({ message: "Passwords do not match" });
@@ -94,4 +116,5 @@ router.put("/password-reset/:uuid", async (req, res) => {
   await passwordReset.destroy();
   res.status(200).send({ message: "Password updated" });
 });
+
 module.exports = router;

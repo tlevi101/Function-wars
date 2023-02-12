@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
     }
-    toJSON() {
+    toJSONForJWT() {
       return {
         name: this.name,
         email: this.email,
@@ -28,6 +28,15 @@ module.exports = (sequelize, DataTypes) => {
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
         JWT_createdAt: new Date(),
+      };
+    }
+    toJSON() {
+      return {
+        name: this.name,
+        email: this.email,
+        banned: this.banned,
+        banned_reason: this.banned_reason,
+        is_admin: this.is_admin,
       };
     }
   }
@@ -102,7 +111,7 @@ module.exports = (sequelize, DataTypes) => {
         afterValidate: (user) => {
           let salt = bcrypt.genSaltSync(10);
           user.password = bcrypt.hashSync(user.password, salt);
-        }
+        },
       },
     }
   );
