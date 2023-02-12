@@ -50,7 +50,6 @@ router.post("/login", async (req, res) => {
     return res.status(400).send({ message: "Email required" });
   }
   const user = await User.findOne({ where: { email } });
-  console.log(user);
   if (!user) {
     return res.status(404).send({ message: "Incorrect email" });
   }

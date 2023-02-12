@@ -108,10 +108,12 @@ module.exports = (sequelize, DataTypes) => {
           let salt = bcrypt.genSaltSync(10);
           user.password = bcrypt.hashSync(user.password, salt);
         },
-        afterValidate: (user) => {
+        beforeUpdate: (user, options) => {
+          options.validate = false;
           let salt = bcrypt.genSaltSync(10);
           user.password = bcrypt.hashSync(user.password, salt);
         },
+
       },
     }
   );

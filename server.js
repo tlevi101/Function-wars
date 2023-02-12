@@ -11,7 +11,9 @@ const app = express();
 app.use(express.json());
 
 //routers
-app.use("/", require("./routes/users"));
+app.use("/", require("./routes/auth"));
+app.use("/admin/", require("./routes/admin"));
+
 
 // catch any sequelize validation errors
 app.use(function (err, req, res, next) {
@@ -22,6 +24,7 @@ app.use(function (err, req, res, next) {
   } else if (err instanceof Sequelize.DatabaseError) {
     res.status(400).json({ error: err.message });
   }
+  next(err, req, res, next);
 });
 
 // error logger
