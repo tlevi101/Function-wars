@@ -34,6 +34,9 @@ router.post("/login", async (req, res) => {
   if (!user) {
     return res.status(404).send({ message: "Incorrect email" });
   }
+  if(user.banned) {
+    return res.status(403).send({ message: "User is banned", banned_reason: user.banned_reason });
+  }
   if (!password) {
     return res.status(400).send({ message: "Password required" });
   }
@@ -66,7 +69,29 @@ router.post("/forgot-password", async (req, res) => {
   res.status(201).send(PasswordReset);
 });
 
-router.post("/password-reset/:uuid", async (req, res) => {
+router.put("/password-reset/:uuid", async (req, res) => {
   const { uuid } = req.params;
+  const passwordReset = await PasswordReset.findOne({ where: { unique_id: uuid } });
+  if (!passwordReset) {
+    return res.status(404).send({ message: "Incorrect link" });
+  }
+  if (passwordReset.createdAt < new Date(Date.now() - 3600000)) {
+    await passwordReset.destroy();
+    return res.status(400).send({ message: "Link expired" });
+  }
+  const { password, passwordAgain } = req.body;
+  if (!password) {
+    return res.status(400).send({ message: "Password required" });
+  }
+  if (!passwordAgain) {
+    return res.status(400).send({ message: "Password confirmation required (passwordAgain)" });
+  }
+  if (password !== passwordAgain) {
+    return res.status(400).send({ message: "Passwords do not match" });
+  }
+  const user = await passwordReset.getUser();
+  await user.update({ password });
+  await passwordReset.destroy();
+  res.status(200).send({ message: "Password updated" });
 });
 module.exports = router;
