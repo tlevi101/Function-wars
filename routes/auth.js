@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { User, PasswordReset } = require("../models");
 const jsonwebtoken = require("jsonwebtoken");
-const { Sequelize, Op } = require("sequelize");
+const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 
 router.post("/register-guest", function (req, res, next) {
@@ -19,6 +19,8 @@ router.post("/register-guest", function (req, res, next) {
   );
   res.status(201).json({ message: "Guest accepted", jwt: token });
 });
+
+
 
 router.post("/register", async function (req, res, next) {
   const { name, email, password, passwordAgain } = req.body;
@@ -39,6 +41,8 @@ router.post("/register", async function (req, res, next) {
   });
   res.status(201).json({ message: "User created", jwt: token });
 });
+
+
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -67,6 +71,8 @@ router.post("/login", async (req, res) => {
   return res.status(200).send({ token });
 });
 
+
+
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
   if (!email) {
@@ -86,6 +92,8 @@ router.post("/forgot-password", async (req, res) => {
   const PasswordReset = await user.getPasswordReset();
   res.status(201).send(PasswordReset);
 });
+
+
 
 router.put("/password-reset/:uuid", async (req, res) => {
   const { uuid } = req.params;
