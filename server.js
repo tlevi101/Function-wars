@@ -23,9 +23,12 @@ app.use(function (err, req, res, next) {
   else if(err instanceof Sequelize.ValidationError) {
     res.status(400).json({error: err.message});
   }
+  else if( err instanceof Sequelize.DatabaseError){
+    res.status(400).json({error:err.message});
+  }
 });
 
-// error handler
+// error logger
 app.use(async function (err, req, res, next) {
   if (res.headersSent) {
     return next(err);

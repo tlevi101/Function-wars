@@ -11,10 +11,26 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      this.hasOne(models.PasswordReset, {
+        foreignKey: {
+          name: 'user_id',
+          allowNull: true,
+        },
+      });
       // define association here
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
+    }
+    toJSON(){
+      return {
+        name: this.name,
+        email: this.email,
+        banned: this.banned,
+        banned_reason: this.banned_reason,
+        is_admin: this.is_admin,
+        JWT_createdAt: new Date(),
+      }
     }
 
   }
@@ -76,13 +92,6 @@ module.exports = (sequelize, DataTypes) => {
         },
       }
     },
-    indexes: [
-      {
-        unique: true,
-        fields: ['name', 'email'],
-        msg: 'Username or email already exists'
-      }
-    ]
   }, {
     sequelize,
     modelName: 'User',

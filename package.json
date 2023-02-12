@@ -7,6 +7,7 @@
         "dev": "npx nodemon server.js",
         "db": "npx sequelize db:migrate && npx sequelize db:seed:all",
         "db:fresh": "npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all",
+        "db:fresh:last":" npx sequelize db:migrate:undo && npx sequelize db:migrate && npx sequelize db:seed:all",
         "log:clear": "rm -rf logs/*.log",
         "test": "echo \"Error: no test specified\" && exit 1"
   },
