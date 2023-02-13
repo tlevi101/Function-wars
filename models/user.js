@@ -99,6 +99,7 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      chat_restriction: DataTypes.BOOLEAN,
     },
     {
       sequelize,

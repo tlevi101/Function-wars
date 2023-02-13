@@ -31,6 +31,10 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
+        chat_restriction: {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false,
+        },
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE,
