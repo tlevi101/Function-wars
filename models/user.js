@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
         JWT_createdAt: new Date(),
+        chat_restriction: this.chat_restriction,
       };
     }
     toJSON() {
@@ -37,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         banned: this.banned,
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
+        chat_restriction: this.chat_restriction,
       };
     }
   }
@@ -54,13 +56,11 @@ module.exports = (sequelize, DataTypes) => {
             args: [3, 20],
             msg: "Username must be between 3 and 20 characters",
           },
-          notEmpty: {
-            msg: "Username cannot be empty",
-          },
         },
       },
       email: {
         type: DataTypes.STRING,
+        allowNull: false,
         unique: {
           args: true,
           msg: "Email already exists",

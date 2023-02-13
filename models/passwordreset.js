@@ -11,6 +11,16 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: "user_id" });
     }
+    toJSON(){
+      return{
+        user_id: this.user_id,
+        link : this.link,
+        unique_id : this.unique_id
+      }
+    }
+    getUuid(){
+      return this.unique_id;
+    }
   }
   PasswordReset.init(
     {

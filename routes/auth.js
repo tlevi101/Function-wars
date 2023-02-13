@@ -10,6 +10,8 @@ router.post("/register-guest", function (req, res, next) {
   if (!name) {
     return res.status(400).json({ message: "Name is required" });
   }
+  if(name.length > 20 || name.length < 3)
+    return res.status(400).json({message: "Name is must be between 3 and 20 characters long"}); 
   const token = jsonwebtoken.sign(
     { name, guest: true, JWT_createdAt: new Date(), uuid: uuidv4() },
     process.env.JWT_SECRET,
@@ -67,7 +69,7 @@ router.post("/login", async (req, res) => {
   const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
     algorithm: process.env.JWT_ALGO,
   });
-  return res.status(200).send({ token });
+  return res.status(200).send({ message:'Login successful',jwt: token });
 });
 
 
@@ -81,6 +83,11 @@ router.post("/forgot-password", async (req, res) => {
   if (!user) {
     return res.status(404).send({ message: "Incorrect email" });
   }
+  if (user.banned) {
+    return res
+      .status(403)
+      .send({ message: "User is banned", banned_reason: user.banned_reason });
+  }
   await user.createPasswordReset().catch(async (err) => {
     if (err instanceof Sequelize.UniqueConstraintError) {
       let passwordReset = await user.getPasswordReset();
@@ -89,7 +96,9 @@ router.post("/forgot-password", async (req, res) => {
     }
   });
   const PasswordReset = await user.getPasswordReset();
-  res.status(201).send(PasswordReset);
+  // TODO: Add if/else for dev/prod and test environment, and remove uuid from dev/prod
+  // TODO: Send email in dev/prod 
+  res.status(201).send({ message: 'Email sent', uuid: PasswordReset.unique_id });
 });
 
 
