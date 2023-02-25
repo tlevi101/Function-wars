@@ -23,6 +23,10 @@ module.exports = {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
         },
+        role: {
+          type: Sequelize.STRING,
+          defaultValue: "user",
+        },
         banned: {
           type: Sequelize.BOOLEAN,
           defaultValue: false,

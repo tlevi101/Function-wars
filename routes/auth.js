@@ -5,7 +5,6 @@ const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 const forgotPasswordMailer = require('../mail/forgotPasswordMail');
-const os = require('os');
 
 router.post("/register-guest", function (req, res, next) {
   const { name } = req.body;
@@ -99,7 +98,7 @@ router.post("/forgot-password", async (req, res) => {
   });
   const passwordReset = await user.getPasswordReset();
   if(process.env.NODE_ENV==="test"){
-    return res.status(201).send({ message: 'Email sent', uuid: passwordReset.unique_id });
+    return res.status(201).send({ message: 'Email sent', uuid: passwordReset.uuid });
   }
   else{
     forgotPasswordMailer(user, passwordReset.link)
@@ -112,7 +111,7 @@ router.post("/forgot-password", async (req, res) => {
 router.put("/password-reset/:uuid", async (req, res) => {
   const { uuid } = req.params;
   const passwordReset = await PasswordReset.findOne({
-    where: { unique_id: uuid },
+    where: { uuid: uuid },
   });
   if (!passwordReset) {
     return res.status(404).send({ message: "Incorrect link" });

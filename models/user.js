@@ -15,7 +15,24 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: true,
         },
       });
-      // define association here
+      this.belongsTo(models.Report, {
+        foreignKey: {
+          name: "reported_by",
+          allowNull: true,
+        },
+        as: {
+          name: "mySentReport",
+        },
+      });
+      this.belongsTo(models.Report, {
+        foreignKey: {
+          name: "reported",
+          allowNull: true,
+        },
+        as: {
+          name: "myReceivedReport",
+        },
+      });
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
@@ -27,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
         banned: this.banned,
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
+        role: this.role,
         JWT_createdAt: new Date(),
         chat_restriction: this.chat_restriction,
       };
@@ -38,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
         banned: this.banned,
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
+        role: this.role,
         chat_restriction: this.chat_restriction,
       };
     }
@@ -88,6 +107,13 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       is_admin: DataTypes.BOOLEAN,
+      role: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isIn:[['super_admin', 'admin', 'user']],
+        }
+      },
       banned: DataTypes.BOOLEAN,
       banned_reason: {
         type: DataTypes.STRING,
