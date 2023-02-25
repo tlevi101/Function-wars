@@ -13,6 +13,7 @@ app.use(express.json());
 //routers
 app.use("/", require("./routes/auth"));
 app.use("/admin/", require("./routes/admin"));
+app.use("/user/", require("./routes/user"));
 app.use('*', (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

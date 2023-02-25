@@ -1,6 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 const bcrypt = require("bcryptjs");
+// const { Friendship } = require("./friendship");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -33,6 +34,16 @@ module.exports = (sequelize, DataTypes) => {
           name: "myReceivedReport",
         },
       });
+      // this.belongsToMany(models.User, {
+      //   through: "Friendships",
+      //   as: "friends",
+      //   foreignKey: "user_id",
+      // });
+      // this.belongsToMany(models.User, {
+      //   through: "Friendships",
+      //   as: "friendOf",
+      //   foreignKey: "friend_id",
+      // });
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
@@ -59,6 +70,19 @@ module.exports = (sequelize, DataTypes) => {
         role: this.role,
         chat_restriction: this.chat_restriction,
       };
+    }
+    getFriends() {
+      const friendOf =this.friendOf;
+      const friends = this.friends;
+      return friends.array.concat(friendOf);
+    }
+    async getFriendRequests() {
+      return await Friendship.findAll({
+        where: {
+          friend_id: this.id,
+          pending: true,
+        },
+      });
     }
   }
   User.init(
