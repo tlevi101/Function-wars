@@ -4,6 +4,8 @@ const { User, PasswordReset } = require("../models");
 const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
+const forgotPasswordMailer = require('../mail/forgotPasswordMail');
+const os = require('os');
 
 router.post("/register-guest", function (req, res, next) {
   const { name } = req.body;
@@ -95,10 +97,14 @@ router.post("/forgot-password", async (req, res) => {
       await user.createPasswordReset();
     }
   });
-  const PasswordReset = await user.getPasswordReset();
-  // TODO: Add if/else for dev/prod and test environment, and remove uuid from dev/prod
-  // TODO: Send email in dev/prod 
-  res.status(201).send({ message: 'Email sent', uuid: PasswordReset.unique_id });
+  const passwordReset = await user.getPasswordReset();
+  if(process.env.NODE_ENV==="test"){
+    return res.status(201).send({ message: 'Email sent', uuid: passwordReset.unique_id });
+  }
+  else{
+    forgotPasswordMailer(user, passwordReset.link)
+    return res.status(201).send({ message: 'Email sent'});
+  }
 });
 
 
