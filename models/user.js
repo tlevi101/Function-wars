@@ -1,6 +1,7 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
+// const {Friendship} = require("sequelize.models")
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -15,7 +16,24 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: true,
         },
       });
-      // define association here
+      this.hasOne(models.Report, {
+        foreignKey: "reported_by",
+        as: "mySentReport",
+      });
+      this.hasOne(models.Report, {
+        foreignKey: "reported",
+        as: "myReceivedReport",
+      });
+      this.belongsToMany(models.User, {
+        through: "Friendships",
+        as: "myFriends",
+        foreignKey: "user_id",
+      });
+      this.belongsToMany(models.User, {
+        through: "Friendships",
+        as: "friendOf",
+        foreignKey: "friend_id",
+      });
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
@@ -27,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         banned: this.banned,
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
+        role: this.role,
         JWT_createdAt: new Date(),
         chat_restriction: this.chat_restriction,
       };
@@ -38,8 +57,26 @@ module.exports = (sequelize, DataTypes) => {
         banned: this.banned,
         banned_reason: this.banned_reason,
         is_admin: this.is_admin,
+        role: this.role,
         chat_restriction: this.chat_restriction,
       };
+    }
+    async getFriends() {
+      const friends = await sequelize.models.Friendship.findAll({
+        where: {
+          [Op.or]: [{ user_id: this.id }, { friend_id: this.id }],
+          pending: false,
+        },
+      });
+      return friends;
+    }
+    async getFriendRequests() {
+      return await sequelize.models.Friendship.findAll({
+        where: {
+          friend_id: this.id,
+          pending: true,
+        },
+      });
     }
   }
   User.init(
@@ -88,6 +125,13 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       is_admin: DataTypes.BOOLEAN,
+      role: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isIn: [["super_admin", "admin", "user"]],
+        },
+      },
       banned: DataTypes.BOOLEAN,
       banned_reason: {
         type: DataTypes.STRING,
@@ -114,7 +158,6 @@ module.exports = (sequelize, DataTypes) => {
           let salt = bcrypt.genSaltSync(10);
           user.password = bcrypt.hashSync(user.password, salt);
         },
-
       },
     }
   );

@@ -11,22 +11,22 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: "user_id" });
     }
-    toJSON(){
-      return{
+    toJSON() {
+      return {
         user_id: this.user_id,
-        link : this.link,
-        unique_id : this.unique_id
-      }
+        link: this.link,
+        uuid: this.uuid,
+      };
     }
-    getUuid(){
-      return this.unique_id;
+    getUuid() {
+      return this.uuid;
     }
   }
   PasswordReset.init(
     {
       user_id: DataTypes.INTEGER,
       link: DataTypes.STRING,
-      unique_id: DataTypes.STRING,
+      uuid: DataTypes.STRING,
     },
     {
       sequelize,
@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeCreate: (PasswordResetRequest) => {
           const uuid = uuidv4();
-          PasswordResetRequest.unique_id = uuid;
+          PasswordResetRequest.uuid = uuid;
           PasswordResetRequest.link = `/password-reset/${uuid}`;
         },
       },

@@ -16,7 +16,7 @@ module.exports = {
         link: {
           type: Sequelize.STRING,
         },
-        unique_id: {
+        uuid: {
           type: Sequelize.STRING,
         },
         createdAt: {
