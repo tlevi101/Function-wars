@@ -1,7 +1,7 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
-// const { Friendship } = require("./friendship");
+// const {Friendship} = require("sequelize.models")
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -16,34 +16,24 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: true,
         },
       });
-      this.belongsTo(models.Report, {
-        foreignKey: {
-          name: "reported_by",
-          allowNull: true,
-        },
-        as: {
-          name: "mySentReport",
-        },
+      this.hasOne(models.Report, {
+        foreignKey:"reported_by",
+        as: "mySentReport",
       });
-      this.belongsTo(models.Report, {
-        foreignKey: {
-          name: "reported",
-          allowNull: true,
-        },
-        as: {
-          name: "myReceivedReport",
-        },
+      this.hasOne(models.Report, {
+        foreignKey: "reported",
+        as: "myReceivedReport",
       });
-      // this.belongsToMany(models.User, {
-      //   through: "Friendships",
-      //   as: "friends",
-      //   foreignKey: "user_id",
-      // });
-      // this.belongsToMany(models.User, {
-      //   through: "Friendships",
-      //   as: "friendOf",
-      //   foreignKey: "friend_id",
-      // });
+      this.belongsToMany(models.User, {
+        through: "Friendships",
+        as: "myFriends",
+        foreignKey: "user_id",
+      });
+      this.belongsToMany(models.User, {
+        through: "Friendships",
+        as: "friendOf",
+        foreignKey:"friend_id",
+      });
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
@@ -71,13 +61,17 @@ module.exports = (sequelize, DataTypes) => {
         chat_restriction: this.chat_restriction,
       };
     }
-    getFriends() {
-      const friendOf =this.friendOf;
-      const friends = this.friends;
-      return friends.array.concat(friendOf);
+    async getFriends() {
+      const friends = await sequelize.models.Friendship.findAll({
+        where: {
+          [Op.or]:[{user_id: this.id}, {friend_id: this.id}],
+          pending: false,
+        },
+      });
+      return friends;
     }
     async getFriendRequests() {
-      return await Friendship.findAll({
+      return await sequelize.models.Friendship.findAll({
         where: {
           friend_id: this.id,
           pending: true,

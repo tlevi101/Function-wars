@@ -24,9 +24,10 @@ app.use(function (err, req, res, next) {
     res.status(400).json({ error: err.errors[0].message });
   } else if (err instanceof Sequelize.ValidationError) {
     res.status(400).json({ error: err.message });
-  } else if (err instanceof Sequelize.DatabaseError) {
-    res.status(400).json({ error: err.message });
-  }
+  } 
+  // else if (err instanceof Sequelize.DatabaseError) {
+  //   res.status(400).json({ error: err.message });
+  // }
   next(err, req, res, next);
 });
 

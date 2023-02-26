@@ -5,21 +5,24 @@ const auth = require("../middlewares/auth");
 const { Op } = require("sequelize");
 
 router.get("/friends", auth,async (req, res) => {
-	const user = req.user;	
+	const {email} = req.user;
+	const user = await User.findOne({ where:{ email: email } });
 	res.status(200).json({ friends: await user.getFriends() });
 });
 
 router.get("/friends/requests", auth,async (req, res) => {
-	const user = req.user;	
+	const {email} = req.user;
+	const user = await User.findOne({ where:{ email: email } });
 	res.status(200).json({ friends: user.getFriendRequests() });
 });
 
 router.put("/friends/requests/accept/:id", auth,async (req, res) => {
-	const user = req.user;
+	const {name} = req.user;
 	const {id} = req.params;
+	const user = await User.findOne({ where:{ name: name } });
 	const friendship = await Friendship.findOne({
 		where: {
-			id: id,
+			user_id: id,
 		}
 	})
 	if(!friendship){
@@ -75,8 +78,12 @@ router.delete("/friends/:id", auth,async (req, res) => {
 });
 
 router.post("/friends/:id", auth,async (req, res) => {
-	const user = req.user;
+	const {name} = req.user;
 	const {id} = req.params;
+	const user = await User.findOne({ where:{ name: name }, });
+	if(user.id === id){
+		return res.status(403).json({message: "You can't add yourself as a friend."})
+	}
 	const friendship = await Friendship.findOne({
 		where: {
 			[Op.or]: [
@@ -96,3 +103,5 @@ router.post("/friends/:id", auth,async (req, res) => {
 	res.status(200).json({message: "Friendship request sent."})
 });
 
+
+module.exports = router;
