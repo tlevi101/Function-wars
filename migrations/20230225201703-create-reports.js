@@ -17,6 +17,7 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       handled: {
         type: Sequelize.BOOLEAN,

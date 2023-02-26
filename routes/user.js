@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { User, Friendship } = require("../models");
+const { User, Friendship, Report } = require("../models");
 const auth = require("../middlewares/auth");
 const { Op } = require("sequelize");
 
@@ -119,4 +119,27 @@ router.post("/friends/:id", auth, async (req, res) => {
   res.status(200).json({ message: "Friendship request sent." });
 });
 
+router.post("/report/:id", auth, async (req, res) => {
+	const { name } = req.user;
+	const { id } = req.params;
+	const { description } = req.body;
+	if(!description)
+		return res.status(400).json({ message: "Description is required." });
+	const user = await User.findOne({ where: { name: name } });
+	if (user.id === id) {
+		return res.status(403).json({ message: "You can't report yourself." });
+	}
+	const reportedUser = await User.findByPk(id);
+	if (!reportedUser) {
+		return res.status(404).json({ message: "User not found." });
+	}
+	const report = await Report.create({
+		reported_by: user.id,
+		reported: id,
+		description: description,
+	});
+	res.status(200).json({ message: "Report sent." });
+});
+
+//TODO: Add a route for blocking other user
 module.exports = router;
