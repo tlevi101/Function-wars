@@ -1,20 +1,33 @@
-<div class="d-flex justify-content-center container">
+<div class="d-flex justify-content-center container-center">
 	<form action="">
 		<div class="form-group mb-1">
-			<label for="email">Email</label>
+			<label class="from-label" for="email">Email</label>
 			<input type="email" class="form-control" id="email" placeholder="Email">
 		</div>
 		<div class="form-group mb-1">
-			<label for="password">Password</label>
+			<label class="from-label" for="password">Password</label>
 			<input type="password" class="form-control" id="password" placeholder="Password">
 		</div>
-		<div class="form-group mb-1 form-check">
-			<input id="remember" name="remember" type="checkbox"  class="form-check-input mb-1">
-			<label for="remember" class="form-check-label">Remember me</label>
+		<div class="d-flex">
+			<div class="form-group form-check">
+				<input id="remember" name="remember" type="checkbox"  class="form-check-input">
+				<label class="from-label" for="remember" class="form-check-label">Remember me</label>
+			</div>
+			<a class="ms-5" routerLink="/forgot-password">Forgot password</a>
 		</div>
-		<div class="d-flex mb-1">
-			<button type="submit" class="me-auto btn btn-primary">Submit</button>
-			<a routerLink="/register"><button class="btn btn-primary">Register</button></a>
+		<div class="d-flex">
+			<div class="container">
+				<div class="row">
+					<a id="register" routerLink="/register"><button class="btn btn-primary">Register</button></a>
+				</div>
+				<div class="row">
+					<a class="" routerLink="/register-guest">Or register as guest</a>
+				</div>
+
+			</div>
+			<div>
+				<button type="submit" class="btn btn-primary">Login</button>
+			</div>
 		</div>
 	</form>
 </div>
