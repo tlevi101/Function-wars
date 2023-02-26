@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.User, { foreignKey: "user_id" });
     }
-    toJSON(){
-      return{
+    toJSON() {
+      return {
         user_id: this.user_id,
-        link : this.link,
-        uuid : this.uuid
-      }
+        link: this.link,
+        uuid: this.uuid,
+      };
     }
-    getUuid(){
+    getUuid() {
       return this.uuid;
     }
   }

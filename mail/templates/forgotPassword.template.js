@@ -1,6 +1,5 @@
-
 const forgotPassword = (user, link) => {
-	return `
+  return `
 		<h1>Dear ${user.name}</h1>
 		<p>
 			As your requested your reset password link has been 
@@ -17,7 +16,7 @@ const forgotPassword = (user, link) => {
 		<a href="${link}">
 			${link}
 		</a>
-	`
-}
+	`;
+};
 
 module.exports = forgotPassword;

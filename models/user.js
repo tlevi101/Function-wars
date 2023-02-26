@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
       this.hasOne(models.Report, {
-        foreignKey:"reported_by",
+        foreignKey: "reported_by",
         as: "mySentReport",
       });
       this.hasOne(models.Report, {
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.User, {
         through: "Friendships",
         as: "friendOf",
-        foreignKey:"friend_id",
+        foreignKey: "friend_id",
       });
     }
     comparePassword(password) {
@@ -64,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
     async getFriends() {
       const friends = await sequelize.models.Friendship.findAll({
         where: {
-          [Op.or]:[{user_id: this.id}, {friend_id: this.id}],
+          [Op.or]: [{ user_id: this.id }, { friend_id: this.id }],
           pending: false,
         },
       });
@@ -129,8 +129,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
         validate: {
-          isIn:[['super_admin', 'admin', 'user']],
-        }
+          isIn: [["super_admin", "admin", "user"]],
+        },
       },
       banned: DataTypes.BOOLEAN,
       banned_reason: {
@@ -158,7 +158,6 @@ module.exports = (sequelize, DataTypes) => {
           let salt = bcrypt.genSaltSync(10);
           user.password = bcrypt.hashSync(user.password, salt);
         },
-
       },
     }
   );

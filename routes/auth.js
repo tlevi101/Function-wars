@@ -4,15 +4,17 @@ const { User, PasswordReset } = require("../models");
 const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
-const forgotPasswordMailer = require('../mail/forgotPasswordMail');
+const forgotPasswordMailer = require("../mail/forgotPasswordMail");
 
 router.post("/register-guest", function (req, res, next) {
   const { name } = req.body;
   if (!name) {
     return res.status(400).json({ message: "Name is required" });
   }
-  if(name.length > 20 || name.length < 3)
-    return res.status(400).json({message: "Name is must be between 3 and 20 characters long"}); 
+  if (name.length > 20 || name.length < 3)
+    return res
+      .status(400)
+      .json({ message: "Name is must be between 3 and 20 characters long" });
   const token = jsonwebtoken.sign(
     { name, guest: true, JWT_createdAt: new Date(), uuid: uuidv4() },
     process.env.JWT_SECRET,
@@ -22,8 +24,6 @@ router.post("/register-guest", function (req, res, next) {
   );
   res.status(201).json({ message: "Guest accepted", jwt: token });
 });
-
-
 
 router.post("/register", async function (req, res, next) {
   const { name, email, password, passwordAgain } = req.body;
@@ -44,8 +44,6 @@ router.post("/register", async function (req, res, next) {
   });
   res.status(201).json({ message: "User created", jwt: token });
 });
-
-
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -70,10 +68,8 @@ router.post("/login", async (req, res) => {
   const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
     algorithm: process.env.JWT_ALGO,
   });
-  return res.status(200).send({ message:'Login successful',jwt: token });
+  return res.status(200).send({ message: "Login successful", jwt: token });
 });
-
-
 
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
@@ -97,16 +93,15 @@ router.post("/forgot-password", async (req, res) => {
     }
   });
   const passwordReset = await user.getPasswordReset();
-  if(process.env.NODE_ENV==="test"){
-    return res.status(201).send({ message: 'Email sent', uuid: passwordReset.uuid });
-  }
-  else{
-    forgotPasswordMailer(user, passwordReset.link)
-    return res.status(201).send({ message: 'Email sent'});
+  if (process.env.NODE_ENV === "test") {
+    return res
+      .status(201)
+      .send({ message: "Email sent", uuid: passwordReset.uuid });
+  } else {
+    forgotPasswordMailer(user, passwordReset.link);
+    return res.status(201).send({ message: "Email sent" });
   }
 });
-
-
 
 router.put("/password-reset/:uuid", async (req, res) => {
   const { uuid } = req.params;

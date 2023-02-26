@@ -14,7 +14,7 @@ app.use(express.json());
 app.use("/", require("./routes/auth"));
 app.use("/admin/", require("./routes/admin"));
 app.use("/user/", require("./routes/user"));
-app.use('*', (req, res) => {
+app.use("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
@@ -24,7 +24,7 @@ app.use(function (err, req, res, next) {
     res.status(400).json({ error: err.errors[0].message });
   } else if (err instanceof Sequelize.ValidationError) {
     res.status(400).json({ error: err.message });
-  } 
+  }
   // else if (err instanceof Sequelize.DatabaseError) {
   //   res.status(400).json({ error: err.message });
   // }
@@ -50,4 +50,3 @@ app.use(async function (err, req, res, next) {
 });
 
 module.exports = app;
-
