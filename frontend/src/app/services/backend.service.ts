@@ -1,7 +1,11 @@
 import { importProvidersFrom, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LoginBodyInterface } from './interfaces/login-body';
-import { RegisterBodyInterface } from './interfaces/register-body';
+import { 
+  RegisterBodyInterface, 
+  LoginBodyInterface,
+  ForgotPasswordBodyInterface,
+  ResetPasswordBodyInterface
+} from '../interfaces/backend-body.interfaces';
 
 @Injectable({
   providedIn: 'root'

@@ -10,6 +10,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { RegisterGuestComponent } from './register-guest/register-guest.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,8 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule,
     AppRoutingModule,
     NgbModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

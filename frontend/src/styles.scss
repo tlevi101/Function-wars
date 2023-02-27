@@ -20,4 +20,19 @@ input:-webkit-autofill:active{
 }
 @import "../node_modules/bootstrap/scss/bootstrap";
 
+.invalid-feedback{
+	display: block;
+}
+.valid-feedback{
+	display: block;
+}
+.container-center {
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	min-width: 50%;
+}
+.container-center form {
+	min-width: 30%;
+}
 // Then add additional custom code here
