@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { BackendService } from '../services/backend.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ValidationService } from '../services/validation.service';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -118,7 +119,6 @@ export class RegisterComponent {
     if(this.passwordAgain?.hasError('notEquivalent')){
       return 'Passwords are not same';
     }
-    this.passwordAgain?.setErrors(null);
     return '';
   }
   getPasswordAgainState() : string{

@@ -24,6 +24,8 @@ export class ValidationService {
           control2.setErrors(control2Errors);
       } else {
         delete control2Errors['notEquivalent'];
+        if(Object.keys(control2Errors).length === 0)
+          control2Errors = null;
         control2.setErrors(control2Errors);
       }
       return null;

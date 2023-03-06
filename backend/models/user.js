@@ -34,6 +34,20 @@ module.exports = (sequelize, DataTypes) => {
         as: "friendOf",
         foreignKey: "friend_id",
       });
+      this.hasMany(models.Field, {
+        foreignKey: "user_id",
+        as: "fields",
+      });
+      this.belongsToMany(models.User, {
+        through: "Blocks",
+        as: "blockedBy",
+        foreignKey: "user_id",
+      });
+      this.belongsToMany(models.User, {
+        through: "Blocks",
+        as: "blocked",
+        foreignKey: "blocked_id",
+      });
     }
     comparePassword(password) {
       return bcrypt.compareSync(password, this.password);
@@ -77,6 +91,15 @@ module.exports = (sequelize, DataTypes) => {
           pending: true,
         },
       });
+    }
+    async getChat(friend) {
+      const friendship = await sequelize.models.Friendship.findOne({
+        where: { user_id: this.id, friend_id: friend.id },
+      });
+      if (friendship) {
+        return friendship.chat;
+      }
+      return null;
     }
   }
   User.init(
