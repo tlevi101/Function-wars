@@ -1,16 +1,22 @@
 <div class="d-flex justify-content-center container-center">
-	<form action="">
-		<div class="form-group mb-1">
+	<form [formGroup]="loginForm" (ngSubmit)="submit()" class="" novalidate>
+		<div class="mb-1">
 			<label class="from-label" for="email">Email</label>
-			<input type="email" class="form-control" id="email" placeholder="Email">
+			<input type="email" class="form-control {{getEmailState()}}" id="email" placeholder="Email" formControlName="email">
+			<div *ngIf="email?.touched" class="invalid-feedback">
+				{{ getEmailError() }}
+			</div>
 		</div>
-		<div class="form-group mb-1">
-			<label class="from-label" for="password">Password</label>
-			<input type="password" class="form-control" id="password" placeholder="Password">
+		<div class="mb-1">
+			<label class="from-label" for="password" autocomplete>Password</label>
+			<input type="password" class="form-control {{getPasswordState()}}" id="password" placeholder="Password" formControlName="password">
+			<div *ngIf="password?.touched" class="invalid-feedback">
+				{{ getPasswordError() }}
+			</div>
 		</div>
 		<div class="d-flex">
-			<div class="form-group form-check">
-				<input id="remember" name="remember" type="checkbox"  class="form-check-input">
+			<div class="form-check me-auto">
+				<input id="remember" name="remember" type="checkbox"  class="form-check-input" formControlName="rememberMe">
 				<label class="from-label" for="remember" class="form-check-label">Remember me</label>
 			</div>
 			<a class="ms-5" routerLink="/forgot-password">Forgot password</a>
@@ -26,7 +32,7 @@
 
 			</div>
 			<div>
-				<button type="submit" class="btn btn-primary">Login</button>
+				<button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid" >Login</button>
 			</div>
 		</div>
 	</form>
