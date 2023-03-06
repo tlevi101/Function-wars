@@ -1,0 +1,38 @@
+// Custom.scss
+// Option A: Include all of Bootstrap
+
+$body-bg: #011627;
+$body-color: #D6DEEB;
+$primary: #82AAFF;
+
+// input
+$input-bg: #1D3B53;
+$input-border-color:#1D3B53;
+$form-check-input-checked-color:          $body-color;
+$form-check-input-checked-bg-color:       $primary;
+// $input-group-addon-bg:   #7FDBCA;
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px $input-bg inset !important;
+	-webkit-text-fill-color: $body-color !important;
+}
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+.invalid-feedback{
+	display: block;
+}
+.valid-feedback{
+	display: block;
+}
+.container-center {
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	min-width: 50%;
+}
+.container-center form {
+	min-width: 30%;
+}
+// Then add additional custom code here

@@ -10,13 +10,13 @@ router.get("/friends", auth, async (req, res) => {
   res.status(200).json({ friends: await user.getFriends() });
 });
 
-router.get("/friends/requests", auth, async (req, res) => {
+router.get("/requests", auth, async (req, res) => {
   const { email } = req.user;
   const user = await User.findOne({ where: { email: email } });
   res.status(200).json({ friends: user.getFriendRequests() });
 });
 
-router.put("/friends/requests/accept/:id", auth, async (req, res) => {
+router.put("/requests/accept/:id", auth, async (req, res) => {
   const { name } = req.user;
   const { id } = req.params;
   const user = await User.findOne({ where: { name: name } });
@@ -39,7 +39,7 @@ router.put("/friends/requests/accept/:id", auth, async (req, res) => {
   res.status(200).json({ message: "Friendship accepted." });
 });
 
-router.delete("/friends/requests/reject/:id", auth, async (req, res) => {
+router.delete("/requests/:id/reject", auth, async (req, res) => {
   const user = req.user;
   const { id } = req.params;
   const friendship = await Friendship.findOne({
@@ -119,7 +119,7 @@ router.post("/friends/:id", auth, async (req, res) => {
   res.status(200).json({ message: "Friendship request sent." });
 });
 
-router.post("/report/:id", auth, async (req, res) => {
+router.post("/users/:id/report", auth, async (req, res) => {
 	const { name } = req.user;
 	const { id } = req.params;
 	const { description } = req.body;
