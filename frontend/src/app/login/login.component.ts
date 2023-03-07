@@ -2,6 +2,7 @@ import { Component, OnInit} from '@angular/core';
 import { BackendService } from '../services/backend.service';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoginBodyInterface } from '../interfaces/backend-body.interfaces';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -31,7 +32,28 @@ export class LoginComponent implements OnInit {
   }
 
   public submit() {
+    const body : LoginBodyInterface = {
+      email: this.email?.value,
+      password: this.password?.value
+    }
+    this.backendService.login(body).subscribe(
+      (res: any) => {
+        if(this.rememberMe?.value)
+          localStorage.setItem('token',res.token);
+        else
+          sessionStorage.setItem('token',res.token);
+        this.router.navigate(['/']);
+      },
+      (err: any) => {
+        if(err.status === 400 || err.status === 404)
+          this.loginForm.setErrors({invalidCredentials: true});
+        if(err.status === 403)
+          this.loginForm.setErrors({userBanned: true});
+        console.log(err);
+      }
+    );
     return;
+
   }
 
 
@@ -46,7 +68,7 @@ export class LoginComponent implements OnInit {
   getEmailState() : string {
     if(!this.email?.touched)
       return '';
-    if(this.email?.invalid)
+    if(this.email?.invalid || this.getLoginError()!=='')
       return 'is-invalid';
     return 'is-valid';
   }
@@ -62,9 +84,16 @@ export class LoginComponent implements OnInit {
   getPasswordState() : string{
     if(!this.password?.touched)
       return '';
-    if(this.password?.invalid)
+    if(this.password?.invalid || this.getLoginError()!=='')
       return 'is-invalid';
     return 'is-valid';
+  }
+  getLoginError() : string{
+    if(this.loginForm.hasError('invalidCredentials'))
+      return 'Email or password is incorrect';
+    if(this.loginForm.hasError('userBanned'))
+      return 'User is banned';
+    return '';
   }
   get email(){
     return this.loginForm.get('email');
@@ -72,5 +101,7 @@ export class LoginComponent implements OnInit {
   get password(){
     return this.loginForm.get('password');
   }
-
+  get rememberMe(){
+    return this.loginForm.get('rememberMe');
+  }
 }

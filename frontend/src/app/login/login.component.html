@@ -13,6 +13,9 @@
 			<div *ngIf="password?.touched" class="invalid-feedback">
 				{{ getPasswordError() }}
 			</div>
+			<div *ngIf="getLoginError() !== ''" class="invalid-feedback">
+				{{ getLoginError() }}
+			</div>
 		</div>
 		<div class="d-flex">
 			<div class="form-check me-auto">
@@ -36,4 +39,5 @@
 			</div>
 		</div>
 	</form>
+
 </div>
