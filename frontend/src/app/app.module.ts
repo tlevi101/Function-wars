@@ -19,7 +19,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     RegisterComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
-    RegisterGuestComponent
+    RegisterGuestComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,7 @@
 import { Component, OnInit} from '@angular/core';
 import { BackendService } from '../services/backend.service';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -10,7 +11,7 @@ export class LoginComponent implements OnInit {
   
   loginForm: FormGroup;
   
-  constructor(private backendService:BackendService, private formBuilder: FormBuilder) {
+  constructor(private backendService:BackendService, private formBuilder: FormBuilder, private router: Router) {
     this.loginForm =  new FormGroup({
       email: new FormControl('',[
         Validators.required,
@@ -25,6 +26,8 @@ export class LoginComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    if(localStorage.getItem('token') || sessionStorage.getItem('token'))
+      this.router.navigate(['/']);
   }
 
   public submit() {

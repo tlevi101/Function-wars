@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { BackendService } from '../services/backend.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ValidationService } from '../services/validation.service';
-
+import { RegisterBodyInterface } from '../interfaces/backend-body.interfaces';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -12,7 +13,10 @@ export class RegisterComponent {
   
   registerForm: FormGroup;
 
-  constructor(private backendService: BackendService, private validationService: ValidationService) {
+  constructor(
+      private backendService: BackendService, 
+      private validationService: ValidationService,
+      private router: Router) {
     this.registerForm = new FormGroup({
       name: new FormControl('',[
           Validators.required,
@@ -32,7 +36,8 @@ export class RegisterComponent {
         Validators.required,
         Validators.minLength(8),
         Validators.maxLength(20)
-      ])
+      ]),
+      rememberMe: new FormControl(false)
     },{
       validators: this.validationService.passwordMatchValidator("password","passwordAgain")
     }
@@ -45,6 +50,30 @@ export class RegisterComponent {
 
 
   public submit() {
+    const body: RegisterBodyInterface = {
+      name: this.name?.value,
+      email: this.email?.value,
+      password: this.password?.value,
+      passwordAgain: this.passwordAgain?.value
+    }
+    this.backendService.register(body).subscribe(
+      (res: any) => {
+        console.log(res);
+        if(this.rememberMe?.value)
+          localStorage.setItem('token', res.jwt);
+        else
+          sessionStorage.setItem('token', res.jwt);
+        this.router.navigate(['/']);
+      },
+      (err: any) => {
+        const {msg}= err.error;
+        if(msg.includes('email') && msg.includes('unique'))
+          this.email?.setErrors({unique: true});
+        if(msg.includes('name') && msg.includes('unique'))
+          this.name?.setErrors({unique: true});
+        console.log(err);
+      }
+    );
     return;
   }
 
@@ -58,6 +87,8 @@ export class RegisterComponent {
       return 'Name must be at least 3 character';
     if(nameControl.hasError('maxlength'))
       return 'Name must be maximum 20 character';
+    if(nameControl.hasError('unique'))
+      return 'Name is already taken';
     return '';
   }
   getNameState() : string {
@@ -78,6 +109,8 @@ export class RegisterComponent {
       return 'Email is required';
     if(emailControl.hasError('email'))
       return 'Email is not valid';
+    if(emailControl.hasError('unique'))
+      return 'Email is already taken';
     return '';
   }
   getEmailState() : string {
@@ -143,5 +176,7 @@ export class RegisterComponent {
   get passwordAgain(){
     return this.registerForm.get('passwordAgain');
   }
-
+  get rememberMe(){
+    return this.registerForm.get('rememberMe');
+  }
 }

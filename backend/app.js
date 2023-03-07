@@ -6,9 +6,11 @@ const { Sequelize } = require("sequelize");
 require("express-async-errors");
 const fs = require("fs").promises;
 const app = express();
+const cors = require('cors');
 
 // parse requests of content-type - application/json
 app.use(express.json());
+app.use(cors());
 
 //routers
 app.use("/", require("./routes/auth"));
@@ -21,9 +23,9 @@ app.use("*", (req, res) => {
 // catch any sequelize validation errors
 app.use(function (err, req, res, next) {
   if (err instanceof Sequelize.UniqueConstraintError) {
-    res.status(400).json({ error: err.errors[0].message });
+    res.status(400).json({ msg: err.errors[0].message });
   } else if (err instanceof Sequelize.ValidationError) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ msg: err.message });
   }
   // else if (err instanceof Sequelize.DatabaseError) {
   //   res.status(400).json({ error: err.message });
