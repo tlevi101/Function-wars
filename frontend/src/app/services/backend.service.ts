@@ -22,4 +22,8 @@ export class BackendService {
   register(body: RegisterBodyInterface) {
     return this.http.post(`${this.url}/register`,body, {headers:this.hr});
   }
+
+  forgotPassword(body: ForgotPasswordBodyInterface) {
+    return this.http.post(`${this.url}/forgot-password`,body, {headers:this.hr});
+  }
 }

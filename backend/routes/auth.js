@@ -72,6 +72,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/forgot-password", async (req, res) => {
+  console.log(req.header('Referer'));
   const { email } = req.body;
   if (!email) {
     return res.status(400).send({ message: "Email required" });
@@ -98,7 +99,7 @@ router.post("/forgot-password", async (req, res) => {
       .status(201)
       .send({ message: "Email sent", uuid: passwordReset.uuid });
   } else {
-    forgotPasswordMailer(user, passwordReset.link);
+    forgotPasswordMailer(user, req.header('Referer') + passwordReset.link);
     return res.status(201).send({ message: "Email sent" });
   }
 });
