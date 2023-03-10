@@ -9,9 +9,8 @@ import { RegisterGuestComponent } from './register-guest/register-guest.componen
 const routes: Routes = [
   { path: 'login', component: LoginComponent},
   { path: 'register', component: RegisterComponent},
-  {path:'forgot-password', component: ForgotPasswordComponent},
-  // TODO: Add reset-password route param
-  { path:'reset-password', component: ResetPasswordComponent},
+  { path:'forgot-password', component: ForgotPasswordComponent},
+  { path:'reset-password/:uuid', component: ResetPasswordComponent},
   { path:'register-guest', component: RegisterGuestComponent}
 ];
 

@@ -26,4 +26,8 @@ export class BackendService {
   forgotPassword(body: ForgotPasswordBodyInterface) {
     return this.http.post(`${this.url}/forgot-password`,body, {headers:this.hr});
   }
+
+  resetPassword(uuid:string,body: ResetPasswordBodyInterface) {
+    return this.http.put(`${this.url}/reset-password/${uuid}`,body, {headers:this.hr});
+  }
 }

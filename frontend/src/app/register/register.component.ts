@@ -45,6 +45,8 @@ export class RegisterComponent {
 }
 
   ngOnInit(): void {
+    if(localStorage.getItem('token') || sessionStorage.getItem('token'))
+      this.router.navigate(['/']);
   }
 
 

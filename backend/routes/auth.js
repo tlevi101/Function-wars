@@ -104,7 +104,7 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
-router.put("/password-reset/:uuid", async (req, res) => {
+router.put("/reset-password/:uuid", async (req, res) => {
   const { uuid } = req.params;
   const passwordReset = await PasswordReset.findOne({
     where: { uuid: uuid },

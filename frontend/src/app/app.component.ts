@@ -10,12 +10,14 @@ export class AppComponent implements OnInit {
   title = 'frontend';
   public authorized = false;
   constructor(private router:Router) { }
+  
   ngOnInit(): void {
     if(localStorage.getItem('token') || sessionStorage.getItem('token'))
       this.authorized = true;
     else{
       this.authorized = false;
-      this.router.navigate(['/login']);
+      if(!window.location.href.includes('reset-password'))
+        this.router.navigate(['/login']);
     }
   }
 }
