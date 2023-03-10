@@ -39,9 +39,9 @@ export class LoginComponent implements OnInit {
     this.backendService.login(body).subscribe(
       (res: any) => {
         if(this.rememberMe?.value)
-          localStorage.setItem('token',res.token);
+          localStorage.setItem('token',res.jwt);
         else
-          sessionStorage.setItem('token',res.token);
+          sessionStorage.setItem('token',res.jwt);
         this.router.navigate(['/']);
       },
       (err: any) => {

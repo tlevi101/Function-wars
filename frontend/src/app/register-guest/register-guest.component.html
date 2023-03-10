@@ -1,8 +1,11 @@
 <div class="d-flex justify-content-center container-center">
-	<form action="">
+	<form [formGroup]="guestForm" (ngSubmit)="submit()">
 		<div class="form-group mb-1">
 			<label class="from-label" for="name">Name</label>
-			<input type="text" class="form-control" id="name" placeholder="Name">
+			<input type="text" class="form-control {{getNameState()}}" id="name" placeholder="Name" formControlName="name">
+			<div *ngIf="name?.touched" class="invalid-feedback">
+				{{ getNameError() }}
+			</div>
 		</div>
 		<div class="d-flex mb-1 justify-content-end">
 			<button type="submit" class="btn btn-primary">Login as guest</button>

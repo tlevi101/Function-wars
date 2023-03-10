@@ -30,4 +30,8 @@ export class BackendService {
   resetPassword(uuid:string,body: ResetPasswordBodyInterface) {
     return this.http.put(`${this.url}/reset-password/${uuid}`,body, {headers:this.hr});
   }
+
+  registerGuest(body: RegisterBodyInterface) {
+    return this.http.post(`${this.url}/register-guest`,body, {headers:this.hr});
+  }
 }
