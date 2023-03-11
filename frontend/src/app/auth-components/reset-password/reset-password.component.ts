@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, ComponentRef, OnInit, ViewContainerRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ResetPasswordBodyInterface } from '../interfaces/backend-body.interfaces';
-import { BackendService } from '../services/backend.service';
-import { ValidationService } from '../services/validation.service';
+import { InfoComponent } from 'src/app/pop-up/info/info.component';
+import { ResetPasswordBodyInterface } from '../../interfaces/backend-body.interfaces';
+import { BackendService } from '../../services/backend.service';
+import { ValidationService } from '../../services/validation.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,10 +14,15 @@ import { ValidationService } from '../services/validation.service';
 export class ResetPasswordComponent implements OnInit {
   
   public resetPasswordForm : FormGroup;
+  public componentRef: ComponentRef<InfoComponent>;
+
   constructor(private router: Router,
               private backendService: BackendService,
               private validationService: ValidationService,
-              private currentRoute: ActivatedRoute) { 
+              private currentRoute: ActivatedRoute,
+              public viewContainerRef: ViewContainerRef,
+          public CFR: ComponentFactoryResolver) { 
+    this.componentRef = this.viewContainerRef.createComponent<InfoComponent>(this.CFR.resolveComponentFactory(InfoComponent));
     this.resetPasswordForm = new FormGroup({
       password: new FormControl('',[
         Validators.required,
@@ -45,8 +51,9 @@ export class ResetPasswordComponent implements OnInit {
     }
     this.backendService.resetPassword(uuid,body).subscribe(
       (res: any) => {
-        //TODO: Show success message
-        this.router.navigate(['/login']);
+        this.componentRef.instance.description = 'Password reset was successful. <br> You can now log in.';
+        this.componentRef.instance.buttonLink = '/login';
+        this.componentRef.instance.buttonText = 'Login';
       },
       (err: any) => {
         console.log(err);

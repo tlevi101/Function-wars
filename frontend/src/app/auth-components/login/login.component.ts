@@ -1,8 +1,8 @@
 import { Component, OnInit} from '@angular/core';
-import { BackendService } from '../services/backend.service';
+import { BackendService } from '../../services/backend.service';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoginBodyInterface } from '../interfaces/backend-body.interfaces';
+import { LoginBodyInterface } from '../../interfaces/backend-body.interfaces';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',

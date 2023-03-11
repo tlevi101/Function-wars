@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, ComponentRef, OnInit, ViewContainerRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ForgotPasswordBodyInterface } from '../interfaces/backend-body.interfaces';
-import { BackendService } from '../services/backend.service';
+import { InfoComponent } from 'src/app/pop-up/info/info.component';
+import { ForgotPasswordBodyInterface } from '../../interfaces/backend-body.interfaces';
+import { BackendService } from '../../services/backend.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,7 +13,13 @@ import { BackendService } from '../services/backend.service';
 export class ForgotPasswordComponent implements OnInit{
   
   public forgotPasswordForm: FormGroup;
-  constructor(private router: Router, private backendService: BackendService) { 
+  public componentRef: ComponentRef<InfoComponent>;
+  constructor(
+          private router: Router,
+          private backendService: BackendService,
+          public viewContainerRef: ViewContainerRef,
+          public CFR: ComponentFactoryResolver) { 
+    this.componentRef = this.viewContainerRef.createComponent<InfoComponent>(this.CFR.resolveComponentFactory(InfoComponent));
     this.forgotPasswordForm = new FormGroup({
       email: new FormControl('',[
         Validators.required,
@@ -27,8 +34,8 @@ export class ForgotPasswordComponent implements OnInit{
     }
     this.backendService.forgotPassword(body).subscribe(
       (response) => {
-        //TODO show success message
-        this.router.navigate(['/login']);
+        this.componentRef.instance.description = 'Email sent';
+        this.componentRef.instance.buttonLink = '/login';
       },
       (err) => {
         if(err.status === 404)

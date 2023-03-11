@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BackendService } from '../services/backend.service';
+import { BackendService } from '../../services/backend.service';
 
 @Component({
   selector: 'app-register-guest',
