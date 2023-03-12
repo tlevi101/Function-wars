@@ -32,13 +32,13 @@ export const myAnimations = [
     state(
       'up',
       style({
-        height: '50px',
+        height: '40px',
       })
     ),
     state(
       'down',
       style({
-        height: '160px',
+        height: '130px',
       })
     ),
     transition('up => down', [animate('0.5s')]),

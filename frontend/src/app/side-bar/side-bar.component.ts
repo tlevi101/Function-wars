@@ -1,6 +1,12 @@
 import { Component } from '@angular/core';
 import { FriendsService } from '../services/friends.service';
 import { myAnimations } from './animations';
+
+interface Friend {
+  id: number;
+  name: string;
+};
+  
 @Component({
   selector: 'app-side-bar',
   animations: myAnimations,
@@ -9,12 +15,15 @@ import { myAnimations } from './animations';
 })
 export class SideBarComponent {
   myFriendsHovered = false;
-  friends = [...Array(20).keys()];
-  friendCurrentState = [...Array(20).keys()].map(() => 'up');
+  friends : Friend[];
+  friendCurrentState: string[];
   constructor(private friendsService: FriendsService) {
+    this.friendCurrentState = [];
+    this.friends = [];
     this.friendsService.getFriends().subscribe((res: any) => {
       this.friends = res.friends;
-      console.log(res);
+      if(this.friends === null) return;
+      this.friendCurrentState = [...Array(this.friends.length).keys()].map(() => 'up');
     });
   }
   myFriendsMouseIn(): void {
