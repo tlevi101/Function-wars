@@ -7,7 +7,9 @@ const { Op } = require("sequelize");
 router.get("/friends", auth, async (req, res) => {
   const { email } = req.user;
   const user = await User.findOne({ where: { email: email } });
-  res.status(200).json({ friends: await user.getFriends() });
+  let friends = await user.getFriends();
+  friends = friends.map((friend) => { return { name: friend.name, id: friend.id } });
+  res.status(200).json({ friends: friends});
 });
 
 router.get("/requests", auth, async (req, res) => {
@@ -29,11 +31,9 @@ router.put("/requests/accept/:id", auth, async (req, res) => {
     return res.status(404).json({ message: "Friendship request not found." });
   }
   if (friendship.friend_id !== user.id) {
-    return res
-      .status(403)
-      .json({
-        message: "You are not the recipient of this friendship request.",
-      });
+    return res.status(403).json({
+      message: "You are not the recipient of this friendship request.",
+    });
   }
   await friendship.update({ pending: false });
   res.status(200).json({ message: "Friendship accepted." });
@@ -51,11 +51,9 @@ router.delete("/requests/:id/reject", auth, async (req, res) => {
     return res.status(404).json({ message: "Friendship request not found." });
   }
   if (friendship.friend_id !== user.id) {
-    return res
-      .status(403)
-      .json({
-        message: "You are not the recipient of this friendship request.",
-      });
+    return res.status(403).json({
+      message: "You are not the recipient of this friendship request.",
+    });
   }
   await friendship.destroy();
   res.status(200).json({ message: "Friendship rejected." });
@@ -81,11 +79,9 @@ router.delete("/friends/:id", auth, async (req, res) => {
       .json({ message: "You can't delete a pending friendship." });
   }
   if (friendship.friend_id !== user.id && friendship.user_id !== user.id) {
-    return res
-      .status(403)
-      .json({
-        message: "You are not the recipient of this friendship request.",
-      });
+    return res.status(403).json({
+      message: "You are not the recipient of this friendship request.",
+    });
   }
   await friendship.destroy();
   res.status(200).json({ message: "Friendship deleted." });
@@ -120,25 +116,25 @@ router.post("/friends/:id", auth, async (req, res) => {
 });
 
 router.post("/users/:id/report", auth, async (req, res) => {
-	const { name } = req.user;
-	const { id } = req.params;
-	const { description } = req.body;
-	if(!description)
-		return res.status(400).json({ message: "Description is required." });
-	const user = await User.findOne({ where: { name: name } });
-	if (user.id === id) {
-		return res.status(403).json({ message: "You can't report yourself." });
-	}
-	const reportedUser = await User.findByPk(id);
-	if (!reportedUser) {
-		return res.status(404).json({ message: "User not found." });
-	}
-	const report = await Report.create({
-		reported_by: user.id,
-		reported: id,
-		description: description,
-	});
-	res.status(200).json({ message: "Report sent." });
+  const { name } = req.user;
+  const { id } = req.params;
+  const { description } = req.body;
+  if (!description)
+    return res.status(400).json({ message: "Description is required." });
+  const user = await User.findOne({ where: { name: name } });
+  if (user.id === id) {
+    return res.status(403).json({ message: "You can't report yourself." });
+  }
+  const reportedUser = await User.findByPk(id);
+  if (!reportedUser) {
+    return res.status(404).json({ message: "User not found." });
+  }
+  const report = await Report.create({
+    reported_by: user.id,
+    reported: id,
+    description: description,
+  });
+  res.status(200).json({ message: "Report sent." });
 });
 
 //TODO: Add a route for blocking other user

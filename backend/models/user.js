@@ -76,12 +76,20 @@ module.exports = (sequelize, DataTypes) => {
       };
     }
     async getFriends() {
-      const friends = await sequelize.models.Friendship.findAll({
+      const friendShips = await sequelize.models.Friendship.findAll({
         where: {
           [Op.or]: [{ user_id: this.id }, { friend_id: this.id }],
           pending: false,
         },
       });
+      let friends=[];
+      for (const friendShip of friendShips) {
+        if(friendShip.user_id===this.id){
+          friends.push(await sequelize.models.User.findByPk(friendShip.friend_id));
+        }else{
+          friends.push(await sequelize.models.User.findByPk(friendShip.user_id));
+        }
+      }
       return friends;
     }
     async getFriendRequests() {

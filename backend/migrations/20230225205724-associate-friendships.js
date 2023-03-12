@@ -22,7 +22,7 @@ module.exports = {
         references: {
           model: "Users",
           key: "id",
-        }
+        },
       },
       friend_id: {
         type: Sequelize.INTEGER,
@@ -30,7 +30,7 @@ module.exports = {
         references: {
           model: "Users",
           key: "id",
-        }
+        },
       },
       pending: {
         type: Sequelize.BOOLEAN,
