@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FriendsService } from '../services/friends.service';
 import { myAnimations } from './animations';
 @Component({
   selector: 'app-side-bar',
@@ -10,6 +11,12 @@ export class SideBarComponent {
   myFriendsHovered = false;
   friends = [...Array(20).keys()];
   friendCurrentState = [...Array(20).keys()].map(() => 'up');
+  constructor(private friendsService: FriendsService) {
+    this.friendsService.getFriends().subscribe((res: any) => {
+      this.friends = res.friends;
+      console.log(res);
+    });
+  }
   myFriendsMouseIn(): void {
     this.myFriendsHovered = true;
   }

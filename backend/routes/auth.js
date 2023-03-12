@@ -5,6 +5,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 const forgotPasswordMailer = require("../mail/forgotPasswordMail");
+const auth = require("../middlewares/auth");
 
 router.post("/register-guest", function (req, res, next) {
   const { name } = req.body;
@@ -134,4 +135,7 @@ router.put("/reset-password/:uuid", async (req, res) => {
   res.status(200).send({ message: "Password updated" });
 });
 
+router.get("/validate-token", auth, (req, res) => {
+  res.status(200).send({ message: "Token valid" });
+});
 module.exports = router;
