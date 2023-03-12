@@ -5,6 +5,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 const forgotPasswordMailer = require("../mail/forgotPasswordMail");
+const auth = require("../middlewares/auth");
 
 router.post("/register-guest", function (req, res, next) {
   const { name } = req.body;
@@ -72,6 +73,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/forgot-password", async (req, res) => {
+  console.log(req.header('Referer'));
   const { email } = req.body;
   if (!email) {
     return res.status(400).send({ message: "Email required" });
@@ -98,12 +100,12 @@ router.post("/forgot-password", async (req, res) => {
       .status(201)
       .send({ message: "Email sent", uuid: passwordReset.uuid });
   } else {
-    forgotPasswordMailer(user, passwordReset.link);
+    forgotPasswordMailer(user, req.header('Referer') + passwordReset.link);
     return res.status(201).send({ message: "Email sent" });
   }
 });
 
-router.put("/password-reset/:uuid", async (req, res) => {
+router.put("/reset-password/:uuid", async (req, res) => {
   const { uuid } = req.params;
   const passwordReset = await PasswordReset.findOne({
     where: { uuid: uuid },
@@ -133,4 +135,7 @@ router.put("/password-reset/:uuid", async (req, res) => {
   res.status(200).send({ message: "Password updated" });
 });
 
+router.get("/validate-token", auth, (req, res) => {
+  res.status(200).send({ message: "Token valid" });
+});
 module.exports = router;

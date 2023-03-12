@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         beforeCreate: (PasswordResetRequest) => {
           const uuid = uuidv4();
           PasswordResetRequest.uuid = uuid;
-          PasswordResetRequest.link = `/password-reset/${uuid}`;
+          PasswordResetRequest.link = `reset-password/${uuid}`;
         },
       },
     }

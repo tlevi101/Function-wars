@@ -18,6 +18,9 @@ input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px $input-bg inset !important;
 	-webkit-text-fill-color: $body-color !important;
 }
+$offcanvas-bg-color: #00294b;
+$offcanvas-horizontal-width: 300px;
+$offcanvas-backdrop-bg: #ffffff00;
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 .invalid-feedback{
