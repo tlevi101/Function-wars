@@ -4,25 +4,25 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   title = 'frontend';
   public authorized = false;
-  constructor(private router:Router) { }
-  
+  constructor(private router: Router) {}
+
   ngOnInit(): void {
-    if(localStorage.getItem('token') || sessionStorage.getItem('token'))
+    if (localStorage.getItem('token') || sessionStorage.getItem('token'))
       this.authorized = true;
-    else{
+    else {
       this.authorized = false;
-      if(!window.location.href.includes('reset-password'))
+      if (!window.location.href.includes('reset-password'))
         this.router.navigate(['/login']);
     }
   }
 
-  get isAuthorized() : boolean | null {
-    if(localStorage.getItem('token') || sessionStorage.getItem('token'))
+  get isAuthorized(): boolean | null {
+    if (localStorage.getItem('token') || sessionStorage.getItem('token'))
       return true;
     return false;
   }

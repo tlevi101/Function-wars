@@ -40,6 +40,6 @@ import { SideBarComponent } from './side-bar/side-bar.component';
     BrowserAnimationsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -7,15 +7,15 @@ import { ResetPasswordComponent } from './auth-components/reset-password/reset-p
 import { RegisterGuestComponent } from './auth-components/register-guest/register-guest.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent},
-  { path: 'register', component: RegisterComponent},
-  { path:'forgot-password', component: ForgotPasswordComponent},
-  { path:'reset-password/:uuid', component: ResetPasswordComponent},
-  { path:'register-guest', component: RegisterGuestComponent}
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password/:uuid', component: ResetPasswordComponent },
+  { path: 'register-guest', component: RegisterGuestComponent },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

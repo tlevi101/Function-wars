@@ -1,33 +1,30 @@
-import { AfterViewInit, Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { myAnimations } from './animations';
 @Component({
   selector: 'app-side-bar',
   animations: myAnimations,
   templateUrl: './side-bar.component.html',
-  styleUrls: ['./side-bar.component.scss']
+  styleUrls: ['./side-bar.component.scss'],
 })
 export class SideBarComponent {
-
-  myFriendsHovered= false;
-  friends =  [...Array(20).keys()];
+  myFriendsHovered = false;
+  friends = [...Array(20).keys()];
   friendCurrentState = [...Array(20).keys()].map(() => 'up');
-  constructor() { }
-  myFriendsMouseIn(): void{
+  myFriendsMouseIn(): void {
     this.myFriendsHovered = true;
   }
-  myFriendsMouseLeave(){
+  myFriendsMouseLeave() {
     this.myFriendsHovered = false;
   }
-  get slideDirection() : string {
+  get slideDirection(): string {
     return this.myFriendsHovered ? 'left' : 'right';
   }
-  get friendSlideDirection() : string {
+  get friendSlideDirection(): string {
     return this.myFriendsHovered ? 'down' : 'up';
   }
-  friendClicked(index : number){
-    this.friendCurrentState[index] === 'up' ? 
-      this.friendCurrentState[index] = 'down' : 
-      this.friendCurrentState[index] = 'up';
+  friendClicked(index: number) {
+    this.friendCurrentState[index] === 'up'
+      ? (this.friendCurrentState[index] = 'down')
+      : (this.friendCurrentState[index] = 'up');
   }
-
 }
