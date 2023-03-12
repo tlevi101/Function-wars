@@ -20,4 +20,10 @@ export class AppComponent implements OnInit {
         this.router.navigate(['/login']);
     }
   }
+
+  get isAuthorized() : boolean | null {
+    if(localStorage.getItem('token') || sessionStorage.getItem('token'))
+      return true;
+    return false;
+  }
 }

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +14,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { InfoComponent } from './pop-up/info/info.component';
 import { ConfirmComponent } from './pop-up/confirm/confirm.component';
+import { NavBarComponent } from './nav-bar/nav-bar.component';
+import { SideBarComponent } from './side-bar/side-bar.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,8 @@ import { ConfirmComponent } from './pop-up/confirm/confirm.component';
     RegisterGuestComponent,
     InfoComponent,
     ConfirmComponent,
+    NavBarComponent,
+    SideBarComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,7 +36,8 @@ import { ConfirmComponent } from './pop-up/confirm/confirm.component';
     AppRoutingModule,
     NgbModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

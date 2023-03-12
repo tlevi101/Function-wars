@@ -1,2 +1,3 @@
 <router-outlet></router-outlet>
-<p *ngIf="authorized">Home</p>
+<app-nav-bar *ngIf="isAuthorized"></app-nav-bar>
+<app-side-bar *ngIf="isAuthorized"></app-side-bar>
