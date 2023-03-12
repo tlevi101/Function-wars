@@ -1,4 +1,5 @@
 "use strict";
+const { faker } = require('@faker-js/faker');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -11,6 +12,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
+    
   },
 
   async down(queryInterface, Sequelize) {
