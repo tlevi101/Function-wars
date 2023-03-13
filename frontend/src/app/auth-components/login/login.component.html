@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-center container-center">
-	<form [formGroup]="loginForm" (ngSubmit)="submit()" class="" novalidate>
+	<form [formGroup]="loginForm" (ngSubmit)="submit()" (keydown)="keyDownFunction($event)" class="" novalidate>
 		<div class="mb-1">
 			<label class="from-label" for="email">Email</label>
 			<input type="email" class="form-control {{getEmailState()}}" id="email" placeholder="Email" formControlName="email">

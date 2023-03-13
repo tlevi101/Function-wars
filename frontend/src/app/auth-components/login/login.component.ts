@@ -26,7 +26,11 @@ export class LoginComponent implements OnInit {
     if (localStorage.getItem('token') || sessionStorage.getItem('token'))
       this.router.navigate(['/']);
   }
-
+  public keyDownFunction(event: any) {
+    if (event.keyCode === 13) {
+      this.submit();
+    }
+  }
   public submit() {
     const body: LoginBodyInterface = {
       email: this.email?.value,

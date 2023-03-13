@@ -60,7 +60,11 @@ router.delete("/requests/:id/reject", auth, async (req, res) => {
 });
 
 router.delete("/friends/:id", auth, async (req, res) => {
-  const user = req.user;
+  const userJWT = req.user;
+  const user = await User.findOne({ where: { email: userJWT.email } });
+  if(!user){
+    return res.status(404).json({ message: "User not found." });
+  }
   const { id } = req.params;
   const friendship = await Friendship.findOne({
     where: {

@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     toJSONForJWT() {
       return {
+        id: this.id,
         name: this.name,
         email: this.email,
         banned: this.banned,

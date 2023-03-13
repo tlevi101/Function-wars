@@ -135,7 +135,12 @@ router.put("/reset-password/:uuid", async (req, res) => {
   res.status(200).send({ message: "Password updated" });
 });
 
-router.get("/validate-token", auth, (req, res) => {
+router.get("/validate-token", auth, async (req, res) => {
+  const { email } = req.user;
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return res.status(404).send({ message: "Incorrect email" });
+  }
   res.status(200).send({ message: "Token valid" });
 });
 module.exports = router;

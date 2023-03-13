@@ -27,7 +27,6 @@ module.exports = {
       let users = [];
       for (let i = 0; i < userCount; i++) {
         let userName= faker.internet.userName();
-        console.log(userName.length);
         while(userName.length<3 || userName.length>20){
           userName= faker.internet.userName();
         }
@@ -38,10 +37,8 @@ module.exports = {
         });
         users.push(user);
       }
-      console.log('admin');
       for (let i = 0; i < adminCount; i++) {
         let userName= faker.internet.userName();
-        console.log(userName.length);
         while(userName.length<3 || userName.length>20){
           userName= faker.internet.userName();
         }
@@ -50,6 +47,7 @@ module.exports = {
           email: `admin${i}@functionWars.com`,
           password: "password",
           is_admin: true,
+          role: "admin",
         });
       }
       console.log('friendship');

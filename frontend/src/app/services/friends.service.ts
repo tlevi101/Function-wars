@@ -15,9 +15,15 @@ export class FriendsService {
     return this.http.get(`${this.url}/user/friends`, { headers: this.hr });
   }
 
+  deleteFriend(friendId: number) {
+    this.checkToken();
+    return this.http.delete(`${this.url}/user/friends/${friendId}`, { headers: this.hr });
+  }
+
   checkToken() {
     this.http.get(`${this.url}/validate-token`, { headers: this.hr }).subscribe(
-      (res: any) => {},
+      (res: any) => {
+      },
       (err: any) => {
         console.log(err);
         localStorage.removeItem('token');

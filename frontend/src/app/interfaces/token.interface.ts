@@ -1,4 +1,5 @@
 export interface DecodedTokenInterface {
+  id: number;
   name: string;
   email: string;
   banned: boolean;
