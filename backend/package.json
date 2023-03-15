@@ -9,7 +9,7 @@
     "db:fresh": "npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all",
     "db:fresh:last": " npx sequelize db:migrate:undo && npx sequelize db:migrate && npx sequelize db:seed:all",
     "db:test": "npx sequelize db:migrate:undo:all --env test && npx sequelize db:migrate --env test && npx sequelize db:seed:all --env test",
-    "log:clear": "rm -rf logs/*.log",
+    "log:clear": "rm -rf logs/*.json",
     "prettier": "npx prettier --write \"**/*.{js,json}\"",
     "test": "npm run db:test && npx jest --watchAll"
   },

@@ -141,5 +141,22 @@ router.post("/users/:id/report", auth, async (req, res) => {
   res.status(200).json({ message: "Report sent." });
 });
 
-//TODO: Add a route for blocking other user
+router.post("/users/:id/block", auth, async (req, res) => {
+  const { email } = req.user;
+  const { id } = req.params;
+  const user = await User.findOne({ where: { email: email } });
+  if(!user){
+    return res.status(404).json({ message: "User not found." });
+  }
+  const blockedUser = await User.findByPk(id);
+  if (!blockedUser) {
+    return res.status(404).json({ message: "Blocked user not found." });
+  }
+  if (user.id === id) {
+    return res.status(403).json({ message: "You can't block yourself." });
+  }
+  await user.addBlocked(blockedUser);
+  res.status(200).json({ message: "User blocked." });
+});
+
 module.exports = router;

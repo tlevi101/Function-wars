@@ -15,7 +15,7 @@ app.use(cors());
 //routers
 app.use("/", require("./routes/auth"));
 app.use("/admin/", require("./routes/admin"));
-app.use("/user/", require("./routes/user"));
+app.use("/", require("./routes/user"));
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
@@ -38,16 +38,29 @@ app.use(async function (err, req, res, next) {
   if (res.headersSent) {
     return next(err);
   }
-  await fs.appendFile(
-    `logs/${date.format(new Date(), "YYYY. MM. DD")}.log`,
-    [
-      `[${date.format(new Date(), "HH:mm:ss")}]\n`,
-      "Name: " + err.name,
-      "Message: " + err.message,
-      "Stack:\n" + err.stack,
-    ].join("\n") + "\n\n"
-  );
-  // render the error page
+  const time = date.format(new Date(), "HH:mm:ss");
+  const error= {
+    [time.toString()]: {
+    name: err.name,
+    message: err.message,
+    stack: err.stack.split('\n'),
+    req:{
+      body: req.body,
+      params: req.params,
+      headers: req.headers,
+      url: req.url
+    }
+  }
+};
+  try{
+    const log = await fs.readFile(`logs/${date.format(new Date(), "YYYY. MM. DD")}.json`, "utf8");
+    const json = JSON.parse(log);
+    json.push(error);
+    await fs.writeFile(`logs/${date.format(new Date(), "YYYY. MM. DD")}.json`, JSON.stringify(json));
+  }
+  catch(e){
+    await fs.writeFile(`logs/${date.format(new Date(), "YYYY. MM. DD")}.json`, JSON.stringify([error]));
+  }
   res.status(err.status || 500).json({ error: err.message });
 });
 
