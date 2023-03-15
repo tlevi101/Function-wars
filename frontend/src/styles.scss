@@ -39,3 +39,25 @@ $offcanvas-backdrop-bg: #ffffff00;
 	min-width: 30%;
 }
 // Then add additional custom code here
+::-webkit-scrollbar {
+	width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+	background: none;
+	padding: 2px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+	background: $primary;
+	border-radius: 10px;
+	margin-right: 2px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+	background: $primary;
+  }
+  

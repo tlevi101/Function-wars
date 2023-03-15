@@ -16,6 +16,7 @@ import { InfoComponent } from './pop-up/info/info.component';
 import { ConfirmComponent } from './pop-up/confirm/confirm.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { SideBarComponent } from './side-bar/side-bar.component';
+import { FriendChatComponent } from './chats/friend-chat/friend-chat.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { SideBarComponent } from './side-bar/side-bar.component';
     ConfirmComponent,
     NavBarComponent,
     SideBarComponent,
+    FriendChatComponent,
   ],
   imports: [
     BrowserModule,

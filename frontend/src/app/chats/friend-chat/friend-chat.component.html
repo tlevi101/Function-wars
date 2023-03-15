@@ -1,0 +1,15 @@
+<div class="position-absolute bottom-0 end chat-window">
+		<div class="chat-header d-flex">
+			<h2 class="text-center me-auto">Chat</h2>
+			<button type="button" class="btn-close btn-close-white"></button>
+
+		</div>
+		<div class="chat-messages" >
+			<div class="chat-message {{math.floor(math.random() * 2) ===1 ? 'from-me' : 'from-other'}}" *ngFor="let i of [].constructor(20)" >
+					<p>asd</p>
+			</div>
+		</div>
+		<form>
+			<input type="text" class="form-control" placeholder="Type your message here...">
+		</form>
+</div>
