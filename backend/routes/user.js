@@ -12,19 +12,31 @@ router.get("/friends", auth, async (req, res) => {
   res.status(200).json({ friends: friends});
 });
 
-router.get("/requests", auth, async (req, res) => {
+router.get("/friends/requests", auth, async (req, res) => {
   const { email } = req.user;
   const user = await User.findOne({ where: { email: email } });
-  res.status(200).json({ friends: user.getFriendRequests() });
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+  let requests = await user.getFriendRequests();
+  requests = requests.map((request) => { return { id: request.id, from:{ id:request.from.id, name:request.from.name} } });
+  res.status(200).json({ requests: requests});
 });
 
-router.put("/requests/accept/:id", auth, async (req, res) => {
-  const { name } = req.user;
+
+
+router.put("/friends/requests/:id/accept", auth, async (req, res) => {
+  const { email } = req.user;
   const { id } = req.params;
-  const user = await User.findOne({ where: { name: name } });
+  console.log(email);
+  console.log(id);
+  const user = await User.findOne({ where: { email: email } });
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
   const friendship = await Friendship.findOne({
     where: {
-      user_id: id,
+      id: id,
     },
   });
   if (!friendship) {
@@ -39,9 +51,13 @@ router.put("/requests/accept/:id", auth, async (req, res) => {
   res.status(200).json({ message: "Friendship accepted." });
 });
 
-router.delete("/requests/:id/reject", auth, async (req, res) => {
-  const user = req.user;
+router.delete("/friends/requests/:id/reject", auth, async (req, res) => {
+  const {email} = req.user;
   const { id } = req.params;
+  const user = await User.findOne({ where: { email: email } });
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
   const friendship = await Friendship.findOne({
     where: {
       id: id,

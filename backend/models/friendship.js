@@ -12,6 +12,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "friendship_id",
         as: "chat",
       });
+      this.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: 'User',
+        onDelete: 'CASCADE'
+
+      });
+      this.belongsTo(models.User, {
+        foreignKey: "friend_id",
+        as: 'Friend',
+        onDelete: 'CASCADE'
+      });
     }
   }
   Friendship.init(

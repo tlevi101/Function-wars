@@ -23,7 +23,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     try {
       const adminCount = faker.datatype.number({ min: 2, max: 3 });
-      const userCount = faker.datatype.number({ min: 20, max: 30 });
+      const userCount = faker.datatype.number({ min: 30, max: 50 });
       let users = [];
       for (let i = 0; i < userCount; i++) {
         let userName= faker.internet.userName();
@@ -50,21 +50,16 @@ module.exports = {
           role: "admin",
         });
       }
-      console.log('friendship');
       for (const user of users) {
-        const friendCount = faker.datatype.number({ min: 3, max: 7 });
+        const friendCount = faker.datatype.number({ min: 20, max: 30 });
+        let otherUsers = users.filter((u) => u.id !== user.id);
         for (let i = 0; i < friendCount; i++) {
-          let friend_id = faker.helpers.arrayElement(users).id;
-            while (
-            friend_id === user.id ||
-            await findFriendship(user.id, friend_id) !== null
-          ) {
-            friend_id = faker.helpers.arrayElement(users).id;
-          }
+          let friend_id = faker.helpers.arrayElement(otherUsers).id;
+          otherUsers = otherUsers.filter((u) => u.id !== friend_id);
           const newFriendship = await Friendship.create({
             user_id: user.id,
             friend_id: friend_id,
-            pending: false,
+            pending: faker.datatype.boolean(),
           });
         }
       }

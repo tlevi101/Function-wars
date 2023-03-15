@@ -18,6 +18,10 @@ interface SelectedFriend{
   index: number;
   action: Actions;
 }
+interface FriendRequest{
+  id: number;
+  from: Friend;
+}
 @Component({
   selector: 'app-side-bar',
   animations: myAnimations,
@@ -30,16 +34,30 @@ export class SideBarComponent {
   myFriendsHovered = false;
   friends : Friend[];
   friendCurrentState: string[];
+  friendRequests : FriendRequest[];
   selectedFriend: SelectedFriend;
+  activeTitle = 'Friends';
   constructor(private friendsService: FriendsService, private usersService: UsersService) {
     this.friendCurrentState = [];
     this.friends = [];
+    this.friendRequests = [];
     this.selectedFriend = {friend: {id: 0, name: ''}, index: 0, action: Actions.Undefine};
     this.friendsService.getFriends().subscribe((res: any) => {
       this.friends = res.friends;
       if(this.friends === null) return;
       this.friendCurrentState = [...Array(this.friends.length).keys()].map(() => 'up');
+    },
+      (err: any) => {
+        console.log(err);
+        //TODO Create an error message component
     });
+    this.friendsService.getFriendRequests().subscribe((res: any) => {
+      this.friendRequests = res.requests;
+    },
+    (err: any) => {
+      console.log(err);
+      //TODO Create an error message component
+  });
   }
   myFriendsMouseIn(): void {
     this.myFriendsHovered = true;
@@ -95,12 +113,41 @@ export class SideBarComponent {
       },
     );
   }
+  changeMenuPoint(event: any) {
+    this.activeTitle = event.target.innerText;
+  }
+  myStatus(title: string): string {
+    return this.activeTitle === title ? 'active' : '';
+  }
 
+  accept(friendRequest: FriendRequest, index: number) {
+    this.friendsService.acceptFriendRequest(friendRequest.id).subscribe(
+      (res: any) => {
+        this.friendRequests = this.friendRequests.filter((f) => f.id !== friendRequest.id);
+        this.friends.push(friendRequest.from);
+        this.friendCurrentState.push('up');
+      },
+      (err: any) => {
+        console.log(err);
+        //TODO Create an error message component
+      }
+    );
+  }
+  reject(friendRequest: FriendRequest, index: number) {
+    this.friendsService.rejectFriendRequest(friendRequest.id).subscribe(
+      (res: any) => {
+        this.friendRequests = this.friendRequests.filter((f) => f.id !== friendRequest.id);
+      },
+      (err: any) => {
+        console.log(err);
+        //TODO Create an error message component
+      }
+    );
+  }
   get slideDirection(): string {
     return this.myFriendsHovered ? 'left' : 'right';
   }
   get friendSlideDirection(): string {
     return this.myFriendsHovered ? 'down' : 'up';
   }
-
 }

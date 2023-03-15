@@ -19,4 +19,16 @@ export class FriendsService {
   deleteFriend(friendId: number) {
     return this.http.delete(`${this.url}/${friendId}`, { headers: this.hr });
   }
+
+  getFriendRequests() {
+    return this.http.get(`${this.url}/requests`, { headers: this.hr });
+  }
+
+  acceptFriendRequest(friendId: number) {
+    return this.http.put(`${this.url}/requests/${friendId}/accept`, {}, { headers: this.hr });
+  }
+
+  rejectFriendRequest(friendId: number) {
+    return this.http.delete(`${this.url}/requests/${friendId}/reject`, { headers: this.hr });
+  }
 }

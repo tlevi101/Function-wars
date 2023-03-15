@@ -82,24 +82,60 @@ module.exports = (sequelize, DataTypes) => {
           [Op.or]: [{ user_id: this.id }, { friend_id: this.id }],
           pending: false,
         },
+        attributes: [],
+        include:[
+          {
+            model: sequelize.models.User,
+            as: "User",
+            attributes: {exclude: ["password"]},
+            where:{
+              banned: false,
+            }
+          },
+          {
+            model: sequelize.models.User,
+            as: "Friend",
+            attributes: {exclude: ["password"]},
+            where:{
+              banned: false,
+            }
+          }
+        ]
       });
-      let friends=[];
-      for (const friendShip of friendShips) {
-        if(friendShip.user_id===this.id){
-          friends.push(await sequelize.models.User.findByPk(friendShip.friend_id));
+      let friends= [];
+      friendShips.forEach(friendship => {
+        if(friendship.User.id === this.id){
+          friends.push(friendship.Friend);
         }else{
-          friends.push(await sequelize.models.User.findByPk(friendShip.user_id));
+          friends.push(friendship.User);
         }
-      }
+      });
       return friends;
     }
+
     async getFriendRequests() {
-      return await sequelize.models.Friendship.findAll({
+      const requests =  await sequelize.models.Friendship.findAll({
         where: {
           friend_id: this.id,
           pending: true,
         },
+        include: [
+          {
+            model: sequelize.models.User,
+            as: "User",
+            attributes: {exclude: ["password"]},
+            where:{
+              banned: false
+            }
+          }
+        ],
       });
+      let requestsArray = [];
+      requests.forEach(request => {
+        let obj = {id:request.id,from:request.User.dataValues};
+        requestsArray.push(obj);
+      });
+      return requestsArray;
     }
     async getChat(friend) {
       const friendship = await sequelize.models.Friendship.findOne({

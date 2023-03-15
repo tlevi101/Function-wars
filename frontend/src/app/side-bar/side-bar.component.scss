@@ -16,16 +16,45 @@
 }
 
 .container{
-	margin-bottom: 10px;
 	background-color: #003764;
+	margin-bottom: 10px;
 	border-radius: 10px;
 	height: 40px;
 	overflow: hidden;
+}
+.container-request{
+	background-color: #003764;
+	margin-bottom: 10px;
+	border-radius: 10px;
+	padding: 10px;
 }
 .d-flex > button {
 	margin: 5px;
 }
 h6{
-	text-align: center;
 	margin-top: 12px;
+}
+.container-request > h6{
+	text-align: center;
+	margin-top: 0px;
+}
+.offcanvas-title{
+	margin-top:10px;
+	height: 40px;
+	margin-bottom: 0px;
+}
+
+.offcanvas-header{
+	background-color: #003764;
+	padding-left: 16px;
+	height: 72px;
+}
+
+.active{
+	margin-top: 1px;
+	background-color: #00294b;
+	padding: 10px;
+	height: 150%;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
 }
