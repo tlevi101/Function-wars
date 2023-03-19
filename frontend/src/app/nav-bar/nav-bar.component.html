@@ -5,10 +5,16 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-			<div class="navbar-nav d-flex">
-					<a class="nav-link active" aria-current="page" href="#">Home</a>
-					<a class="nav-link" href="#">My fields</a>
+			<div *ngIf="user?.is_admin" class="navbar-nav d-flex">
+					<a class="nav-link active" aria-current="page" [routerLink]="['/admin/users']">Users</a>
+					<a class="nav-link" href="#">Reports</a>
+					<a class="nav-link" href="#">Fields</a>
+
 			</div>
+			<div *ngIf="!user?.is_admin" class="navbar-nav d-flex">
+				<a class="nav-link active" aria-current="page" [routerLink]="['/']">Home</a>
+				<a class="nav-link" href="#">My fields</a>
+		</div>
 		</div>
 		<label class="mt-3 me-2"><p class="text-center text-primary"><strong>{{name}}</strong></p></label>
 		<button type="button" class="btn btn-primary btn-sm" (click)="logout()">Log out</button>

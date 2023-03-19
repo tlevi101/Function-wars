@@ -21,7 +21,36 @@ input:-webkit-autofill:active{
 $offcanvas-bg-color: #00294b;
 $offcanvas-horizontal-width: 300px;
 $offcanvas-backdrop-bg: #ffffff00;
+
+$pagination-color:                  $body-color;
+$pagination-bg:                     #003764;
+$pagination-border-color:           #000000;
+
+$pagination-focus-color:            $body-color;
+$pagination-focus-bg:               #80A4C2;
+$pagination-focus-box-shadow:       0;
+$pagination-focus-outline:          0;
+
+$pagination-hover-color:            $body-color;
+$pagination-hover-bg:               #80A4C2;
+$pagination-hover-border-color:     black;
+
+$pagination-active-color:           $body-color;
+$pagination-active-bg:              #7e57c2;
+$pagination-active-border-color:    black;
+
+$pagination-disabled-color:			$body-color;
+$pagination-disabled-bg:			#7e57c228;
+$pagination-disabled-border-color:  #000000;
+
+$form-check-input-bg: white;
+$form-check-input-checked-bg-color: #0051ff;
+
+$modal-content-bg:                  #00294b;
+$modal-content-border-width:        0px;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
+@import "~bootstrap-icons/font/bootstrap-icons.css";
 
 .invalid-feedback{
 	display: block;
@@ -60,4 +89,3 @@ $offcanvas-backdrop-bg: #ffffff00;
   ::-webkit-scrollbar-thumb:hover {
 	background: $primary;
   }
-  

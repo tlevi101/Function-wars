@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import jwt_decode from 'jwt-decode';
+import { DecodedTokenInterface } from './interfaces/token.interface';
 
 @Component({
   selector: 'app-root',
@@ -7,13 +9,22 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'frontend';
+  title = 'Function Wars';
   public authorized = false;
-  constructor(private router: Router) {}
+  user: DecodedTokenInterface | undefined;
+
+  constructor(private router: Router) {
+    const token =
+      localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      this.user = this.getDecodedAccessToken(token);
+    }
+  }
 
   ngOnInit(): void {
-    if (localStorage.getItem('token') || sessionStorage.getItem('token'))
-      this.authorized = true;
+    const token =
+      localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) this.authorized = true;
     else {
       this.authorized = false;
       if (!window.location.href.includes('reset-password'))
@@ -25,5 +36,13 @@ export class AppComponent implements OnInit {
     if (localStorage.getItem('token') || sessionStorage.getItem('token'))
       return true;
     return false;
+  }
+
+  getDecodedAccessToken(token: string): DecodedTokenInterface | undefined {
+    try {
+      return jwt_decode(token);
+    } catch (Error) {
+      return;
+    }
   }
 }

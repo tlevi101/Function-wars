@@ -67,6 +67,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     toJSON() {
       return {
+        id: this.id,
         name: this.name,
         email: this.email,
         banned: this.banned,

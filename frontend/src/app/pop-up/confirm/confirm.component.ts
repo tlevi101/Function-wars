@@ -22,5 +22,4 @@ export class ConfirmComponent {
     this.cancelEvent.emit();
     this.description = '';
   }
-
 }

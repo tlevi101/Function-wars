@@ -1,0 +1,96 @@
+  <!-- Modal -->
+<div class="modal fade" id="singleBanModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h1 class="modal-title fs-5" id="exampleModalLabel">Ban user</h1>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<input #reasonInput type="text" class="form-control" placeholder="Reason" aria-label="Reason">			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		  <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="modalSubmitted()">Ban</button>
+		</div>
+	  </div>
+	</div>
+</div>
+
+<div class="container p-4">
+	<table>
+		<thead>
+			<tr>
+				<th>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+							(click)="selectAll($event)">
+						<label class="form-check-label" for="flexCheckDefault">
+							All
+						</label>
+					</div>
+				</th>
+				<th *ngFor="let header of headers">{{header.label}}</th>
+				<th>
+					Actions
+					<div class="d-flex">
+						<i class="bi bi-exclamation-octagon-fill me-2 text-danger fs-4 " placement="top" ngbTooltip="Ban/Unban selected users" (click)="actionClicked(Actions.BAN_UNBAN)"></i>
+						<div class="slashedChat position-relative" placement="top" ngbTooltip="Add/Remove chat restriction to selected users" (click)="actionClicked(Actions.CHAT_RESTRICTION)">
+							<i class=" fs-4 bi bi-chat position-absolute" ></i>
+							<div class="slashRotate position-absolute">
+								<i class="fs-2 bi bi-slash-lg"></i>
+							</div>
+						</div>
+					</div>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr
+				*ngFor="let user of users  | slice: (pagination.page-1) * pagination.pageSize : pagination.page * pagination.pageSize; let i=index">
+				<td class="selects">
+					<div class="form-check">
+						<input #dataCheckBox class="form-check-input" type="checkbox" id="dataCheckBox_{{i}}">
+					</div>
+				</td>
+				<td *ngFor="let header of headers" [innerHTML]="getDataField(user, header)"></td>
+				<td>
+					<div class="d-flex">
+						<i *ngIf="user.banned" class="bi bi-exclamation-octagon-fill me-2 text-danger fs-4 " placement="top" ngbTooltip="Ban/Unban user" (click)="actionClicked(Actions.BAN_UNBAN, user.id)"></i>
+						<i *ngIf="!user.banned" class="bi bi-exclamation-octagon-fill me-2 text-danger fs-4 " placement="top" ngbTooltip="Ban/Unban user" data-bs-toggle="modal" data-bs-target="#singleBanModal" (click)="actionClicked(Actions.BAN_UNBAN, user.id)"></i>
+						<div class="slashedChat position-relative" placement="top" ngbTooltip="Add/Remove chat restriction" (click)="actionClicked(Actions.CHAT_RESTRICTION, user.id)">
+							<i class=" fs-4 bi bi-chat position-absolute" ></i>
+							<div class="slashRotate position-absolute">
+								<i class="fs-2 bi bi-slash-lg"></i>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<nav aria-label="Page navigation example">
+		<ul class="pagination justify-content-center">
+			<li class="page-item {{pagination.page!== 1 ? '' : 'disabled'}}">
+				<a class="page-link" (click)="pagination.incrementCurrentPageBy(-1)">Previous</a>
+			</li>
+			<li class="page-item {{1===pagination.page? 'active':''}}"><a class="page-link"
+					(click)="pagination.turnPageTo(1)">{{1}}</a></li>
+			<li *ngIf="1!==pagination.first-1" class="page-item disabled"><a class="page-link">...</a></li>
+			<li *ngFor="let j of [].constructor(pagination.SliderSize); let i =index"
+				class="page-item {{pagination.first+i === pagination.page? 'active':''}}">
+				<a class="page-link" (click)="pagination.turnPageTo(pagination.first+i)">{{pagination.first+i}}</a>
+			</li>
+			<li *ngIf="pagination.pageCount>pagination.first+pagination.SliderSize" class="page-item disabled"><a
+					class="page-link">...</a></li>
+			<li *ngIf="pagination.pageCount!==1"
+				class="page-item {{pagination.pageCount===pagination.page? 'active':''}}"><a class="page-link"
+					(click)="pagination.turnPageTo(pagination.pageCount)">{{pagination.pageCount}}</a></li>
+
+			<li class="page-item">
+				<a class="page-link {{pagination.page!==pagination.pageCount? '' : 'disabled'}}"
+					(click)="pagination.incrementCurrentPageBy(1)">Next</a>
+			</li>
+		</ul>
+	</nav>
+</div>

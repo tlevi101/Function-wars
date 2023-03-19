@@ -10,20 +10,24 @@ import { DecodedTokenInterface } from '../interfaces/token.interface';
 })
 export class NavBarComponent implements OnInit {
   public name: string | undefined = 'User';
-  constructor(private router: Router) {}
+  public user: DecodedTokenInterface | null;
+  constructor(private router: Router) {
+    this.user = null;
+  }
 
   ngOnInit(): void {
     const token =
       localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
-      const decodedToken = this.getDecodedAccessToken(token);
-      this.name = decodedToken?.name;
+      this.user = this.getDecodedAccessToken(token);
+      this.name = this.user?.name;
     }
   }
   getDecodedAccessToken(token: string): DecodedTokenInterface | null {
     try {
       return jwt_decode(token);
     } catch (Error) {
+      //TODO handle error
       return null;
     }
   }

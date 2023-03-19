@@ -5,66 +5,48 @@ const auth = require("../../middlewares/auth");
 const { Op } = require("sequelize");
 
 const setHandledTrue = async (user_id) => {
-  await Report.update({
-    where: {
-      reported: user_id,
-    },
-    handled: true,
-  });
+  if(await Report.findOne({ where: { reported: user_id, handled: false } })){
+    await Report.update({
+      where: {
+        reported: user_id,
+      },
+      handled: true,
+    });
+  }
 };
 
-router.put("/ban", auth, async (req, res) => {
+router.put("/:id/ban", auth, async (req, res) => {
   if (!req.user.is_admin)
     return res.status(403).json({ message: "You are not an admin." });
-  const { user_ids } = req.body;
-  if (!user_ids || Array.isArray(user_ids)) {
-    return res
-      .status(400)
-      .send({ message: "No user_ids provided or user_ids is not an array." });
-  }
-  const users = await User.findAll({
+  const { id } = req.params;
+  const { banned_reason } = req.body;
+  const user = await User.findOne({
     where: {
-      id: {
-        [Op.in]: user_ids,
-      },
+      id: id
     },
   });
-  if (!users) {
-    return res.status(404).send({ message: "Users not found." });
+  if (!user) {
+    return res.status(404).send({ message: "User not found." });
   }
-  for (let user of users) {
-    if (user.is_admin) continue;
-    await user.update({ banned: true });
-    setHandledTrue(user.id);
-  }
-
-  res.status(200).send({ message: "Users banned." });
+  await user.update({ banned: true, banned_reason: banned_reason });
+  setHandledTrue(user.id);
+  res.status(200).send({ message: "User banned." });
 });
 
-router.put("/unban", auth, async (req, res) => {
+router.put("/:id/unban", auth, async (req, res) => {
   if (!req.user.is_admin)
     return res.status(403).json({ message: "You are not an admin." });
-  const { user_ids } = req.body;
-  if (!user_ids || Array.isArray(user_ids)) {
-    return res
-      .status(400)
-      .send({ message: "No user_ids provided or user_ids is not an array." });
-  }
-  const users = await User.findAll({
+  const { id } = req.params;
+  const user = await User.findOne({
     where: {
-      id: {
-        [Op.in]: user_ids,
-      },
+      id: id
     },
   });
-  if (!users) {
-    return res.status(404).send({ message: "Users not found." });
+  if (!user) {
+    return res.status(404).send({ message: "User not found." });
   }
-  for (let user of users) {
-    if (user.is_admin) continue;
-    await user.update({ banned: false });
-  }
-  res.status(200).send({ message: "Users unbanned." });
+  await user.update({ banned: false, banned_reason: null });
+  res.status(200).send({ message: "User unbanned." });
 });
 
 router.put("/make-admin", auth, async (req, res) => {
@@ -133,11 +115,11 @@ router.put("/remove-admin", auth, async (req, res) => {
     .send({ message: "Users are no longer admins.", triedToChangeSuperAdmin });
 });
 
-router.put("/chat-restriction", auth, async (req, res) => {
+router.put("/add-remove-chat-restriction", auth, async (req, res) => {
   if (!req.user.is_admin)
     return res.status(403).json({ message: "You are not an admin." });
   const { user_ids } = req.body;
-  if (!user_ids || Array.isArray(user_ids)) {
+  if (!user_ids || !Array.isArray(user_ids)) {
     return res
       .status(400)
       .send({ message: "No user_ids provided or user_ids is not an array." });
@@ -154,38 +136,14 @@ router.put("/chat-restriction", auth, async (req, res) => {
   }
   for (let user of users) {
     if (user.is_admin) continue;
-    if (user.chat_restriction) continue;
-    await user.update({ chat_restriction: true });
-    setHandledTrue(user.id);
+    if (user.chat_restriction)
+      await user.update({ chat_restriction: false });
+    else{
+      await user.update({ chat_restriction: true });
+      setHandledTrue(user.id);
+    }
   }
   res.status(200).send({ message: "Users are now chat restricted." });
-});
-
-router.put("/remove-chat-restriction", auth, async (req, res) => {
-  if (!req.user.is_admin)
-    return res.status(403).json({ message: "You are not an admin." });
-  const { user_ids } = req.body;
-  if (!user_ids || Array.isArray(user_ids)) {
-    return res
-      .status(400)
-      .send({ message: "No user_ids provided or user_ids is not an array." });
-  }
-  const users = await User.findAll({
-    where: {
-      id: {
-        [Op.in]: user_ids,
-      },
-    },
-  });
-  if (!users) {
-    return res.status(404).send({ message: "Users not found." });
-  }
-  for (let user of users) {
-    if (user.is_admin) continue;
-    if (!user.chat_restriction) continue;
-    await user.update({ chat_restriction: false });
-  }
-  res.status(200).send({ message: "Users are no longer chat restricted." });
 });
 
 module.exports = router;
