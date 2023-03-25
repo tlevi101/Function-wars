@@ -8,6 +8,7 @@ import { RegisterGuestComponent } from './auth-components/register-guest/registe
 import { UsersComponent } from './list-component/users/users.component';
 import jwt_decode from 'jwt-decode';
 import { DecodedTokenInterface } from './interfaces/token.interface';
+import { ReportsComponent } from './list-component/reports/reports.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -27,9 +28,11 @@ export class AppRoutingModule {
       localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       const user = this.getDecodedAccessToken(token);
+	  console.log(user);
       if (user?.is_admin) {
         routes.push(
           { path: 'admin/users', component: UsersComponent },
+          { path: 'admin/reports', component: ReportsComponent},
           { path: '', redirectTo: '/admin/users', pathMatch: 'full' }
         );
       }

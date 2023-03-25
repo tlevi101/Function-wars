@@ -2,7 +2,7 @@
 const { faker } = require("@faker-js/faker");
 const chalk = require("chalk");
 const models = require("../models");
-const { User, Friendship } = models;
+const { User, Friendship, Report } = models;
 const { Op } = require("sequelize");
 
 
@@ -17,7 +17,6 @@ const findFriendship= async (user_id, friend_id) => {
   });
   return friendship;
 }
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -50,7 +49,7 @@ module.exports = {
           role: "admin",
         });
       }
-      for (const user of users) {
+      for (const user of users) { 
         const friendCount = faker.datatype.number({ min: 20, max: 30 });
         let otherUsers = users.filter((u) => u.id !== user.id);
         for (let i = 0; i < friendCount; i++) {
@@ -62,6 +61,18 @@ module.exports = {
             pending: faker.datatype.boolean(),
           });
         }
+        const reportCount = faker.datatype.number({ min: 0, max: 3 });
+        otherUsers = users.filter((u) => u.id !== user.id);
+        for (let i = 0; i < reportCount; i++) {
+          let reported_id = faker.helpers.arrayElement(otherUsers).id;
+          const newReport = await Report.create({
+            reported_by: user.id,
+            reported: reported_id,
+            description: faker.lorem.sentence(),
+            handled: faker.datatype.boolean(),
+          });
+        }
+
       }
     } catch (err) {
       console.log(
@@ -72,7 +83,6 @@ module.exports = {
       console.log(chalk.gray(err));
     }
   },
-
   async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.

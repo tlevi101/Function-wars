@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import jwt_decode from 'jwt-decode';
 import { DecodedTokenInterface } from '../interfaces/token.interface';
 
@@ -8,6 +8,7 @@ import { DecodedTokenInterface } from '../interfaces/token.interface';
   templateUrl: './nav-bar.component.html',
   styleUrls: ['./nav-bar.component.scss'],
 })
+
 export class NavBarComponent implements OnInit {
   public name: string | undefined = 'User';
   public user: DecodedTokenInterface | null;
@@ -31,7 +32,9 @@ export class NavBarComponent implements OnInit {
       return null;
     }
   }
-
+  get route(){
+    return this.router.url;
+  }
   logout() {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');

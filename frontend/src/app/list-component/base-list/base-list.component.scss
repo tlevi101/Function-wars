@@ -1,0 +1,41 @@
+thead > tr{
+	background-color: #7e57c2;
+}
+table{
+	border-radius: 20px;
+	width: 100%;
+}
+.header > .col> p, .selectAll{
+	color: white;
+}
+.col{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+table {
+	border-collapse: separate;
+	border-spacing: 0 15px;
+  }
+tr{
+	background-color: #004985;
+	color: white;
+}
+tr td:first-child,th:first-child {
+	width: 100px;
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px; 
+}
+tr td:last-child,th:last-child { 
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+tr>td,th{
+	padding: 10px;
+}
+.form-check .form-check-input{
+	margin-left: 0px;
+	margin-right: 5px;
+}
+td, th{
+	text-align: center;
+}

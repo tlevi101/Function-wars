@@ -40,4 +40,12 @@ export class AdminService {
       headers: this.hr,
     });
   }
+
+  deleteReport(reportId: number) {
+	return this.http.delete(`${this.url}/reports/${reportId}`, { headers: this.hr });
+	}
+
+  getReports() {
+    return this.http.get(`${this.url}/reports`, { headers: this.hr });
+  }
 }

@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+export interface ConfirmData {
+	readonly myName: 'ConfirmData';
+	description: string;
+}
 @Component({
   selector: 'app-confirm',
   templateUrl: './confirm.component.html',
@@ -21,5 +25,9 @@ export class ConfirmComponent {
   cancel() {
     this.cancelEvent.emit();
     this.description = '';
+  }
+
+  public show(data: ConfirmData) {
+	this.description = data.description;
   }
 }

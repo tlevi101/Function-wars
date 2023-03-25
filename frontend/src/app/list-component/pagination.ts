@@ -6,9 +6,9 @@ export class Pagination {
   first: number;
   constructor(collectionSize: number) {
     this.first = 2;
-    this.pageSize = 8;
+    this.pageSize = 7;
     this.collectionSize = collectionSize;
-    if (this.pageCount - this.SLIDER_SIZE <= 0)
+    if (this.pageCount - this.SLIDER_SIZE -1<= 0)
       this.SLIDER_SIZE = this.pageCount - 2 < 0 ? 0 : this.pageCount - 2;
   }
   handlePageTurn() {

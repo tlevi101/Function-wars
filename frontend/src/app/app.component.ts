@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
       localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       this.user = this.getDecodedAccessToken(token);
+	  console.log(this.user);
     }
   }
 
@@ -27,6 +28,7 @@ export class AppComponent implements OnInit {
     if (token) this.authorized = true;
     else {
       this.authorized = false;
+	  console.log(this.user);
       if (!window.location.href.includes('reset-password'))
         this.router.navigate(['/login']);
     }
