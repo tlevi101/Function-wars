@@ -5,8 +5,9 @@ const auth = require("../../middlewares/auth");
 const { Op } = require("sequelize");
 
 const setHandledTrue = async (user_id) => {
-  if(await Report.findOne({ where: { reported: user_id, handled: false } })){
-    await Report.update({
+	const report = await Report.findOne({ where: { reported: user_id, handled: false } });
+  if(report){
+    await report.update({
       where: {
         reported: user_id,
       },
@@ -115,35 +116,21 @@ router.put("/remove-admin", auth, async (req, res) => {
     .send({ message: "Users are no longer admins.", triedToChangeSuperAdmin });
 });
 
-router.put("/add-remove-chat-restriction", auth, async (req, res) => {
+router.put("/:id/add-remove-chat-restriction", auth, async (req, res) => {
   if (!req.user.is_admin)
     return res.status(403).json({ message: "You are not an admin." });
-  const { user_ids } = req.body;
-  if (!user_ids || !Array.isArray(user_ids)) {
-    return res
-      .status(400)
-      .send({ message: "No user_ids provided or user_ids is not an array." });
+  const {id} = req.params;
+  const user = await User.findByPk(id);
+  if (!user) {
+    return res.status(404).send({ message: "User not found." });
   }
-  const users = await User.findAll({
-    where: {
-      id: {
-        [Op.in]: user_ids,
-      },
-    },
-  });
-  if (!users) {
-    return res.status(404).send({ message: "Users not found." });
-  }
-  for (let user of users) {
-    if (user.is_admin) continue;
-    if (user.chat_restriction)
-      await user.update({ chat_restriction: false });
-    else{
-      await user.update({ chat_restriction: true });
-      setHandledTrue(user.id);
-    }
-  }
-  res.status(200).send({ message: "Users are now chat restricted." });
+if (user.chat_restriction)
+	await user.update({ chat_restriction: false });
+else{
+	await user.update({ chat_restriction: true });
+	setHandledTrue(user.id);
+}
+  res.status(200).send({ message: "User is now chat restricted." });
 });
 
 module.exports = router;

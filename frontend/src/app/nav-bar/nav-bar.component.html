@@ -5,9 +5,9 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-			<div *ngIf="user?.is_admin" class="navbar-nav d-flex">
-					<a class="nav-link active" aria-current="page" [routerLink]="['/admin/users']">Users</a>
-					<a class="nav-link" href="#">Reports</a>
+			<div *ngIf="user?.is_admin" class="navbar-nav d-flex" >
+					<a class="nav-link {{route === '/admin/users'?  'active' : ''}}" aria-current="page" [routerLink]="['/admin/users']">Users</a>
+					<a class="nav-link {{route === '/admin/reports' ?  'active' : ''}}" [routerLink]="['/admin/reports']">Reports</a>
 					<a class="nav-link" href="#">Fields</a>
 
 			</div>
