@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { User, Report } = require("../models");
 const auth = require("../middlewares/auth");
-const { Op } = require("sequelize");
 
 router.get("/users", auth, async (req, res) => {
   if (!req.user.is_admin)
@@ -38,7 +37,7 @@ router.delete("/reports/:id", auth, async (req, res) => {
   const report = await Report.findByPk(req.params.id);
   if (!report) return res.status(404).json({ message: "Report not found." });
   if(!report.deletedAt)
-    await report.update({ deletedAt: new Date() });
+    await report.update({ handled:true,deletedAt: new Date() });
   else
     await report.destroy();
   res.status(200).json({ message: "Report deleted." });
