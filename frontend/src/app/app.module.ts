@@ -21,7 +21,13 @@ import { UsersComponent } from './list-component/users/users.component';
 import { ReportsComponent } from './list-component/reports/reports.component';
 import { ConfirmWithInputComponent } from './pop-up/confirm-with-input/confirm-with-input.component';
 import { BaseListComponent } from './list-component/base-list/base-list.component';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: { 
+	transports: ['websocket'],
+	query: { token: sessionStorage.getItem('token') || localStorage.getItem('token') },
+	extraHeaders: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` }
+}} ;
 @NgModule({
     declarations: [
         AppComponent,
@@ -49,8 +55,10 @@ import { BaseListComponent } from './list-component/base-list/base-list.componen
         ReactiveFormsModule,
         FormsModule,
         BrowserAnimationsModule,
+		SocketIoModule.forRoot(config)
     ],
     providers: [],
     bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

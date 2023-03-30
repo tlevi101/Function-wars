@@ -1,15 +1,16 @@
-<div class="position-absolute bottom-0 end chat-window">
+<div *ngIf="friendId" class="position-absolute bottom-0 end chat-window">
 		<div class="chat-header d-flex">
-			<h2 class="text-center me-auto">Chat</h2>
-			<button type="button" class="btn-close btn-close-white"></button>
+			<h2 class="text-center me-auto">{{friendName}}</h2>
+			<button type="button" class="btn-close btn-close-white" (click)="closeChat()"></button>
 
 		</div>
-		<div class="chat-messages" >
-			<div class="chat-message {{math.floor(math.random() * 2) ===1 ? 'from-me' : 'from-other'}}" *ngFor="let i of [].constructor(20)" >
-					<p>asd</p>
+		<div #chatContainer class="chat-messages">
+			<div *ngFor="let message of messages" class="chat-message {{message.from===user?.id ? 'from-me' : 'from-other'}}">
+					<p>{{message.message}}</p>
 			</div>
 		</div>
-		<form>
-			<input type="text" class="form-control" placeholder="Type your message here...">
+		<form class="d-flex">
+			<input #sendInput type="text" class="form-control me-2" placeholder="Type your message here...">
+			<button type="submit" class="btn btn-primary" (click)="sendMessage(sendInput.value)">Send</button>
 		</form>
 </div>

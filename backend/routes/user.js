@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { User, Friendship, Report } = require("../models");
+const { User, Friendship, Report, Chat } = require("../models");
 const auth = require("../middlewares/auth");
 const { Op } = require("sequelize");
 
@@ -23,6 +23,36 @@ router.get("/friends/requests", auth, async (req, res) => {
   res.status(200).json({ requests: requests});
 });
 
+router.get("/friends/:id/chat", auth, async (req, res) => {
+	const { email } = req.user;
+	const { id } = req.params;
+	const user = await User.findOne({ where: { email: email } });
+	if (!user) {
+		return res.status(404).json({ message: "User not found." });
+	}
+	const friend = await User.findOne({ where: { id: id } });
+	if (!friend) {
+		return res.status(404).json({ message: "Friend not found." });
+	}
+	const friendship = await Friendship.findOne({
+		where: {
+			[Op.or]: [
+				{ user_id: user.id, friend_id: friend.id },
+				{ user_id: friend.id, friend_id: user.id },
+			],
+			pending: false,
+		},
+	});
+	if (!friendship) {
+		return res.status(404).json({ message: "Friendship not found." });
+	}
+	let chat = await user.getChat(friend.id);
+	if(!chat){
+		let messages = [];
+		chat =  await Chat.create({friendship_id:friendship.id, messages:messages});
+	}
+	res.status(200).json({ chat: chat });
+});
 
 
 router.put("/friends/requests/:id/accept", auth, async (req, res) => {

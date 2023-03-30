@@ -1,4 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
+import { FriendChatComponent } from '../chats/friend-chat/friend-chat.component';
 import { ConfirmComponent } from '../pop-up/confirm/confirm.component';
 import { FriendsService } from '../services/friends.service';
 import { UsersService } from '../services/users.service';
@@ -30,6 +31,7 @@ interface FriendRequest {
 })
 export class SideBarComponent {
     @ViewChild('confirm', { static: true }) confirm!: ConfirmComponent;
+	@ViewChild('friendChat', { static: true }) friendChat!: FriendChatComponent;
     myFriendsHovered = false;
     friends: Friend[];
     friendCurrentState: string[];
@@ -150,6 +152,11 @@ export class SideBarComponent {
             }
         );
     }
+	openChat(friend: Friend) {
+		this.friendChat.friendId= friend.id;
+		this.friendChat.friendName = friend.name;
+		this.friendChat.loadChat(friend.id);
+	}
     get slideDirection(): string {
         return this.myFriendsHovered ? 'left' : 'right';
     }

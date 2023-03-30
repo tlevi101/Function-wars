@@ -138,15 +138,32 @@ module.exports = (sequelize, DataTypes) => {
       });
       return requestsArray;
     }
-    async getChat(friend) {
+    async getChat(friend_id) {
       const friendship = await sequelize.models.Friendship.findOne({
-        where: { user_id: this.id, friend_id: friend.id },
+		where: {
+			[Op.or]: [
+				{ user_id: this.id, friend_id: friend_id },
+				{ user_id: friend_id, friend_id: this.id },
+			],
+		},
       });
       if (friendship) {
-        return friendship.chat;
+        return await friendship.getChat();
       }
       return null;
     }
+	async getFriendShip(friend_id){
+		const friendship = await sequelize.models.Friendship.findOne({
+			where: {
+				[Op.or]: [
+					{ user_id: this.id, friend_id: friend_id },
+					{ user_id: friend_id, friend_id: this.id },
+				],
+			},
+		});
+		return friendship;
+	}
+
   }
   User.init(
     {

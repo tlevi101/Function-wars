@@ -1,5 +1,5 @@
 <app-nav-bar *ngIf="isAuthorized"></app-nav-bar>
-<app-side-bar *ngIf="isAuthorized && isAdmin"></app-side-bar>
+<app-side-bar *ngIf="isAuthorized && !isAdmin"></app-side-bar>
 <app-users *ngIf="isAuthorized && isAdmin && activatedRoute==''"></app-users>
 <router-outlet></router-outlet>
 <!-- <app-friend-chat *ngIf="isAuthorized"></app-friend-chat> -->
