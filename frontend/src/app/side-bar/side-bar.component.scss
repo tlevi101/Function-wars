@@ -1,18 +1,23 @@
 .btnParent{
 	margin-top: 10px;
+	padding-top: 10px;
+	padding-left: 10px;
 	position: relative;
 	float: right;
 	overflow-x: hidden;
+	overflow-y: visible;
 	background-color: none;
 }
 .btnParent > button{
-	position: relative;
 	right: -85px;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 }
 .bi-chevron-double-down, .bi-chevron-double-up{
 	margin-top: 10px;
+}
+.offcanvas-body{
+	overflow-x: hidden;
 }
 
 .container{

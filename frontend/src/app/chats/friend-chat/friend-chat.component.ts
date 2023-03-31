@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterContentInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
 import { ChatService } from 'src/app/services/chat.service';
 
@@ -13,6 +13,7 @@ export class FriendChatComponent implements AfterContentChecked, AfterContentIni
 	@Input() friendName: string | undefined;
 	@ViewChild('chatContainer') chatContainer!: ElementRef;
 	@ViewChild('sendInput') sendInput!: ElementRef;
+	@Output('chatClosed') chatClosed :EventEmitter<boolean> = new EventEmitter();
 	messages: any[] = [];
 	user: DecodedTokenInterface | undefined;
 	constructor(private chatService: ChatService) {
@@ -26,6 +27,7 @@ export class FriendChatComponent implements AfterContentChecked, AfterContentIni
 		this.scrollToBottom();
 	}
 	public sendMessage(message: string) {
+		if(message === '' || message === undefined) return;
 		this.messages.push({from: this.user?.id, message, seen: false});
 		this.chatService.sendMessage(message, this.friendId!);
 		this.sendInput.nativeElement.value = '';
@@ -33,18 +35,22 @@ export class FriendChatComponent implements AfterContentChecked, AfterContentIni
 	public closeChat() {
 		this.friendId = undefined;
 		this.friendName = undefined;
+		this.chatClosed.emit(true);
 	}
 	public loadChat(friend_id: number) {
 		this.chatService.getChatMessages(friend_id).subscribe(
 			(res: any) => {
 				this.messages = res.chat.messages;
+				this.chatService.setSeen(friend_id);
 			},
 			(err: any) => {
 				console.log(err);
 			},
 		);
 		this.chatService.receiveMessage().subscribe((message: any) => {
+			this.chatService.setSeen(friend_id);
 			this.messages.push(message);
+			setTimeout(this.scrollToBottom, 100);
 		})
 	}
 	scrollToBottom(): void {

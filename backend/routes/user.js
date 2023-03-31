@@ -8,7 +8,14 @@ router.get("/friends", auth, async (req, res) => {
   const { email } = req.user;
   const user = await User.findOne({ where: { email: email } });
   let friends = await user.getFriends();
-  friends = friends.map((friend) => { return { name: friend.name, id: friend.id } });
+  friends = await Promise.all(friends.map(async (friend) => { 
+ 	const chat = await friend.getChat(user.id);
+	let unreadMessages = 0;
+	if(chat){
+		unreadMessages = chat.messages.filter(message => message.seen === false && message.from !=user.id).length;
+	}
+	return { name: friend.name, id: friend.id, unreadMessages:unreadMessages };
+	}));
   res.status(200).json({ friends: friends});
 });
 

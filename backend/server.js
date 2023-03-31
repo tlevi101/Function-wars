@@ -57,6 +57,7 @@ io.use(function(socket, next){
 			if(message.from !== user.id){
 				message.seen = true;
 			}
+			return message;
 		});
 		await Chat.update({messages: chat.messages}, {where: {id: chat.id}});
 	});
