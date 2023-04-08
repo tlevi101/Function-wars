@@ -2,5 +2,6 @@
 <app-side-bar *ngIf="isAuthorized && !isAdmin"></app-side-bar>
 <app-users *ngIf="isAuthorized && isAdmin && activatedRoute==''"></app-users>
 <router-outlet></router-outlet>
+<app-field-editor *ngIf="isAuthorized"></app-field-editor>
 <!-- <app-friend-chat *ngIf="isAuthorized"></app-friend-chat> -->
 <!-- <app-confirm-with-input></app-confirm-with-input> -->

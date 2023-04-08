@@ -1,0 +1,52 @@
+<div class="center container d-flex m-4">
+	<div class="field me-2">
+		<canvas #field width="1000" height="700" (mousemove)="mouseMoved($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseOnHold=false">
+
+		</canvas>
+	</div>
+	<div class="controls">
+		<div class="objects d-flex m-3">
+			<div class="circle me-4" ngbTooltip="Click to add" (click)="addCircle()">
+			</div>
+			<div class="square" ngbTooltip="Click to add" (click)="addRectangle()">
+			</div>
+		</div>
+		<div class="object-controls m-3">
+			<label for="width-range" class="form-label">Width: {{widthRange.value}}</label>
+			<input #widthRange type="range" name="width-range" id="width-range" class="form-range" min="20" max="200" value="110" (input)="widthChange()">
+			<label for="height-range" class="form-label">Height: {{heightRange.value}}</label>
+			<input #heightRange type="range" name="height-range" id="height-range" class="form-range" min="20" max="200" value="110"  (input)="heightChange()">
+			
+		</div>
+		<div class="players-controls m-3">
+			<label for="height-range" class="form-label">Player count: {{playerCountRange.value}}</label>
+			<input #playerCountRange type="range" name="height-range" id="player-count-range" class="form-range" min="2" max="4" value="2" ngbTooltip="{{playerCountRange.value}}">
+			<div class="d-flex">
+				<div class="objects">
+					<div class="circle-sm me-4">
+					</div>
+				</div>
+				<div class="buttons mt-4">
+					<button class="btn btn-primary btn-sm {{playerCountRange.valueAsNumber == playerCount ? 'disabled': ''}}" (click)="addPlayer()">Add player</button>
+				</div>
+			</div>
+		</div>
+		<div class="m-3">
+			<button class="btn btn-primary btn-sm {{fieldParticles.size ==0 ? 'disabled': ''}}" (click)="removeSelected()">Remove selected</button>
+		</div>
+		<div class="m-3">
+			<form [formGroup]="fieldSubmitForm" class="" novalidate>
+				<div class="d-flex">
+					<input type="text" class="form-control w-50 me-auto {{fieldNameState}}" id="field-name" placeholder="Field name" formControlName="fieldName">
+					<button type="submit" class="btn btn-primary btn-sm {{fieldSubmitFormValid ? '': 'disabled'}}" >Save field</button>
+				</div>
+				<div *ngIf="fieldName?.touched" class="invalid-feedback mb-3">
+					{{ fieldNameError }}
+				</div>
+				<div *ngIf="fieldName?.touched" class="invalid-feedback">
+					{{ fieldSubmitFormErrors }}
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

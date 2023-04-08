@@ -22,6 +22,7 @@ import { ReportsComponent } from './list-component/reports/reports.component';
 import { ConfirmWithInputComponent } from './pop-up/confirm-with-input/confirm-with-input.component';
 import { BaseListComponent } from './list-component/base-list/base-list.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { FieldEditorComponent } from './field-editor/field-editor.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: { 
 	transports: ['websocket'],
@@ -45,6 +46,7 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {
         ReportsComponent,
         ConfirmWithInputComponent,
         BaseListComponent,
+        FieldEditorComponent,
     ],
     imports: [
         BrowserModule,
