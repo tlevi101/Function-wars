@@ -24,6 +24,8 @@ import { BaseListComponent } from './list-component/base-list/base-list.componen
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { FieldEditorComponent } from './field-editor/field-editor.component';
 import { FieldListComponent } from './list-component/field-list/field-list.component';
+import { NewGameComponent } from './new-game/new-game.component';
+import { OnWaitingComponent } from './on-waiting/on-waiting.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: { 
 	transports: ['websocket'],
@@ -49,6 +51,8 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {
         BaseListComponent,
         FieldEditorComponent,
         FieldListComponent,
+        NewGameComponent,
+        OnWaitingComponent,
     ],
     imports: [
         BrowserModule,
