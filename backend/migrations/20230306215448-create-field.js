@@ -16,6 +16,10 @@ module.exports = {
                     key: 'id',
                 },
             },
+            name: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
             is_admin_field: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,

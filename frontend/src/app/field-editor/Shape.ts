@@ -74,6 +74,7 @@ export class Shape {
 export class Ellipse extends Shape {
 	constructor(location: Point, dimension: Dimension) {
 		super(location, { width: Math.round(dimension.width/2), height: Math.round(dimension.height/2) });
+		this.changeAvoidAreaRadius();
 	}
 	public override pointInside(point: Point): boolean {
 		const x = point.x - this.Location.x;

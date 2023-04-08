@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     Field.init(
         {
+            name: DataTypes.STRING,
             user_id: DataTypes.INTEGER,
             is_admin_field: DataTypes.BOOLEAN,
             field: DataTypes.JSON,

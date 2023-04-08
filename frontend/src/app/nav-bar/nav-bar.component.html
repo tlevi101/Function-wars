@@ -8,12 +8,12 @@
 			<div *ngIf="user?.is_admin" class="navbar-nav d-flex" >
 					<a class="nav-link {{route === '/admin/users'?  'active' : ''}}" aria-current="page" [routerLink]="['/admin/users']">Users</a>
 					<a class="nav-link {{route === '/admin/reports' ?  'active' : ''}}" [routerLink]="['/admin/reports']">Reports</a>
-					<a class="nav-link" href="#">Fields</a>
+					<a class="nav-link {{route === '/admin/fields' ?  'active' : ''}}" [routerLink]="['/admin/fields']">Fields</a>
 
 			</div>
 			<div *ngIf="!user?.is_admin" class="navbar-nav d-flex">
-				<a class="nav-link active" aria-current="page" [routerLink]="['/']">Home</a>
-				<a class="nav-link" href="#">My fields</a>
+				<a class="nav-link {{route === '/' ?  'active' : ''}}" aria-current="page" [routerLink]="['/']">Home</a>
+				<a class="nav-link {{route === '/my-fields' ?  'active' : ''}}" [routerLink]="['/my-fields']">My fields</a>
 		</div>
 		</div>
 		<label class="mt-3 me-2"><p class="text-center text-primary"><strong>{{name}}</strong></p></label>

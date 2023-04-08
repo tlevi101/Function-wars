@@ -38,7 +38,7 @@
 			<form [formGroup]="fieldSubmitForm" class="" novalidate>
 				<div class="d-flex">
 					<input type="text" class="form-control w-50 me-auto {{fieldNameState}}" id="field-name" placeholder="Field name" formControlName="fieldName">
-					<button type="submit" class="btn btn-primary btn-sm {{fieldSubmitFormValid ? '': 'disabled'}}" >Save field</button>
+					<button type="submit" class="btn btn-primary btn-sm {{fieldSubmitFormValid ? '': 'disabled'}}" (click)="saveField()">Save field</button>
 				</div>
 				<div *ngIf="fieldName?.touched" class="invalid-feedback mb-3">
 					{{ fieldNameError }}

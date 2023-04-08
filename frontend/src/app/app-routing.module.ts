@@ -7,6 +7,8 @@ import { ResetPasswordComponent } from './auth-components/reset-password/reset-p
 import { RegisterGuestComponent } from './auth-components/register-guest/register-guest.component';
 import { UsersComponent } from './list-component/users/users.component';
 import { ReportsComponent } from './list-component/reports/reports.component';
+import { FieldListComponent } from './list-component/field-list/field-list.component';
+import { FieldEditorComponent } from './field-editor/field-editor.component';
 
 const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -16,6 +18,10 @@ const routes: Routes = [
     { path: 'register-guest', component: RegisterGuestComponent },
     { path: 'admin/users', component: UsersComponent },
     { path: 'admin/reports', component: ReportsComponent },
+	{ path: 'admin/fields', component: FieldListComponent },
+	{ path: 'my-fields', component: FieldListComponent },
+	{ path: 'field/edit/:id', component: FieldEditorComponent },
+	{ path: 'field/new', component: FieldEditorComponent },
 ];
 
 @NgModule({

@@ -48,6 +48,7 @@ export interface PlayerInterface {
 }
 
 export interface ObjectInterface {
+	type: string,
 	location: {x: number, y: number},
 	dimension: {width: number, height: number},
 	avoidArea: {location: {x: number, y: number}, radius: number}

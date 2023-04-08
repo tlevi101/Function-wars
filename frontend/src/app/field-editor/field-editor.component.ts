@@ -1,10 +1,12 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { LinkedList } from './LinkedList';
 import { Dimension, Ellipse, Shape, Point, Rectangle } from './Shape';
 import { Player } from './Player';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FieldService } from '../services/field.service';
 import { FieldBodyInterface, ObjectInterface, PlayerInterface } from '../interfaces/backend-body.interfaces';
+import { JwtService } from '../services/jwt.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 
@@ -13,7 +15,7 @@ import { FieldBodyInterface, ObjectInterface, PlayerInterface } from '../interfa
   templateUrl: './field-editor.component.html',
   styleUrls: ['./field-editor.component.scss']
 })
-export class FieldEditorComponent {
+export class FieldEditorComponent implements OnInit {
 	fieldParticles= new LinkedList<Shape | Player>();
 	mouseOnHold = false;
 	fieldSubmitForm: FormGroup;
@@ -23,7 +25,7 @@ export class FieldEditorComponent {
 	@ViewChild('heightRange') heightRange!: ElementRef<HTMLInputElement>;
 	@ViewChild('playerCountRange') playerCountRange!: ElementRef<HTMLInputElement>;
 
-	constructor(private fieldService: FieldService) {
+	constructor(private fieldService: FieldService, private jwt: JwtService, private router: Router, private activeRoute: ActivatedRoute) {
 		this.fieldSubmitForm = new FormGroup({
 			fieldName: new FormControl('', [
 				Validators.required, 
@@ -32,9 +34,44 @@ export class FieldEditorComponent {
 		});
 	}
 
+	ngOnInit(): void {
+		if(!this.jwt.isTokenValid()){
+			this.router.navigate(['/login']);
+		}
+		if(this.router.url !== '/field/new'){
+			this.activeRoute.paramMap.subscribe(
+				async (params) => {
+					let id = params.get('id');
+					if(id !== null){
+						await this.sendGetFieldRequest(parseInt(id));
+						this.drawObjects();
+					}
+					else{
+						//TODO 404
+					}
+				}
+			);
+
+		}
+	}
+
+	async sendGetFieldRequest(id: number) {
+		await this.fieldService.getField(id).toPromise().then(
+			(res:any) => {
+				this.fieldName= res.field.name;
+				this.setFieldNameTouched();
+				this.loadFieldParticlesFromJSON(res.field.field.players, res.field.field.objects);
+			},
+			(err) => {
+				//TODO handle error
+				console.log(err);
+			}
+		);
+	}
+
+
 	saveField() {
 		if(!this.validateField){
-			alert('Field is not valid');
 			return;
 		}
 		let fieldParticlesAsJson = this.fieldParticlesToJSON();
@@ -46,16 +83,33 @@ export class FieldEditorComponent {
 				objects: fieldParticlesAsJson.objects
 			}
 		}
-		this.fieldService.postField(body).subscribe(
-			(res) => {
-				//TODO redirect to field list
-				console.log(res);
-			},
-			(err) => {
-				//TODO handle error
-				console.log(err);
+		if(this.router.url === '/field/new'){
+			this.fieldService.postField(body).subscribe(
+				(res) => {
+					this.router.navigate(['/my-fields']);
+				},
+				(err) => {
+					//TODO handle error
+					console.log(err);
+				}
+			);
+		}
+		else{
+			let id = this.activeRoute.snapshot.paramMap.get('id');
+			if(id === null){
+				this.router.navigate(['/my-fields']);
+				return;
 			}
-		);
+			this.fieldService.putField(parseInt(id),body).subscribe(
+				(res) => {
+					this.router.navigate(['/my-fields']);
+				},
+				(err) => {
+					//TODO handle error
+					console.log(err);
+				}
+			);
+		}
 	}
 
 	widthChange() {
@@ -241,6 +295,13 @@ export class FieldEditorComponent {
 	get fieldName(){
 		return this.fieldSubmitForm.get('fieldName');
 	}
+	set fieldName(value){
+		this.fieldSubmitForm.get('fieldName')?.setValue(value);
+	}
+
+	setFieldNameTouched(){
+		this.fieldName?.markAsTouched();
+	}
 
 	private fieldParticlesToJSON():{players: PlayerInterface[], objects: ObjectInterface[]}{
 		let players: PlayerInterface[] = this.fieldParticles.filter((object: Shape | Player) => {return object instanceof Player}).map((player: Player | Shape) => {
@@ -252,9 +313,12 @@ export class FieldEditorComponent {
 			return result;
 		});
 		let objects:ObjectInterface[] = this.fieldParticles.filter((object: Shape | Player) => {return object instanceof Shape}).map((object: Shape | Player ) => {
+			let type = object instanceof Rectangle ? "Rectangle" : "Ellipse";
+			let dimension = object instanceof Rectangle ? object.Dimension : {width: object.Dimension.width*2, height: object.Dimension.height*2};
 			let result: ObjectInterface = {
+				type: type,
 				location: {x: object.Location.x, y: object.Location.y},
-				dimension: {width: object.Dimension.width, height: object.Dimension.height},
+				dimension: dimension,
 				avoidArea: {location: {x: object.AvoidArea.Location.x, y: object.AvoidArea.Location.y}, radius: object.AvoidArea.Radius}
 			}
 			return result;
@@ -262,6 +326,18 @@ export class FieldEditorComponent {
 		return{
 			players: players,
 			objects: objects
+		}
+	}
+
+	private loadFieldParticlesFromJSON(players: PlayerInterface[], objects: ObjectInterface[]){
+		for (const player of players) {
+			this.fieldParticles.add(new Player(new Point(player.location.x, player.location.y)));
+		}
+		for (const object of objects) {
+			if(object.type == "Rectangle")
+				this.fieldParticles.add(new Rectangle(new Point(object.location.x, object.location.y), {width:object.dimension.width, height:object.dimension.height}));
+			else
+				this.fieldParticles.add(new Ellipse(new Point(object.location.x, object.location.y), {width:object.dimension.width, height:object.dimension.height}));
 		}
 	}
 	validateField(): boolean {

@@ -146,7 +146,7 @@ export class BaseListComponent {
         }
         if (header.type == DataType.DATE) {
             return this.getDataWithKeys(data, header.key)
-                ? `<div>${new Date(this.getDataWithKeys(data, header.key)).toLocaleDateString()}</div>`
+                ? `<div>${new Date(this.getDataWithKeys(data, header.key)).toLocaleString()}</div>`
                 : `<i class="fs-4 bi bi-dash-lg text-white fs-1"></i>`;
         }
         return this.getDataWithKeys(data, header.key)

@@ -125,7 +125,6 @@ export class ReportsComponent implements OnInit {
     }
 
     handleDeleteAction(reports: any[]) {
-        console.log(reports);
         reports.forEach((report: any) => {
             this.adminService.deleteReport(report.id).subscribe(
                 (res: any) => {

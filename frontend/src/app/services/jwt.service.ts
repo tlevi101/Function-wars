@@ -12,6 +12,9 @@ export class JwtService {
   public getToken(): string {
 	return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
 }
+	public isTokenValid(): boolean {
+		return this.getDecodedAccessToken() !== undefined;
+	}
   public getDecodedAccessToken(): DecodedTokenInterface | undefined {
 	const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
 	try {
