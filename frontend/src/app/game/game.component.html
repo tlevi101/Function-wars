@@ -1,0 +1,25 @@
+<div class="center container d-flex m-4">
+	<div class="field me-2">
+		<canvas #field width="1000" height="700" >
+
+		</canvas>
+	</div>
+	<div class="controls">
+
+		<form [formGroup]="functionForm">
+			<div class="d-flex">
+				<input type="text" class="form-control w-50 me-auto" id="function-name" placeholder="Function name" formControlName="function">
+				<button type="submit" class="btn btn-primary btn-sm" (click)="submitFunction()">Submit function</button>
+			</div>
+			<!-- <div *ngIf="functionName?.touched" class="invalid-feedback mb-3">
+				{{ functionNameError }}
+			</div>
+			<div *ngIf="functionName?.touched" class="invalid-feedback">
+				{{ functionFormErrors }}
+			</div> -->
+		</form>
+		
+	</div>
+</div>
+
+

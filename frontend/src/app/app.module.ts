@@ -26,6 +26,7 @@ import { FieldEditorComponent } from './field-editor/field-editor.component';
 import { FieldListComponent } from './list-component/field-list/field-list.component';
 import { NewGameComponent } from './new-game/new-game.component';
 import { OnWaitingComponent } from './on-waiting/on-waiting.component';
+import { GameComponent } from './game/game.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: { 
 	transports: ['websocket'],
@@ -53,6 +54,7 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {
         FieldListComponent,
         NewGameComponent,
         OnWaitingComponent,
+        GameComponent,
     ],
     imports: [
         BrowserModule,
