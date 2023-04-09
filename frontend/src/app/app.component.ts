@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import jwt_decode from 'jwt-decode';
 import { DecodedTokenInterface } from './interfaces/token.interface';
 
@@ -10,10 +10,11 @@ import { DecodedTokenInterface } from './interfaces/token.interface';
 })
 export class AppComponent implements OnInit {
     title = 'Function Wars';
+	showNewGame = true;
     public authorized = false;
     user: DecodedTokenInterface | undefined;
 
-    constructor(private router: Router) {
+    constructor(private router: Router, private activatedRoute: ActivatedRoute) {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
 			this.user = this.getDecodedAccessToken();
@@ -21,6 +22,9 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
+		this.activatedRoute.url.subscribe((url) => {
+			console.log(url);
+		})
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) this.authorized = true;
         else {
@@ -39,7 +43,7 @@ export class AppComponent implements OnInit {
         return false;
     }
 
-    get activatedRoute(): string {
+    get activateRoute(): string {
         return this.router.url;
     }
     getDecodedAccessToken(): DecodedTokenInterface | undefined {

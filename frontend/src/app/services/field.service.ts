@@ -35,4 +35,14 @@ export class FieldService {
    deleteField(fieldId: number) {
 	   return this.http.delete(`${this.url}/${fieldId}`, { headers: this.hr });
    }
+
+   getFieldByGame(gameUUID: string) {
+		let url = this.url.replace('fields', 'games');
+	   return this.http.get(`${url}/${gameUUID}/field`, { headers: this.hr });
+   }
+
+   getPlayersByGame(gameUUID: string) {
+		let url = this.url.replace('fields', 'games');
+	   	return this.http.get(`${url}/${gameUUID}/players`, { headers: this.hr });
+   }
 }

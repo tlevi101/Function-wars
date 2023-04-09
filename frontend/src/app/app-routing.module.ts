@@ -9,6 +9,7 @@ import { UsersComponent } from './list-component/users/users.component';
 import { ReportsComponent } from './list-component/reports/reports.component';
 import { FieldListComponent } from './list-component/field-list/field-list.component';
 import { FieldEditorComponent } from './field-editor/field-editor.component';
+import { GameComponent } from './game/game.component';
 
 const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
 	{ path: 'my-fields', component: FieldListComponent },
 	{ path: 'field/edit/:id', component: FieldEditorComponent },
 	{ path: 'field/new', component: FieldEditorComponent },
+	{ path: 'game/:uuid', component: GameComponent },
 ];
 
 @NgModule({

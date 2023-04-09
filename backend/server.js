@@ -7,6 +7,7 @@ const { Op } = require('sequelize');
 const { instrument } = require('@socket.io/admin-ui');
 const { joinChatRoom, sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
+const { getGameData } = require('./socket_handlers/game-handler');
 
 const io = require('socket.io')(http, {
     cors: {
@@ -16,6 +17,12 @@ const io = require('socket.io')(http, {
 });
 let waitList = new Map();
 let games = new Map();
+
+module.exports = {
+	waitList,
+	games,
+};
+
 io.use(function (socket, next) {
     if (socket.handshake.query && socket.handshake.query.token) {
         jwt.verify(socket.handshake.query.token, 'secret', function (err, decoded) {
@@ -30,6 +37,7 @@ io.use(function (socket, next) {
     .on('connection', socket => {
         
 		socket.on('join chat rooms', async () => {
+			//TODO remove this
 			joinChatRoom(socket);
         });
         
@@ -46,11 +54,23 @@ io.use(function (socket, next) {
 		});
 		
 		socket.on('leave wait list', async () => {
+			console.log('left wait list');
 			leaveWaitList(socket, waitList, games);
 		});
-			
+		
+		socket.on('get game data', async (gameUUID) => {
+			console.log('get game data');
+			getGameData(socket, gameUUID, games);
+		});
+
+		socket.on('disconnect', async () => {
+			console.log('disconnected');
+			leaveWaitList(socket, waitList, games);
+		});
     })
     .on('disconnect', socket => {
+		waitList.delete(socket.decoded.id);
+		console.log('user disconnected');
         console.log(socket.decoded);
     });
 

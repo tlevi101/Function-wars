@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
-import { FieldBodyInterface, PlayerInterface } from '../interfaces/backend-body.interfaces';
 
 @Injectable({
   providedIn: 'root'

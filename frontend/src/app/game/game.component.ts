@@ -1,26 +1,31 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FieldService } from '../services/field.service';
 import { JwtService } from '../services/jwt.service';
 import { ObjectInterface, PlayerInterface } from '../interfaces/backend-body.interfaces';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { GameService } from '../services/game.service';
 
 @Component({
 	selector: 'app-game',
 	templateUrl: './game.component.html',
 	styleUrls: ['./game.component.scss']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, AfterViewInit {
 
-	players: PlayerInterface[] = [];
+	playersFieldParticles: PlayerInterface[] = [];
+	players: {id: number, name: string, fieldParticle:PlayerInterface}[] = [];
 	objects: ObjectInterface[] = [];
 	fieldName: string = "";
 	ratio: number = 35;
 	functionForm: FormGroup;
-	currentPlayer: PlayerInterface | undefined;
+	currentPlayer: {id: number, name: string, fieldParticle:PlayerInterface} | undefined;
+	gameUUID: string = "";
+
+
 	@ViewChild('field') field!:ElementRef<HTMLCanvasElement>;
 	
-	constructor(private router: Router, private fieldService: FieldService, private jwt:JwtService) {
+	constructor(private router: Router, private gameService:GameService, private jwt:JwtService, private activatedRoute: ActivatedRoute) {
 		this.functionForm = new FormGroup({
 			function: new FormControl('',{
 				validators: [
@@ -30,15 +35,31 @@ export class GameComponent implements OnInit {
 		});
 	}
 
-	async ngOnInit() {
+	ngOnInit() {
+		this.activatedRoute.paramMap.subscribe(
+			(params:any) => {
+				let uuid:string = params.get('uuid');
+				if(uuid){
+					this.gameUUID = uuid;
+					console.log(uuid);
+				}
+				else{
+					//TODO 404
+				}
+			}
+		);
 		if(!this.jwt.isTokenValid()) {
 			this.router.navigate(['/login']);
 		}
 		else{
-			await this.sendGetFieldRequest(5);
 			this.currentPlayer = this.players[0];
-			this.draw();
+
 		}
+	}
+
+	ngAfterViewInit(){
+		this.sendGetGameData(this.gameUUID);
+		this.listenGetGameData();
 	}
 
 	submitFunction(){
@@ -47,16 +68,32 @@ export class GameComponent implements OnInit {
 		}
 	}
 
-	async sendGetFieldRequest(id: number) {
-		await this.fieldService.getField(id).toPromise().then((res:any) => {
-			this.players =  res.field.field.players;
-			this.objects = res.field.field.objects;
-			this.fieldName = res.field.field.name;
-		}, 
-		(err) => {
-			console.log(err);
-		});
+	sendGetGameData(gameUUID: string){
+		this.gameService.getGameData(gameUUID);
 	}
+	listenGetGameData(){
+		this.gameService.listenGameData().subscribe(
+			(response: any) => {
+				console.log(response);
+				this.players = response.players.map((player: any, index:number) => {
+					return {
+						id: index,
+						name: player.name,
+						fieldParticle: response.field.field.players
+					}
+				});
+				this.objects = response.field.field.objects;
+				this.fieldName = response.field.field.name;
+				this.playersFieldParticles = response.field.field.players;
+				this.currentPlayer = this.players[0];
+				this.draw();
+			},
+			(error: any) => {
+				//TODO handle error
+			}
+		);
+	}
+
 
 	animate(){
 		let tickCount = 0;
@@ -86,8 +123,8 @@ export class GameComponent implements OnInit {
 		if(ctx){
 			ctx.strokeStyle = "red";
 			ctx.fillStyle = "red";
-			let playerX = this.currentPlayer.location.x;
-			let playerY = this.currentPlayer.location.y;
+			let playerX = this.currentPlayer.fieldParticle.location.x;
+			let playerY = this.currentPlayer.fieldParticle.location.y;
 			ctx.beginPath();
 			let firstValidPoint = this.findFirstValidPoint(xLimit, func);
 			if(!firstValidPoint){
@@ -167,8 +204,8 @@ export class GameComponent implements OnInit {
 		if(!this.currentPlayer){
 			return 0;
 		}
-		let playerX = this.currentPlayer.location.x;
-		let playerY = this.currentPlayer.location.y;
+		let playerX = this.currentPlayer.fieldParticle.location.x;
+		let playerY = this.currentPlayer.fieldParticle.location.y;
 		let fn = this.replaceXWithValue(func, 0);
 		for(let x = playerX; x > playerX-xLimit && x > 0; x--){
 			fn = this.replaceXWithValue(func, (x-playerX)/this.ratio);
@@ -186,8 +223,8 @@ export class GameComponent implements OnInit {
 		if(!this.currentPlayer){
 			return 0;
 		}
-		let playerX = this.currentPlayer.location.x;
-		let playerY = this.currentPlayer.location.y;
+		let playerX = this.currentPlayer.fieldParticle.location.x;
+		let playerY = this.currentPlayer.fieldParticle.location.y;
 		let fn = this.replaceXWithValue(func, 0);
 		for(let x = playerX; x < playerX+xLimit && x > 0; x++){
 			fn = this.replaceXWithValue(func, (x-playerX)/this.ratio);
@@ -205,8 +242,8 @@ export class GameComponent implements OnInit {
 		if(!this.currentPlayer){
 			return;
 		}
-		let playerX = this.currentPlayer.location.x;
-		let playerY = this.currentPlayer.location.y;
+		let playerX = this.currentPlayer.fieldParticle.location.x;
+		let playerY = this.currentPlayer.fieldParticle.location.y;
 		let fn = this.replaceXWithValue(func, 0);
 		for(let x = playerX; x < playerX+xLimit && x > 0; x++){
 			fn = this.replaceXWithValue(func, (x-playerX)/this.ratio);
@@ -227,8 +264,8 @@ export class GameComponent implements OnInit {
 		if(!this.currentPlayer){
 			return false;
 		}
-		let playerX = this.currentPlayer.location.x;
-		let playerY = this.currentPlayer.location.y;
+		let playerX = this.currentPlayer.fieldParticle.location.x;
+		let playerY = this.currentPlayer.fieldParticle.location.y;
 		let fn = this.replaceXWithValue(func, 0);
 		if(Number.isNaN(Math.round(playerY - eval(fn)*this.ratio)) ){
 			return false;
@@ -291,8 +328,8 @@ export class GameComponent implements OnInit {
 		if(ctx){
 			ctx.fillStyle = "yellowgreen";
 			ctx.beginPath();
-			for(let i = 0; i < this.players.length; i++){
-				ctx.ellipse(this.players[i].location.x, this.players[i].location.y, this.players[i].dimension.width, this.players[i].dimension.height, 0, 0, 2 * Math.PI);
+			for(let i = 0; i < this.playersFieldParticles.length; i++){
+				ctx.ellipse(this.playersFieldParticles[i].location.x, this.playersFieldParticles[i].location.y, this.playersFieldParticles[i].dimension.width, this.playersFieldParticles[i].dimension.height, 0, 0, 2 * Math.PI);
 				ctx.fill();
 			}
 			ctx.closePath();

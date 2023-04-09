@@ -34,7 +34,8 @@ export class NewGameComponent implements OnInit {
 		this.waitListService.joinedGame().subscribe(
 			(response: any) => {
 				console.log(response);
-				// this.router.navigate(['/game']);
+				this.showWaiting = false;
+				this.router.navigate(['/game',response.room] );
 			}
 		);
 	}
