@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 
 @Component({
 	selector: 'app-on-waiting',
@@ -11,10 +11,13 @@ export class OnWaitingComponent implements OnInit, OnDestroy {
 	time = 0;
 	timeText = '00:00';
 	timer: any;
+
+	@Output() cancel = new EventEmitter();
+
 	constructor() { }
 
 	ngOnInit(): void {
-		this.timer = setInterval(() => this.tick(), 500);
+		this.startTimer();
 	}
 
 	ngOnDestroy(): void {
@@ -39,4 +42,16 @@ export class OnWaitingComponent implements OnInit, OnDestroy {
 		this.timeText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	}
 
+
+	cancelWaiting(){
+		clearInterval(this.timer);
+		this.cancel.emit();
+	}
+
+	public startTimer(){
+		this.time = 0;
+		this.timeText = '00:00';
+		this.loadingText = 'Waiting for others...';
+		this.timer = setInterval(() => this.tick(), 500);
+	}
 }

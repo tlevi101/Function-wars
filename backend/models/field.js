@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'user',
             });
         }
+		static async randomField(playerLimit = 2){
+			let fields = await  this.findAll({where: {is_admin_field: true}});
+			fields = await Promise.all(fields.filter(field => field.field.players.length === playerLimit));
+			let randomField = fields[Math.floor(Math.random() * fields.length)];
+			return randomField;
+		}
     }
     Field.init(
         {

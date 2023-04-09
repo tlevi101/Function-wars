@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { JwtService } from '../services/jwt.service';
 import { Router } from '@angular/router';
 import { FieldService } from '../services/field.service';
+import { WaitListService } from '../services/wait-list.service';
+import { OnWaitingComponent } from '../on-waiting/on-waiting.component';
 
 @Component({
   selector: 'app-new-game',
@@ -11,7 +13,11 @@ import { FieldService } from '../services/field.service';
 export class NewGameComponent implements OnInit {
 
 	canCreateGame = false;
-  	constructor(private jwtService:JwtService, private router:Router, private fieldService:FieldService) { }
+	showWaiting = false;
+	@ViewChild('onWaiting') onWaiting!: OnWaitingComponent;
+  	constructor(private jwtService:JwtService, private router:Router, private fieldService:FieldService, private waitListService:WaitListService) {
+
+	}
 
   	ngOnInit(): void {
 		if(!this.jwtService.isTokenValid()){
@@ -25,6 +31,21 @@ export class NewGameComponent implements OnInit {
 				//TODO handle error
 			}
 		);
+		this.waitListService.joinedGame().subscribe(
+			(response: any) => {
+				console.log(response);
+				// this.router.navigate(['/game']);
+			}
+		);
+	}
+
+	newGame(){
+		this.showWaiting = true;
+		this.waitListService.joinWaitList();
+	}
+
+	cancelWaiting(){
+		this.showWaiting = false;
 	}
 
 }
