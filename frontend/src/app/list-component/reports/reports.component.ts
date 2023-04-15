@@ -1,11 +1,11 @@
-import { Component, OnInit,  ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
 import { AdminService } from 'src/app/services/admin.service';
-import {  BaseListComponent } from '../base-list/base-list.component';
+import { BaseListComponent } from '../base-list/base-list.component';
 import jwt_decode from 'jwt-decode';
 import { Pagination } from '../pagination';
-import { baseData} from './base-list.data';
+import { baseData } from './base-list.data';
 
 @Component({
     selector: 'app-reports',
@@ -16,7 +16,7 @@ export class ReportsComponent implements OnInit {
     reports: any[] = [];
     @ViewChild('baseList') baseList!: BaseListComponent;
     constructor(private adminService: AdminService, private router: Router) {
-       this.sendGetReportsRequest();
+        this.sendGetReportsRequest();
     }
 
     ngOnInit(): void {
@@ -138,21 +138,21 @@ export class ReportsComponent implements OnInit {
         });
     }
 
-	sendGetReportsRequest() {
-		this.adminService.getReports().subscribe(
-			(res: any) => {
-				this.reports = res.reports;
-				this.reports = res.reports;
-				baseData.pagination = new Pagination(this.reports.length);
-				baseData.data = this.reports;
+    sendGetReportsRequest() {
+        this.adminService.getReports().subscribe(
+            (res: any) => {
+                this.reports = res.reports;
+                this.reports = res.reports;
+                baseData.pagination = new Pagination(this.reports.length);
+                baseData.data = this.reports;
                 this.baseList.init(baseData);
-			},
-			(err: any) => {
-				// TODO handle error
-				console.log(err);
-			}
-		);
-	}
+            },
+            (err: any) => {
+                // TODO handle error
+                console.log(err);
+            }
+        );
+    }
 
     getDecodedAccessToken(token: string): DecodedTokenInterface | null {
         try {

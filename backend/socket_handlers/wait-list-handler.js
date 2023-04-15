@@ -44,7 +44,7 @@ const PlaceIntoGame = async (count, waitList, games) => {
 		waitList.delete(user);
 	});
 
-	games.set(`game-${field.id}-${players.map(player => player.id).join('')}`, {sockets: sockets, players: players, field: field});
+	games.set(`game-${field.id}-${players.map(player => player.id).join('')}`, {sockets: sockets, players: players, field: field, currentPlayer: players[0]});
 	console.log(games);
 	sockets.forEach(socket => {
 		socket.leave('wait-list');

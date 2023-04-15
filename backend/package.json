@@ -52,8 +52,8 @@
         "uuid": "^8.3.2"
     },
     "devDependencies": {
-        "@socket.io/admin-ui": "^0.5.1",
         "@faker-js/faker": "^7.3.0",
+        "@socket.io/admin-ui": "^0.5.1",
         "jsdoc": "^3.6.10",
         "nodemon": "^2.0.19",
         "prettier": "^2.6.2",

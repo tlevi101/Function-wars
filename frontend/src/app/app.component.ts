@@ -10,21 +10,21 @@ import { DecodedTokenInterface } from './interfaces/token.interface';
 })
 export class AppComponent implements OnInit {
     title = 'Function Wars';
-	showNewGame = true;
+    showNewGame = true;
     public authorized = false;
     user: DecodedTokenInterface | undefined;
 
     constructor(private router: Router, private activatedRoute: ActivatedRoute) {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
-			this.user = this.getDecodedAccessToken();
+            this.user = this.getDecodedAccessToken();
         }
     }
 
     ngOnInit(): void {
-		this.activatedRoute.url.subscribe((url) => {
-			console.log(url);
-		})
+        this.activatedRoute.url.subscribe(url => {
+            console.log(url);
+        });
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) this.authorized = true;
         else {

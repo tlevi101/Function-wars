@@ -17,39 +17,39 @@ export interface ResetPasswordBodyInterface {
 }
 
 export interface FieldBodyInterface {
-	name: string;
-	field:{
-		dimension : {width: number, height: number},
-		players: PlayerInterface[],
-		objects: ObjectInterface[]
-	}
-}	
+    name: string;
+    field: {
+        dimension: { width: number; height: number };
+        players: PlayerInterface[];
+        objects: ObjectInterface[];
+    };
+}
 
 export interface FieldResponseInterface {
-	id: number;
-	name: string;
-	field:{
-		dimension : {width: number, height: number},
-		players: PlayerInterface[],
-		objects: ObjectInterface[]
-	}
+    id: number;
+    name: string;
+    field: {
+        dimension: { width: number; height: number };
+        players: PlayerInterface[];
+        objects: ObjectInterface[];
+    };
 }
 export interface FieldListResponseInterface {
-	id: number;
-	name: string;
-	deletedAt: string;
-	updatedAt: string;
+    id: number;
+    name: string;
+    deletedAt: string;
+    updatedAt: string;
 }
 
 export interface PlayerInterface {
-	location: {x: number, y: number},
-	dimension: {width: number, height: number},
-	avoidArea: {location: {x: number, y: number}, radius: number}
+    location: { x: number; y: number };
+    dimension: { width: number; height: number };
+    avoidArea: { location: { x: number; y: number }; radius: number };
 }
 
 export interface ObjectInterface {
-	type: string,
-	location: {x: number, y: number},
-	dimension: {width: number, height: number},
-	avoidArea: {location: {x: number, y: number}, radius: number}
+    type: string;
+    location: { x: number; y: number };
+    dimension: { width: number; height: number };
+    avoidArea: { location: { x: number; y: number }; radius: number };
 }

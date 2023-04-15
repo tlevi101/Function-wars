@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import {FunctionCalculator} from "../game/FunctionCalculator";
 
 @Injectable({
     providedIn: 'any',
@@ -28,5 +29,29 @@ export class ValidationService {
         };
     }
 
-    //TODO: Implement a better email validator
+    public mathFunctionValidator(controlName:string): ValidatorFn {
+      return (group: AbstractControl): ValidationErrors | null => {
+          const control = group.get(controlName);
+          if (!control) {
+              return null;
+          }
+          const functionCalculator = new FunctionCalculator(control.value, 0, 0);
+
+          let controlErrors = control.errors;
+          if (!controlErrors) {
+              controlErrors = {};
+          }
+
+          if (!functionCalculator.isValidFunction()) {
+              controlErrors['invalidMathFunction'] = functionCalculator.error;
+          } else {
+              delete controlErrors['invalidMathFunction'];
+              if(Object.keys(controlErrors).length === 0) controlErrors = null;
+          }
+
+          control.setErrors(controlErrors);
+          return null;
+        };
+    }
+
 }

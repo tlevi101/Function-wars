@@ -19,11 +19,11 @@ const routes: Routes = [
     { path: 'register-guest', component: RegisterGuestComponent },
     { path: 'admin/users', component: UsersComponent },
     { path: 'admin/reports', component: ReportsComponent },
-	{ path: 'admin/fields', component: FieldListComponent },
-	{ path: 'my-fields', component: FieldListComponent },
-	{ path: 'field/edit/:id', component: FieldEditorComponent },
-	{ path: 'field/new', component: FieldEditorComponent },
-	{ path: 'game/:uuid', component: GameComponent },
+    { path: 'admin/fields', component: FieldListComponent },
+    { path: 'my-fields', component: FieldListComponent },
+    { path: 'field/edit/:id', component: FieldEditorComponent },
+    { path: 'field/new', component: FieldEditorComponent },
+    { path: 'game/:uuid', component: GameComponent },
 ];
 
 @NgModule({

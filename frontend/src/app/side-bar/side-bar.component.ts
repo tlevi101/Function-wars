@@ -9,7 +9,7 @@ import { myAnimations } from './animations';
 interface Friend {
     id: number;
     name: string;
-	unreadMessages: number;
+    unreadMessages: number;
 }
 enum Actions {
     Undefine,
@@ -33,20 +33,24 @@ interface FriendRequest {
 })
 export class SideBarComponent {
     @ViewChild('confirm', { static: true }) confirm!: ConfirmComponent;
-	@ViewChild('friendChat', { static: true }) friendChat!: FriendChatComponent;
+    @ViewChild('friendChat', { static: true }) friendChat!: FriendChatComponent;
     myFriendsHovered = false;
     friends: Friend[];
     friendCurrentState: string[];
     friendRequests: FriendRequest[];
     selectedFriend: SelectedFriend;
     activeTitle = 'Friends';
-	activeFriend : Friend | undefined;
-    constructor(private friendsService: FriendsService, private usersService: UsersService, private chatService: ChatService) {
+    activeFriend: Friend | undefined;
+    constructor(
+        private friendsService: FriendsService,
+        private usersService: UsersService,
+        private chatService: ChatService
+    ) {
         this.friendCurrentState = [];
         this.friends = [];
         this.friendRequests = [];
         this.selectedFriend = {
-            friend: { id: 0, name: '' , unreadMessages: 0},
+            friend: { id: 0, name: '', unreadMessages: 0 },
             index: 0,
             action: Actions.Undefine,
         };
@@ -70,12 +74,12 @@ export class SideBarComponent {
                 //TODO Create an error message component
             }
         );
-		this.chatService.receiveMessage().subscribe((message: any) => {
-			if (message.from !== this.activeFriend?.id) {
-				const index = this.friends.findIndex(f => f.id === message.from);
-				this.friends[index].unreadMessages++;
-			}
-		});
+        this.chatService.receiveMessage().subscribe((message: any) => {
+            if (message.from !== this.activeFriend?.id) {
+                const index = this.friends.findIndex(f => f.id === message.from);
+                this.friends[index].unreadMessages++;
+            }
+        });
     }
     myFriendsMouseIn(): void {
         this.myFriendsHovered = true;
@@ -161,20 +165,20 @@ export class SideBarComponent {
             }
         );
     }
-	openChat(friend: Friend) {
-		this.activeFriend = friend;
-		this.friendChat.friendId= friend.id;
-		this.friendChat.friendName = friend.name;
-		this.friendChat.loadChat(friend.id);
-		let index = this.friends.findIndex(f => f.id === friend.id);
-		this.friends[index].unreadMessages = 0;
-	}
-	handleChatClosed() {
-		this.activeFriend = undefined;
-	}
-	hasUnreadMessages(): boolean {
-		return this.friends.some(f => f.unreadMessages > 0);
-	}
+    openChat(friend: Friend) {
+        this.activeFriend = friend;
+        this.friendChat.friendId = friend.id;
+        this.friendChat.friendName = friend.name;
+        this.friendChat.loadChat(friend.id);
+        let index = this.friends.findIndex(f => f.id === friend.id);
+        this.friends[index].unreadMessages = 0;
+    }
+    handleChatClosed() {
+        this.activeFriend = undefined;
+    }
+    hasUnreadMessages(): boolean {
+        return this.friends.some(f => f.unreadMessages > 0);
+    }
     get slideDirection(): string {
         return this.myFriendsHovered ? 'left' : 'right';
     }

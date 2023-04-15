@@ -28,11 +28,14 @@ import { NewGameComponent } from './new-game/new-game.component';
 import { OnWaitingComponent } from './on-waiting/on-waiting.component';
 import { GameComponent } from './game/game.component';
 
-const config: SocketIoConfig = { url: 'http://localhost:3000', options: { 
-	transports: ['websocket'],
-	query: { token: sessionStorage.getItem('token') || localStorage.getItem('token') },
-	extraHeaders: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` }
-}} ;
+const config: SocketIoConfig = {
+    url: 'http://localhost:3000',
+    options: {
+        transports: ['websocket'],
+        query: { token: sessionStorage.getItem('token') || localStorage.getItem('token') },
+        extraHeaders: { Authorization: `Bearer ${sessionStorage.getItem('token') || localStorage.getItem('token')}` },
+    },
+};
 @NgModule({
     declarations: [
         AppComponent,
@@ -65,10 +68,9 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {
         ReactiveFormsModule,
         FormsModule,
         BrowserAnimationsModule,
-		SocketIoModule.forRoot(config)
+        SocketIoModule.forRoot(config),
     ],
     providers: [],
     bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

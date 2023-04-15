@@ -4,21 +4,21 @@
 
 		</canvas>
 	</div>
-	<div class="controls">
+	<div class="controls p-3">
 
 		<form [formGroup]="functionForm">
+            <div class="d-flex gap-3 mb-3">
+                <button *ngFor="let fn of validFunctions" type="button" class="btn btn-primary btn-sm" (click)="insertFunction(fn)" [innerHTML]="fn"></button>
+            </div>
 			<div class="d-flex">
-				<input type="text" class="form-control w-50 me-auto" id="function-name" placeholder="Function name" formControlName="function">
-				<button type="submit" class="btn btn-primary btn-sm" (click)="submitFunction()">Submit function</button>
+				<input #functionDef type="text" class="form-control w-50 me-auto {{functionDefState}}" id="functionDef" placeholder="Function" formControlName="functionDef" (keydown)="overrideInput($event)">
+				<button type="submit" class="btn btn-primary btn-sm {{functionForm.invalid ? 'disabled' : ''}}" (click)="submitFunction()">Submit function</button>
 			</div>
-			<!-- <div *ngIf="functionName?.touched" class="invalid-feedback mb-3">
-				{{ functionNameError }}
+			 <div *ngIf="functionDefControl?.touched" class="invalid-feedback mb-3">
+                {{getFunctionDefError()}}
 			</div>
-			<div *ngIf="functionName?.touched" class="invalid-feedback">
-				{{ functionFormErrors }}
-			</div> -->
 		</form>
-		
+
 	</div>
 </div>
 

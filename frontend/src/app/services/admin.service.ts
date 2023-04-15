@@ -41,7 +41,7 @@ export class AdminService {
     addRemoveChatRestrictionUsers(userId: any) {
         return this.http.put(
             `${this.url}/users/${userId}/add-remove-chat-restriction`,
-			{},
+            {},
             {
                 headers: this.hr,
             }

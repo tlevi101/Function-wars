@@ -3,21 +3,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NewGameComponent } from './new-game.component';
 
 describe('NewGameComponent', () => {
-  let component: NewGameComponent;
-  let fixture: ComponentFixture<NewGameComponent>;
+    let component: NewGameComponent;
+    let fixture: ComponentFixture<NewGameComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ NewGameComponent ]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [NewGameComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(NewGameComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(NewGameComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

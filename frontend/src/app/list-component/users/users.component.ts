@@ -18,7 +18,7 @@ export class UsersComponent implements OnInit {
     @ViewChild('baseList') baseList!: BaseListComponent;
     constructor(private adminService: AdminService, private router: Router) {
         this.baseList = new BaseListComponent();
-		this.sendGetUsersRequest();
+        this.sendGetUsersRequest();
     }
 
     ngOnInit(): void {
@@ -111,12 +111,12 @@ export class UsersComponent implements OnInit {
         );
     }
 
-	sendGetUsersRequest() {
-		this.adminService.getUsers().subscribe(
+    sendGetUsersRequest() {
+        this.adminService.getUsers().subscribe(
             (res: any) => {
                 this.users = res.users;
                 baseData.pagination = new Pagination(this.users.length);
-				baseData.data = this.users;
+                baseData.data = this.users;
                 this.baseList.init(baseData);
             },
             (err: any) => {
@@ -124,7 +124,7 @@ export class UsersComponent implements OnInit {
                 console.log(err);
             }
         );
-	}
+    }
     getDecodedAccessToken(token: string): DecodedTokenInterface | null {
         try {
             return jwt_decode(token);
