@@ -33,8 +33,6 @@ router.get('/fields', auth, async (req, res) => {
     res.status(200).json({ fields: fields });
 });
 
-
-
 router.get('/fields/:id', auth, async (req, res) => {
     const { email } = req.user;
     const user = await User.findOne({ where: { email: email } });
@@ -51,9 +49,6 @@ router.get('/fields/:id', auth, async (req, res) => {
     }
     res.status(200).json({ field: field });
 });
-
-
-
 
 router.post('/fields', auth, async (req, res) => {
     const { email } = req.user;
@@ -73,8 +68,6 @@ router.post('/fields', auth, async (req, res) => {
     });
     res.status(201).json({ field: field });
 });
-
-
 
 router.put('/fields/:id', auth, async (req, res) => {
     const { email } = req.user;
@@ -97,8 +90,6 @@ router.put('/fields/:id', auth, async (req, res) => {
     await field.update({ name: validated.value.name, field: validated.value.field });
     res.status(200).json({ field: field });
 });
-
-
 
 router.delete('/fields/:id', auth, async (req, res) => {
     const { email } = req.user;

@@ -1,4 +1,3 @@
-
 export interface Point {
     x: number;
     y: number;
@@ -12,7 +11,7 @@ export class FunctionCalculator {
     private zeroY: number;
     private ratio: number;
     private limit: number;
-    private validFunctions: string[] = ['sin', 'cos', 'sqrt', 'log','pow', 'abs'];
+    private validFunctions: string[] = ['sin', 'cos', 'sqrt', 'log', 'pow', 'abs'];
     private specialValidFunctions: string[] = ['√', '|X|', 'e'];
     private validOperators: string[] = ['+', '-', '*', '/', '^'];
     private invalidFunctions: string[] = ['tan', 'a/x', '[x]', '{x}'];
@@ -43,7 +42,7 @@ export class FunctionCalculator {
     }
     replaceAll(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.validFunctions.map((validFn) => {
+            this.validFunctions.map(validFn => {
                 this.fn = this.fn.replaceAll(validFn, `Math.${validFn}`);
             });
             this.replacePowerOperator();
@@ -74,12 +73,12 @@ export class FunctionCalculator {
             }
             if (Number.isInteger(this.f(x))) {
                 points.push({ x: x, y: this.f(x) });
-                if(this.f(x) >= this.height || this.f(x) <= 0){
-                	// console.log("returning");
-                	// console.log("x: "+x);
-                	// console.log("y: "+this.f(x));
-                	// console.log(firstValidPoint);
-                	return points;
+                if (this.f(x) >= this.height || this.f(x) <= 0) {
+                    // console.log("returning");
+                    // console.log("x: "+x);
+                    // console.log("y: "+this.f(x));
+                    // console.log(firstValidPoint);
+                    return points;
                 }
             }
         }
@@ -107,8 +106,8 @@ export class FunctionCalculator {
             }
             if (Number.isInteger(this.f(x))) {
                 points.push({ x: x, y: this.f(x) });
-                if(this.f(x) >= this.height || this.f(x) <=0){
-                	return points;
+                if (this.f(x) >= this.height || this.f(x) <= 0) {
+                    return points;
                 }
             }
         }
@@ -140,11 +139,10 @@ export class FunctionCalculator {
     }
 
     isValidFunction(): boolean {
-        try{
+        try {
             console.log(this.fn);
             this.f(this.zeroX);
-        }
-        catch(e){
+        } catch (e) {
             return false;
         }
         return (
@@ -166,21 +164,21 @@ export class FunctionCalculator {
         return this.fn.match(regex) !== null;
     }
     replacePowerOperator(): void {
-      this.fn = this.fn.replaceAll('^', '**');
+        this.fn = this.fn.replaceAll('^', '**');
     }
 
     replaceEWithMathE(): void {
-      this.fn = this.fn.replaceAll('e', 'Math.E');
+        this.fn = this.fn.replaceAll('e', 'Math.E');
     }
     replaceAbsWithMathAbs(): void {
-      const regex = /\|.*x.*\|/gi;
-      this.fn = this.fn.replaceAll(regex, 'Math.abs($&)');
-      this.fn = this.fn.replaceAll('|', '');
+        const regex = /\|.*x.*\|/gi;
+        this.fn = this.fn.replaceAll(regex, 'Math.abs($&)');
+        this.fn = this.fn.replaceAll('|', '');
     }
     replaceSqrtOperator(): void {
-      const regex = /(√x)|(√\(.*x.*\))/gi;
-      this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
-      this.fn = this.fn.replaceAll('√', '');
+        const regex = /(√x)|(√\(.*x.*\))/gi;
+        this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
+        this.fn = this.fn.replaceAll('√', '');
     }
 
     get error(): string {
@@ -201,14 +199,14 @@ export class FunctionCalculator {
             if (this.firstValidPoint() === null) {
                 return `Function does not contain any valid point in [0;${this.width}]}]`;
             }
-        } catch (e:any) {
+        } catch (e: any) {
             return 'Invalid function';
         }
         return '';
     }
     static get ValidFunctions(): string[] {
         let validFunctions: string[] = ['sin', 'cos', 'log'];
-        validFunctions = validFunctions.map((fn) => fn + '(X)');
+        validFunctions = validFunctions.map(fn => fn + '(X)');
         const specialValidFunctions = ['√(X)', '|X|', 'e^(X)'];
         return [...validFunctions, ...specialValidFunctions];
     }

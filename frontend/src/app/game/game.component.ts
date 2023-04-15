@@ -6,7 +6,7 @@ import { ObjectInterface, PlayerInterface } from '../interfaces/backend-body.int
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GameService } from '../services/game.service';
 import { FunctionCalculator, Point } from './FunctionCalculator';
-import {ValidationService} from "../services/validation.service";
+import { ValidationService } from '../services/validation.service';
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
@@ -16,8 +16,8 @@ export class GameComponent implements OnInit, AfterViewInit {
     playersFieldParticles: PlayerInterface[] = [];
     players: { id: number; name: string; fieldParticle: PlayerInterface }[] = [];
     objects: ObjectInterface[] = [];
-    fieldName= '';
-    ratio= 20;
+    fieldName = '';
+    ratio = 20;
     functionForm: FormGroup;
     currentPlayer: { id: number; name: string; fieldParticle: PlayerInterface } | undefined;
     gameUUID = '';
@@ -31,14 +31,16 @@ export class GameComponent implements OnInit, AfterViewInit {
         private activatedRoute: ActivatedRoute,
         private validationService: ValidationService
     ) {
-        this.functionForm = new FormGroup({
-            functionDef: new FormControl('', {
-                validators: [Validators.required],
-            }),
-        },
-          {
-            validators: [this.validationService.mathFunctionValidator('functionDef')],
-          });
+        this.functionForm = new FormGroup(
+            {
+                functionDef: new FormControl('', {
+                    validators: [Validators.required],
+                }),
+            },
+            {
+                validators: [this.validationService.mathFunctionValidator('functionDef')],
+            }
+        );
     }
 
     ngOnInit() {
@@ -68,21 +70,21 @@ export class GameComponent implements OnInit, AfterViewInit {
         }
         this.animate();
     }
-    overrideInput(event :any) {
+    overrideInput(event: any) {
         if (event.key === 'x') {
             event.preventDefault();
             const start = this.functionDefInput.nativeElement.selectionStart;
-            if(start === null) {
+            if (start === null) {
                 return;
             }
-            let value= this.functionDef;
+            let value = this.functionDef;
             value = value.substring(0, start) + 'X' + value.substring(start);
             this.functionDefControl?.setValue(value);
         }
     }
     insertFunction(functionDef: string) {
         const start = this.functionDefInput.nativeElement.selectionStart;
-        if(start === null) {
+        if (start === null) {
             return;
         }
         let value = this.functionDef;
@@ -133,7 +135,7 @@ export class GameComponent implements OnInit, AfterViewInit {
     }
 
     drawFunction(xLimit: number) {
-        if(this.functionDef === '' || !this.currentPlayer) {
+        if (this.functionDef === '' || !this.currentPlayer) {
             return;
         }
         const fn = this.initFunction(xLimit);
@@ -289,17 +291,17 @@ export class GameComponent implements OnInit, AfterViewInit {
         this.drawFunction(xLimit);
     }
 
-    get functionDefState() :string{
-        if(!this.functionDefControl?.touched) return '';
+    get functionDefState(): string {
+        if (!this.functionDefControl?.touched) return '';
         return this.functionDefControl?.valid ? 'is-valid' : 'is-invalid';
     }
-    getFunctionDefError() :string{
+    getFunctionDefError(): string {
         console.log('getFunctionDefError');
-        if(this.functionDefControl?.hasError('required')) return 'Function definition is required';
-        if(this.functionDefControl?.hasError('invalidMathFunction')) {
+        if (this.functionDefControl?.hasError('required')) return 'Function definition is required';
+        if (this.functionDefControl?.hasError('invalidMathFunction')) {
             return this.functionDefControl?.getError('invalidMathFunction');
         }
-      return '';
+        return '';
     }
     get functionDef(): string {
         return this.functionForm.get('functionDef')?.value;
@@ -310,5 +312,4 @@ export class GameComponent implements OnInit, AfterViewInit {
     get validFunctions() {
         return FunctionCalculator.ValidFunctions;
     }
-
 }

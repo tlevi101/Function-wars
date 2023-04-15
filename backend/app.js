@@ -14,7 +14,6 @@ const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
 //Socket
 
-
 const io = require('socket.io')(http, {
     cors: {
         origin: ['*', 'https://admin.socket.io', 'http://localhost:4200'],
@@ -39,57 +38,56 @@ io.use(function (socket, next) {
 })
     .on('connection', async socket => {
         console.log('user connected');
-        onlineUsers.set(socket.decoded.id, {user: await User.findByPk(socket.decoded.id), socketId: socket.id});
+        onlineUsers.set(socket.decoded.id, { user: await User.findByPk(socket.decoded.id), socketId: socket.id });
 
-		socket.on('send chat message', async ({ message, friend_id }) => {
-           sendChatMessage(socket, message, friend_id, onlineUsers );
-        });
-        
-		socket.on('set seen', async ({ friend_id }) => {
-            setSeen(socket, friend_id );
+        socket.on('send chat message', async ({ message, friend_id }) => {
+            sendChatMessage(socket, message, friend_id, onlineUsers);
         });
 
-		socket.on('join wait list', async () => {
-			console.log('joined wait list');
-			joinWaitList(socket, waitList, games);
-		});
-		
-		socket.on('leave wait list', async () => {
-			console.log('left wait list');
-			console.log('left wait list');
-			leaveWaitList(socket, waitList, games);
-		});
-		
-		// socket.on('get game data', async (gameUUID) => {
-		// 	console.log('get game data');
-		// 	getGameData(socket, gameUUID, games);
-		// });
+        socket.on('set seen', async ({ friend_id }) => {
+            setSeen(socket, friend_id);
+        });
 
-		socket.on('disconnect', async () => {
-			console.log('user disconnected');
-			onlineUsers.delete(socket.decoded.id);
-			leaveWaitList(socket, waitList, games);
-		});
+        socket.on('join wait list', async () => {
+            console.log('joined wait list');
+            joinWaitList(socket, waitList, games);
+        });
+
+        socket.on('leave wait list', async () => {
+            console.log('left wait list');
+            console.log('left wait list');
+            leaveWaitList(socket, waitList, games);
+        });
+
+        // socket.on('get game data', async (gameUUID) => {
+        // 	console.log('get game data');
+        // 	getGameData(socket, gameUUID, games);
+        // });
+
+        socket.on('disconnect', async () => {
+            console.log('user disconnected');
+            onlineUsers.delete(socket.decoded.id);
+            leaveWaitList(socket, waitList, games);
+        });
     })
     .on('disconnect', socket => {
-		waitList.delete(socket.decoded.id);
-		onlineUsers.delete(socket.decoded.id);
-		console.log('user disconnected');
+        waitList.delete(socket.decoded.id);
+        onlineUsers.delete(socket.decoded.id);
+        console.log('user disconnected');
         console.log(socket.decoded);
     });
 
-
 //use socket in routes
 app.use(function (req, res, next) {
-	res.io = io;
-	next();
+    res.io = io;
+    next();
 });
 //use socket maps in routes
 app.use(function (req, res, next) {
-	req.onlineUsers = onlineUsers;
-	req.waitList = waitList;
-	req.games = games;
-	next();
+    req.onlineUsers = onlineUsers;
+    req.waitList = waitList;
+    req.games = games;
+    next();
 });
 
 // parse requests of content-type - application/json
@@ -149,10 +147,7 @@ app.use(async function (err, req, res, next) {
     res.status(err.status || 500).json({ error: err.message });
 });
 
-
-
-
 module.exports = {
-	app,
-	io
+    app,
+    io,
 };

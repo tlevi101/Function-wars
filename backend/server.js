@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {io, app} = require('./app');
+const { io, app } = require('./app');
 const { instrument } = require('@socket.io/admin-ui');
 
 instrument(io, {
