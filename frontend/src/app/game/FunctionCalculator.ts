@@ -184,19 +184,19 @@ export class FunctionCalculator {
     insertMultiplicationOperator(): void {
         const case1 = /[0-9]+x/gi;
         const case2 = /\)x/gi;
-        const caseGroup1 = {cases:[case1, case2], replace: /x/gi, with: '*X'};
+        const caseGroup1 = { cases: [case1, case2], replace: /x/gi, with: '*X' };
 
         const case3 = /x[0-9]+/gi;
         const case4 = /x\(/gi;
-        const caseGroup2 = {cases:[case3, case4], replace: /x/gi, with: 'X*'};
+        const caseGroup2 = { cases: [case3, case4], replace: /x/gi, with: 'X*' };
 
-        caseGroup1.cases.forEach((c) => {
-            while(this.fn.search(c) !== -1) {
+        caseGroup1.cases.forEach(c => {
+            while (this.fn.search(c) !== -1) {
                 this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with);
             }
         });
-        caseGroup2.cases.forEach((c) => {
-            while(this.fn.search(c) !== -1) {
+        caseGroup2.cases.forEach(c => {
+            while (this.fn.search(c) !== -1) {
                 this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with);
             }
         });

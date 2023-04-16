@@ -7,7 +7,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GameService } from '../services/game.service';
 import { FunctionCalculator, Point } from './FunctionCalculator';
 import { ValidationService } from '../services/validation.service';
-import {InfoComponent} from "../pop-up/info/info.component";
+import { InfoComponent } from '../pop-up/info/info.component';
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
@@ -22,7 +22,6 @@ export class GameComponent implements OnInit, AfterViewInit {
     functionForm: FormGroup;
     currentPlayer: { id: number; name: string; fieldParticle: PlayerInterface } | undefined;
     gameUUID = '';
-
 
     @ViewChild('field') field!: ElementRef<HTMLCanvasElement>;
     @ViewChild('functionDef') functionDefInput!: ElementRef<HTMLInputElement>;
@@ -44,7 +43,6 @@ export class GameComponent implements OnInit, AfterViewInit {
                 validators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
-
     }
 
     ngOnInit() {
@@ -90,13 +88,11 @@ export class GameComponent implements OnInit, AfterViewInit {
                 console.log(error);
                 this.infoComponent.description = error.error.message;
                 this.infoComponent.buttonText = 'Ok';
-                if(error.status===403 || error.status===404){
+                if (error.status === 403 || error.status === 404) {
                     this.infoComponent.buttonLink = '/';
-                }
-                else{
+                } else {
                     this.infoComponent.buttonLink = '#';
                 }
-
             }
         );
         // this.animate();
@@ -122,11 +118,11 @@ export class GameComponent implements OnInit, AfterViewInit {
         value = value.substring(0, start) + functionDef + value.substring(start);
         this.functionDefControl?.setValue(value);
     }
-    initFunction(xLimit: number | undefined = undefined, fn?:string): FunctionCalculator {
+    initFunction(xLimit: number | undefined = undefined, fn?: string): FunctionCalculator {
         console.log('initFunction');
-        console.log(fn? fn : this.functionDef);
+        console.log(fn ? fn : this.functionDef);
         return new FunctionCalculator(
-            fn? fn : this.functionDef,
+            fn ? fn : this.functionDef,
             this.currentPlayer!.fieldParticle.location.x,
             this.currentPlayer!.fieldParticle.location.y,
             this.field.nativeElement.width,
@@ -148,10 +144,9 @@ export class GameComponent implements OnInit, AfterViewInit {
                 console.log(error);
                 this.infoComponent.description = error.error.message;
                 this.infoComponent.buttonText = 'Ok';
-                if(error.status===403 || error.status===404){
+                if (error.status === 403 || error.status === 404) {
                     this.infoComponent.buttonLink = '/';
-                }
-                else{
+                } else {
                     this.infoComponent.buttonLink = '#';
                 }
             }
@@ -164,15 +159,14 @@ export class GameComponent implements OnInit, AfterViewInit {
         this.fieldName = res.field.field.name;
         this.playersFieldParticles = res.field.field.players;
         this.currentPlayer = res.currentPlayer;
-        if(this.itsMyTurn){
+        if (this.itsMyTurn) {
             this.functionDefControl?.enable();
-        }
-        else{
+        } else {
             this.functionDefControl?.disable();
         }
     }
 
-    animate(fn?:string) {
+    animate(fn?: string) {
         console.log('animate');
         console.log(fn);
         let tickCount = 0;
@@ -192,7 +186,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         console.log('drawFunction');
         console.log(func);
         //if func is undefined, then we are drawing the function of the current player
-        if ((this.functionDef === '' || !this.currentPlayer) && !func){
+        if ((this.functionDef === '' || !this.currentPlayer) && !func) {
             return;
         }
         const fn = this.initFunction(xLimit, func);
@@ -337,7 +331,7 @@ export class GameComponent implements OnInit, AfterViewInit {
             ctx.closePath();
         }
     }
-    draw(xLimit: number = this.ratio, fn?:string) {
+    draw(xLimit: number = this.ratio, fn?: string) {
         console.log('draw');
         console.log(fn);
         const ctx = this.field.nativeElement.getContext('2d');

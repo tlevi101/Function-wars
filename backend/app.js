@@ -12,7 +12,7 @@ const http = require('http').createServer();
 const jwt = require('jsonwebtoken');
 const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
-const { gameRouter, leaveGame} = require('./socket_handlers/game-handler');
+const { gameRouter, leaveGame } = require('./socket_handlers/game-handler');
 //Socket
 
 const io = require('socket.io')(http, {
@@ -68,12 +68,12 @@ io.use(function (socket, next) {
             console.log('user disconnected');
             onlineUsers.delete(socket.decoded.id);
             leaveWaitList(socket, waitList, games);
-            const gamesIter = games.values()
-            for(let i = 0; i < games.size; i++){
+            const gamesIter = games.values();
+            for (let i = 0; i < games.size; i++) {
                 const game = gamesIter.next().value;
-                if(game.sockets.includes(socket)){
+                if (game.sockets.includes(socket)) {
                     const gameUUID = `game-${game.field.id}-${game.players.map(player => player.id).join('')}`;
-                    socket.to(gameUUID).emit('game ended', {message: `${socket.decoded.name} left the game.}`});
+                    socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.}` });
                     game.sockets.forEach(socket => socket.leave(gameUUID));
                     socket.leave(gameUUID);
                     games.delete(gameUUID);
@@ -87,8 +87,6 @@ io.use(function (socket, next) {
         console.log('user disconnected');
         console.log(socket.decoded);
     });
-
-
 
 //use socket in routes
 app.use(function (req, res, next) {

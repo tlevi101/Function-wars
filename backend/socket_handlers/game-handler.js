@@ -25,7 +25,7 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
         return res.status(400).json({ message: 'You must submit a function.' });
     }
     const modifiedGame = await modifyGame(game);
-    const { location } = modifiedGame.currentPlayer.fieldParticle
+    const { location } = modifiedGame.currentPlayer.fieldParticle;
     const func = new FunctionCalculator(fn, location.x, location.y);
     let { players, field } = modifiedGame;
     if (!func.isValidFunction()) {
@@ -38,8 +38,8 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
     game.currentPlayer = nextPlayer;
     req.games.set(game_uuid, game);
     console.log('emitting to game room');
-    res.io.to(game_uuid).emit('receive function', {function: fn, game: await modifyGame(game)});
-    return res.status(200).json({game: await modifyGame(game)});
+    res.io.to(game_uuid).emit('receive function', { function: fn, game: await modifyGame(game) });
+    return res.status(200).json({ game: await modifyGame(game) });
 });
 
 gameRouter.get('/:game_uuid', auth, async (req, res) => {
@@ -81,7 +81,7 @@ module.exports = {
     gameRouter,
 };
 
-const modifyGame = async (game) => {
+const modifyGame = async game => {
     let { players, field } = game;
     players = await Promise.all(
         players.map((player, index) => {
@@ -98,4 +98,3 @@ const modifyGame = async (game) => {
         currentPlayer: players.find(player => player.id === game.currentPlayer.id),
     };
 };
-

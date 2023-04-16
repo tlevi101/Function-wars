@@ -11,15 +11,7 @@ module.exports = class FunctionCalculator {
     validOperators = ['+', '-', '*', '/', '^'];
     invalidFunctions = ['tan', 'a/x', '[x]', '{x}'];
 
-    constructor(
-        fn,
-        zeroX,
-        zeroY,
-        width = 1000,
-        height = 700,
-        ratio = 35,
-        limit = undefined
-    ) {
+    constructor(fn, zeroX, zeroY, width = 1000, height = 700, ratio = 35, limit = undefined) {
         this.fn = fn;
         (async () => {
             await this.replaceAll();
@@ -77,7 +69,7 @@ module.exports = class FunctionCalculator {
         return points;
     }
 
-    calculateLeftSidePoints(){
+    calculateLeftSidePoints() {
         const points = [];
         const firstValidPoint = this.firstValidPoint();
         if (!firstValidPoint) {
@@ -111,7 +103,7 @@ module.exports = class FunctionCalculator {
         return Math.round(this.zeroY - eval(fn) * this.ratio);
     }
 
-    firstValidPoint(){
+    firstValidPoint() {
         for (let x = this.zeroX; x < this.width; x++) {
             if (Number.isInteger(this.f(x))) {
                 return { x: x, y: this.f(x) };
@@ -176,19 +168,19 @@ module.exports = class FunctionCalculator {
     insertMultiplicationOperator() {
         const case1 = /[0-9]+x/gi;
         const case2 = /\)x/gi;
-        const caseGroup1 = {cases:[case1, case2], replace: /x/gi, with: '*X'};
+        const caseGroup1 = { cases: [case1, case2], replace: /x/gi, with: '*X' };
 
         const case3 = /x[0-9]+/gi;
         const case4 = /x\(/gi;
-        const caseGroup2 = {cases:[case3, case4], replace: /x/gi, with: 'X*'};
+        const caseGroup2 = { cases: [case3, case4], replace: /x/gi, with: 'X*' };
 
-        caseGroup1.cases.forEach((c) => {
-            while(this.fn.search(c) !== -1) {
+        caseGroup1.cases.forEach(c => {
+            while (this.fn.search(c) !== -1) {
                 this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with);
             }
         });
-        caseGroup2.cases.forEach((c) => {
-            while(this.fn.search(c) !== -1) {
+        caseGroup2.cases.forEach(c => {
+            while (this.fn.search(c) !== -1) {
                 this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with);
             }
         });
@@ -223,5 +215,4 @@ module.exports = class FunctionCalculator {
         const specialValidFunctions = ['√(X)', '|X|', 'e^(X)'];
         return [...validFunctions, ...specialValidFunctions];
     }
-}
-
+};
