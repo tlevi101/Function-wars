@@ -32,4 +32,7 @@ export class GameService {
     public gameEnded() {
         return this.socket.fromEvent('game ended');
     }
+    public leaveGame() {
+        this.socket.emit('leave game');
+    }
 }

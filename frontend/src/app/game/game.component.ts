@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FieldService } from '../services/field.service';
 import { JwtService } from '../services/jwt.service';
@@ -13,7 +13,7 @@ import { InfoComponent } from '../pop-up/info/info.component';
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
 })
-export class GameComponent implements OnInit, AfterViewInit {
+export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     playersFieldParticles: PlayerInterface[] = [];
     players: { id: number; name: string; fieldParticle: PlayerInterface }[] = [];
     objects: ObjectInterface[] = [];
@@ -43,6 +43,10 @@ export class GameComponent implements OnInit, AfterViewInit {
                 validators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
+    }
+
+    ngOnDestroy(): void {
+        this.gameService.leaveGame();
     }
 
     ngOnInit() {
