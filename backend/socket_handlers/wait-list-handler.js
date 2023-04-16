@@ -48,9 +48,9 @@ const PlaceIntoGame = async (count, waitList, games) => {
         field: field,
         currentPlayer: players[0],
     });
-    console.log(games);
     sockets.forEach(socket => {
         socket.leave('wait-list');
+        socket.join(`game-${field.id}-${players.map(player => player.id).join('')}`);
         socket.emit('joined game', {
             room: `game-${field.id}-${players.map(player => player.id).join('')}`,
             players: players,

@@ -7,6 +7,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GameService } from '../services/game.service';
 import { FunctionCalculator, Point } from './FunctionCalculator';
 import { ValidationService } from '../services/validation.service';
+import {InfoComponent} from "../pop-up/info/info.component";
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
@@ -22,8 +23,10 @@ export class GameComponent implements OnInit, AfterViewInit {
     currentPlayer: { id: number; name: string; fieldParticle: PlayerInterface } | undefined;
     gameUUID = '';
 
+
     @ViewChild('field') field!: ElementRef<HTMLCanvasElement>;
     @ViewChild('functionDef') functionDefInput!: ElementRef<HTMLInputElement>;
+    @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
         private router: Router,
         private gameService: GameService,
@@ -41,6 +44,7 @@ export class GameComponent implements OnInit, AfterViewInit {
                 validators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
+
     }
 
     ngOnInit() {
@@ -58,6 +62,15 @@ export class GameComponent implements OnInit, AfterViewInit {
         } else {
             this.currentPlayer = this.players[0];
         }
+        this.gameService.receiveFunction().subscribe((response: any) => {
+            this.initGameDataFromResponse(response.game);
+            this.animate(response.function);
+        });
+        this.gameService.gameEnded().subscribe((response: any) => {
+            this.infoComponent.description = response.message;
+            this.infoComponent.buttonText = 'Quit';
+            this.infoComponent.buttonLink = '/';
+        });
     }
 
     ngAfterViewInit() {
@@ -65,10 +78,28 @@ export class GameComponent implements OnInit, AfterViewInit {
     }
 
     submitFunction() {
-        if (this.functionForm.invalid) {
+        if (this.functionForm.invalid || !this.itsMyTurn) {
             return;
         }
-        this.animate();
+        this.gameService.submitFunction(this.gameUUID, this.functionDef).subscribe(
+            (response: any) => {
+                this.initGameDataFromResponse(response.game);
+                // this.animate();
+            },
+            (error: any) => {
+                console.log(error);
+                this.infoComponent.description = error.error.message;
+                this.infoComponent.buttonText = 'Ok';
+                if(error.status===403 || error.status===404){
+                    this.infoComponent.buttonLink = '/';
+                }
+                else{
+                    this.infoComponent.buttonLink = '#';
+                }
+
+            }
+        );
+        // this.animate();
     }
     overrideInput(event: any) {
         if (event.key === 'x') {
@@ -91,9 +122,11 @@ export class GameComponent implements OnInit, AfterViewInit {
         value = value.substring(0, start) + functionDef + value.substring(start);
         this.functionDefControl?.setValue(value);
     }
-    initFunction(xLimit: number | undefined = undefined): FunctionCalculator {
+    initFunction(xLimit: number | undefined = undefined, fn?:string): FunctionCalculator {
+        console.log('initFunction');
+        console.log(fn? fn : this.functionDef);
         return new FunctionCalculator(
-            this.functionDef,
+            fn? fn : this.functionDef,
             this.currentPlayer!.fieldParticle.location.x,
             this.currentPlayer!.fieldParticle.location.y,
             this.field.nativeElement.width,
@@ -107,38 +140,62 @@ export class GameComponent implements OnInit, AfterViewInit {
     sendGetGameData(gameUUID: string) {
         this.gameService.getGameData(gameUUID).subscribe(
             (response: any) => {
-                this.players = response.players;
-                this.objects = response.field.field.objects;
-                this.fieldName = response.field.field.name;
-                this.playersFieldParticles = response.field.field.players;
-                this.currentPlayer = response.currentPlayer;
+                this.initGameDataFromResponse(response);
                 this.draw();
             },
             (error: any) => {
-                //TODO handle error
+                console.log(this.infoComponent);
+                console.log(error);
+                this.infoComponent.description = error.error.message;
+                this.infoComponent.buttonText = 'Ok';
+                if(error.status===403 || error.status===404){
+                    this.infoComponent.buttonLink = '/';
+                }
+                else{
+                    this.infoComponent.buttonLink = '#';
+                }
             }
         );
     }
 
-    animate() {
+    initGameDataFromResponse(res: any) {
+        this.players = res.players;
+        this.objects = res.field.field.objects;
+        this.fieldName = res.field.field.name;
+        this.playersFieldParticles = res.field.field.players;
+        this.currentPlayer = res.currentPlayer;
+        if(this.itsMyTurn){
+            this.functionDefControl?.enable();
+        }
+        else{
+            this.functionDefControl?.disable();
+        }
+    }
+
+    animate(fn?:string) {
+        console.log('animate');
+        console.log(fn);
         let tickCount = 0;
         const ticksPerSecond = 60;
         const tickRate = 1000 / ticksPerSecond;
         const unitPerTick = 0.3;
         const timer = setInterval(() => {
             tickCount++;
-            this.draw(tickCount * this.ratio * unitPerTick);
+            this.draw(tickCount * this.ratio * unitPerTick, fn);
             if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
                 clearInterval(timer);
             }
         }, tickRate);
     }
 
-    drawFunction(xLimit: number) {
-        if (this.functionDef === '' || !this.currentPlayer) {
+    drawFunction(xLimit: number, func?: string) {
+        console.log('drawFunction');
+        console.log(func);
+        //if func is undefined, then we are drawing the function of the current player
+        if ((this.functionDef === '' || !this.currentPlayer) && !func){
             return;
         }
-        const fn = this.initFunction(xLimit);
+        const fn = this.initFunction(xLimit, func);
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.strokeStyle = 'red';
@@ -280,7 +337,9 @@ export class GameComponent implements OnInit, AfterViewInit {
             ctx.closePath();
         }
     }
-    draw(xLimit: number = this.ratio) {
+    draw(xLimit: number = this.ratio, fn?:string) {
+        console.log('draw');
+        console.log(fn);
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.clearRect(0, 0, this.field.nativeElement.width, this.field.nativeElement.height);
@@ -288,7 +347,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         this.drawObjects();
         this.drawPlayers();
         this.drawLines();
-        this.drawFunction(xLimit);
+        this.drawFunction(xLimit, fn);
     }
 
     get functionDefState(): string {
@@ -296,7 +355,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         return this.functionDefControl?.valid ? 'is-valid' : 'is-invalid';
     }
     getFunctionDefError(): string {
-        console.log('getFunctionDefError');
+        console.log(this.functionDefControl?.errors);
         if (this.functionDefControl?.hasError('required')) return 'Function definition is required';
         if (this.functionDefControl?.hasError('invalidMathFunction')) {
             return this.functionDefControl?.getError('invalidMathFunction');
@@ -311,5 +370,9 @@ export class GameComponent implements OnInit, AfterViewInit {
     }
     get validFunctions() {
         return FunctionCalculator.ValidFunctions;
+    }
+
+    get itsMyTurn() {
+        return this.currentPlayer?.id === this.jwt.getDecodedAccessToken()?.id;
     }
 }

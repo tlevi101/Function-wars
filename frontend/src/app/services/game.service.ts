@@ -22,7 +22,14 @@ export class GameService {
         return this.http.get(`${this.url}/${gameUUID}`, { headers: this.hr });
     }
 
-    public listenGameData() {
-        return this.socket.fromEvent('receive game data');
+    public submitFunction(gameUUID: string, fn: string) {
+        return this.http.post(`${this.url}/${gameUUID}/function/submit`, { fn }, { headers: this.hr });
+    }
+
+    public receiveFunction() {
+        return this.socket.fromEvent('receive function');
+    }
+    public gameEnded() {
+        return this.socket.fromEvent('game ended');
     }
 }

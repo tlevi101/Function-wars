@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -10,9 +10,11 @@ export class InfoComponent {
     @Input() description = '';
     @Input() buttonText = 'Ok';
     @Input() buttonLink = '#';
+    @Output() closeEvent = new EventEmitter();
     constructor(private currentRoute: ActivatedRoute, private router: Router) {}
     close() {
         this.description = '';
         this.buttonLink = '#';
+        this.closeEvent.emit();
     }
 }

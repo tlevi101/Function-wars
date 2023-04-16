@@ -12,6 +12,7 @@ const http = require('http').createServer();
 const jwt = require('jsonwebtoken');
 const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
+const { gameRouter, leaveGame} = require('./socket_handlers/game-handler');
 //Socket
 
 const io = require('socket.io')(http, {
@@ -59,15 +60,25 @@ io.use(function (socket, next) {
             leaveWaitList(socket, waitList, games);
         });
 
-        // socket.on('get game data', async (gameUUID) => {
-        // 	console.log('get game data');
-        // 	getGameData(socket, gameUUID, games);
-        // });
+        socket.on('leave game', async () => {
+            leaveGame(socket, games);
+        });
 
         socket.on('disconnect', async () => {
             console.log('user disconnected');
             onlineUsers.delete(socket.decoded.id);
             leaveWaitList(socket, waitList, games);
+            const gamesIter = games.values()
+            for(let i = 0; i < games.size; i++){
+                const game = gamesIter.next().value;
+                if(game.sockets.includes(socket)){
+                    const gameUUID = `game-${game.field.id}-${game.players.map(player => player.id).join('')}`;
+                    socket.to(gameUUID).emit('game ended', {message: `${socket.decoded.name} left the game.}`});
+                    game.sockets.forEach(socket => socket.leave(gameUUID));
+                    socket.leave(gameUUID);
+                    games.delete(gameUUID);
+                }
+            }
         });
     })
     .on('disconnect', socket => {
@@ -76,6 +87,8 @@ io.use(function (socket, next) {
         console.log('user disconnected');
         console.log(socket.decoded);
     });
+
+
 
 //use socket in routes
 app.use(function (req, res, next) {
@@ -95,11 +108,14 @@ app.use(express.json());
 app.use(cors());
 
 //routers
-app.use('/games', require('./routes/games'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));
+
+//socket router
+app.use('/games', gameRouter);
+
 app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });
 });
@@ -123,6 +139,7 @@ app.use(async function (err, req, res, next) {
         return next(err);
     }
     const time = date.format(new Date(), 'HH:mm:ss');
+    console.error(err.stack);
     const error = {
         [time.toString()]: {
             name: err.name,

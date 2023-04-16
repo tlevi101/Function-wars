@@ -8,11 +8,11 @@
 
 		<form [formGroup]="functionForm">
             <div class="d-flex gap-3 mb-3">
-                <button *ngFor="let fn of validFunctions" type="button" class="btn btn-primary btn-sm" (click)="insertFunction(fn)" [innerHTML]="fn"></button>
+                <button *ngFor="let fn of validFunctions" type="button" class="btn btn-primary btn-sm {{itsMyTurn? '':'disabled'}}" (click)="insertFunction(fn)" [innerHTML]="fn"></button>
             </div>
 			<div class="d-flex">
-				<input #functionDef type="text" class="form-control w-50 me-auto {{functionDefState}}" id="functionDef" placeholder="Function" formControlName="functionDef" (keydown)="overrideInput($event)">
-				<button type="submit" class="btn btn-primary btn-sm {{functionForm.invalid ? 'disabled' : ''}}" (click)="submitFunction()">Submit function</button>
+				<input #functionDef type="text" class="form-control w-50 me-auto {{functionDefState}}" [attr.disabled]="!itsMyTurn ? '' : null"id="functionDef" placeholder="Function" formControlName="functionDef" (keydown)="overrideInput($event)">
+				<button type="submit" class="btn btn-primary btn-sm {{functionForm.invalid || !itsMyTurn || !functionForm.touched ? 'disabled' : ''}}" (click)="submitFunction()">Submit function</button>
 			</div>
 			 <div *ngIf="functionDefControl?.touched" class="invalid-feedback mb-3">
                 {{getFunctionDefError()}}
@@ -22,4 +22,5 @@
 	</div>
 </div>
 
+<app-info #infoComponent></app-info>
 

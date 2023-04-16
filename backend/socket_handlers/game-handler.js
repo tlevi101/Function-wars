@@ -1,112 +1,101 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
+const express = require('express');
+const auth = require('../middlewares/auth');
+const gameRouter = express.Router();
+const FunctionCalculator = require('../utils/FuncCalculator');
 
-const submitFunction = async (socket, gameUUID, games, fn) => {
-    let game = games.get(gameUUID);
-    let { currentPlayer } = game;
-    if (currentPlayer.player.id !== socket.decoded.id) {
-        //TODO Handle this on frontend
-        return socket.emit('receive game data', { error: 'It is not your turn.' });
+/**
+ * @route GET games/:game_uuid/function/submit
+ * on success: 200 and emit 'receive function' socket event to game room
+ */
+gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
+    const { game_uuid } = req.params;
+    const { fn } = req.body;
+
+    const game = req.games.get(game_uuid);
+    if (!game) {
+        return res.status(404).json({ message: 'Game not found.' });
     }
-
-    let { player } = currentPlayer;
-
-    //TODO validate function
+    let { currentPlayer } = game;
+    if (currentPlayer.id !== req.user.id) {
+        return res.status(403).json({ message: 'It is not your turn.' });
+    }
+    if (!fn) {
+        return res.status(400).json({ message: 'You must submit a function.' });
+    }
+    const modifiedGame = await modifyGame(game);
+    const { location } = modifiedGame.currentPlayer.fieldParticle
+    const func = new FunctionCalculator(fn, location.x, location.y);
+    let { players, field } = modifiedGame;
+    if (!func.isValidFunction()) {
+        return res.status(400).json({ message: 'Invalid function.' });
+    }
     //TODO check end of game
 
-    let nextPlayer = players[(players.indexOf(player) + 1) % players.length];
+    let nextPlayer = players[(players.indexOf(currentPlayer) + 1) % players.length];
 
     game.currentPlayer = nextPlayer;
-    games.set(gameUUID, game);
-    socket.to(gameUUID).emit('receive function', { function: fn, player: player });
+    req.games.set(game_uuid, game);
+    console.log('emitting to game room');
+    res.io.to(game_uuid).emit('receive function', {function: fn, game: await modifyGame(game)});
+    return res.status(200).json({game: await modifyGame(game)});
+});
+
+gameRouter.get('/:game_uuid', auth, async (req, res) => {
+    const { game_uuid } = req.params;
+
+    const game = req.games.get(game_uuid);
+    if (!game) {
+        //TODO Handle this on frontend
+        return res.status(404).json({ message: 'Game not found.' });
+    }
+    let { players, field } = game;
+    if (!players.find(player => player.id === req.user.id)) {
+        //TODO Handle this on frontend
+        return res.status(403).json({ message: 'You are not in this game.' });
+    }
+    res.status(200).json(await modifyGame(game));
+});
+
+const leaveGame = async (socket, games) => {
+    let game = null;
+    let gameUUID = null;
+    games.forEach((value, key) => {
+        if (value.sockets.find(s => s.id === socket.id)) {
+            game = value;
+            gameUUID = key;
+        }
+    });
+    if (!game) {
+        return;
+    }
+    socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
+    game.sockets.forEach(socket => socket.leave(gameUUID));
+    socket.leave(game.room);
+    games.delete(gameUUID);
 };
 
 module.exports = {
-    submitFunction,
+    leaveGame,
+    gameRouter,
 };
 
-class Function {
-    constructor(fn, width = 1000, height = 800, zeroX, zeroY, ratio = 35) {
-        this.fn = fn;
-        this.width = width;
-        this.height = height;
-        this.zeroX = zeroX;
-        this.zeroY = zeroY;
-        this.ratio = ratio;
-        if (!this.isValidFunction()) {
-            throw new Error('Invalid function');
-        }
-    }
+const modifyGame = async (game) => {
+    let { players, field } = game;
+    players = await Promise.all(
+        players.map((player, index) => {
+            return {
+                id: player.id,
+                name: player.name,
+                fieldParticle: field.field.players[index],
+            };
+        })
+    );
+    return {
+        players,
+        field,
+        currentPlayer: players.find(player => player.id === game.currentPlayer.id),
+    };
+};
 
-    calculateRightSidePoints() {
-        let points = [];
-        for (let x = this.zeroX; x < this.width; x++) {
-            if (!Number.isFinite(this.calculateY(x))) {
-                if (this.calculateY(x) == Infinity) {
-                    points.push({ x: x, y: 0 });
-                }
-                if (this.calculateY(x) == -Infinity) {
-                    points.push({ x: x, y: this.height });
-                }
-                return points;
-            }
-            if (Number.isInteger(this.calculateY(x))) {
-                points.push({ x: x, y: this.calculateY(x) });
-                if (this.calculateY(x) < 0 || this.calculateY(x) > this.height) {
-                    return points;
-                }
-            }
-        }
-        return points;
-    }
-
-    calculateLeftSidePoints() {
-        let points = [];
-        for (let x = this.zeroX; x > 0; x--) {
-            if (!Number.isFinite(this.calculateY(x))) {
-                if (this.calculateY(x) == Infinity) {
-                    points.push({ x: x, y: 0 });
-                }
-                if (this.calculateY(x) == -Infinity) {
-                    points.push({ x: x, y: this.height });
-                }
-                return points;
-            }
-            if (Number.isInteger(this.calculateY(x))) {
-                points.push({ x: x, y: this.calculateY(x) });
-                if (this.calculateY(x) < 0 || this.calculateY(x) > this.height) {
-                    return points;
-                }
-            }
-        }
-        return points;
-    }
-
-    calculateY(x) {
-        let fn = this.replaceXWithValue((x - this.zeroX) / this.ratio);
-        return Math.round(this.zeroY - eval(fn) * this.ratio);
-    }
-
-    firstValidPoint() {
-        for (let x = this.zeroX; x < this.width; x++) {
-            if (Number.isInteger(this.calculateY(x))) {
-                return { x: x, y: this.calculateY(x) };
-            }
-        }
-        for (let x = this.zeroX; x > 0; x--) {
-            if (Number.isInteger(this.calculateY(x))) {
-                return { x: x, y: this.calculateY(x) };
-            }
-        }
-        return null;
-    }
-
-    replaceXWithValue(value) {
-        let fn = this.fn.replaceAll('X', value.toString());
-        return fn;
-    }
-
-    isValidFunction() {
-        return !Number.isNaN(this.calculateY(0)) && this.firstValidPoint !== null; //TODO make other checks
-    }
-}

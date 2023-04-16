@@ -6,14 +6,18 @@ $body-color: #D6DEEB;
 $primary: #82AAFF;
 
 // input
-$input-bg: #1D3B53;
+$input-bg: #00569b;
 $input-border-color:#1D3B53;
+$input-disabled-bg: #011627;
+$input-disabled-border-color: #011627;
+$input-disabled-color: #00447e;
 $form-check-input-checked-color:          $body-color;
 $form-check-input-checked-bg-color:       $primary;
+$input-placeholder-color: #9a9a9a;
 // $input-group-addon-bg:   #7FDBCA;
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px $input-bg inset !important;
 	-webkit-text-fill-color: $body-color !important;
@@ -71,20 +75,20 @@ $modal-content-border-width:        0px;
 ::-webkit-scrollbar {
 	width: 10px;
   }
-  
+
   /* Track */
   ::-webkit-scrollbar-track {
 	background: none;
 	padding: 2px;
   }
-  
+
   /* Handle */
   ::-webkit-scrollbar-thumb {
 	background: $primary;
 	border-radius: 10px;
 	margin-right: 2px;
   }
-  
+
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
 	background: $primary;
