@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { FunctionCalculator } from '../game/FunctionCalculator';
+import { FunctionCalculator } from '../game/utils/FunctionCalculator';
 
 @Injectable({
     providedIn: 'any',

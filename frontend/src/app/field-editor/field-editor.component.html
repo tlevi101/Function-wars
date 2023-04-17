@@ -16,7 +16,7 @@
 			<input #widthRange type="range" name="width-range" id="width-range" class="form-range" min="20" max="200" value="110" (input)="widthChange()">
 			<label for="height-range" class="form-label">Height: {{heightRange.value}}</label>
 			<input #heightRange type="range" name="height-range" id="height-range" class="form-range" min="20" max="200" value="110"  (input)="heightChange()">
-			
+
 		</div>
 		<div class="players-controls m-3">
 			<label for="height-range" class="form-label">Player count: {{playerCountRange.value}}</label>
@@ -27,12 +27,12 @@
 					</div>
 				</div>
 				<div class="buttons mt-4">
-					<button class="btn btn-primary btn-sm {{playerCountRange.valueAsNumber == playerCount ? 'disabled': ''}}" (click)="addPlayer()">Add player</button>
+					<button class="btn btn-primary btn-sm {{playerCountRange.valueAsNumber === playerCount ? 'disabled': ''}}" (click)="addPlayer()">Add player</button>
 				</div>
 			</div>
 		</div>
 		<div class="m-3">
-			<button class="btn btn-primary btn-sm {{fieldParticles.size ==0 ? 'disabled': ''}}" (click)="removeSelected()">Remove selected</button>
+			<button class="btn btn-primary btn-sm {{fieldParticles.size ===0 ? 'disabled': ''}}" (click)="removeSelected()">Remove selected</button>
 		</div>
 		<div class="m-3">
 			<form [formGroup]="fieldSubmitForm" class="" novalidate>

@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { LinkedList } from './LinkedList';
 import { Dimension, Ellipse, Shape, Point, Rectangle } from './Shape';
 import { Player } from './Player';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -14,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     styleUrls: ['./field-editor.component.scss'],
 })
 export class FieldEditorComponent implements OnInit {
-    fieldParticles = new LinkedList<Shape | Player>();
+    fieldParticles = new Map<number,Shape | Player>();
     mouseOnHold = false;
     fieldSubmitForm: FormGroup;
 
@@ -40,7 +39,7 @@ export class FieldEditorComponent implements OnInit {
         }
         if (this.router.url !== '/field/new') {
             this.activeRoute.paramMap.subscribe(async params => {
-                let id = params.get('id');
+                const id = params.get('id');
                 if (id !== null) {
                     await this.sendGetFieldRequest(parseInt(id));
                     this.drawObjects();
@@ -68,12 +67,12 @@ export class FieldEditorComponent implements OnInit {
             );
     }
 
-    saveField() {
-        if (!this.validateField) {
+    async saveField() {
+        if (!(await this.validateField)) {
             return;
         }
-        let fieldParticlesAsJson = this.fieldParticlesToJSON();
-        let body: FieldBodyInterface = {
+        const fieldParticlesAsJson = await this.fieldParticlesToJSON();
+        const body: FieldBodyInterface = {
             name: this.fieldName!.value,
             field: {
                 dimension: { width: this.field.nativeElement.width, height: this.field.nativeElement.height },
@@ -92,7 +91,7 @@ export class FieldEditorComponent implements OnInit {
                 }
             );
         } else {
-            let id = this.activeRoute.snapshot.paramMap.get('id');
+            const id = this.activeRoute.snapshot.paramMap.get('id');
             if (id === null) {
                 this.router.navigate(['/my-fields']);
                 return;
@@ -110,27 +109,35 @@ export class FieldEditorComponent implements OnInit {
     }
 
     widthChange() {
-        if (this.fieldParticles.Tail === null || this.fieldParticles.Tail instanceof Player) return;
-        this.fieldParticles.Tail.width = parseInt(this.widthRange.nativeElement.value);
+        const size = this.fieldParticles.size;
+        const particle = this.fieldParticles.get(size);
+        if (!particle || particle instanceof Player){
+            return;
+        }
+        particle.width = parseInt(this.widthRange.nativeElement.value);
         this.drawObjects();
     }
 
     heightChange() {
-        if (this.fieldParticles.Tail === null || this.fieldParticles.Tail instanceof Player) return;
-        this.fieldParticles.Tail.height = parseInt(this.heightRange.nativeElement.value);
+        const size = this.fieldParticles.size;
+        const particle = this.fieldParticles.get(size);
+        if (!particle || particle instanceof Player) return;
+        particle.height = parseInt(this.heightRange.nativeElement.value);
         this.drawObjects();
     }
 
     addPlayer() {
         const loc: Point = new Point(450, 300);
-        this.fieldParticles.add(new Player(loc));
+        const size = this.fieldParticles.size;
+        this.fieldParticles.set(size+1, new Player(loc));
         this.drawObjects();
     }
 
     addCircle() {
         const loc: Point = new Point(450, 300);
         const dim: Dimension = { width: 110, height: 110 };
-        this.fieldParticles.add(new Ellipse(loc, dim));
+        const size = this.fieldParticles.size;
+        this.fieldParticles.set(size+1,new Ellipse(loc, dim));
         this.modifyObjectControls();
         this.drawObjects();
     }
@@ -138,110 +145,115 @@ export class FieldEditorComponent implements OnInit {
     addRectangle() {
         const loc: Point = new Point(450, 300);
         const dim: Dimension = { width: 110, height: 110 };
-        this.fieldParticles.add(new Rectangle(loc, dim));
+        const size = this.fieldParticles.size;
+        this.fieldParticles.set(size+1,new Rectangle(loc, dim));
         this.modifyObjectControls();
         this.drawObjects();
     }
 
     removeSelected() {
-        if (this.fieldParticles.Tail === null) return;
-        this.fieldParticles.removeTail();
+        const size = this.fieldParticles.size;
+        this.fieldParticles.delete(size);
         this.drawObjects();
     }
 
-    mouseMoved(event: any) {
+    async mouseMoved(event: any) {
         if (!this.mouseOnHold) return;
-        if (this.fieldParticles.Tail === null) return;
-        this.fieldParticles.Tail.Location = new Point(event.offsetX, event.offsetY);
-        this.validateField();
+        const size = this.fieldParticles.size;
+        if (!this.fieldParticles.get(size)) return;
+        this.fieldParticles.get(size)!.Location = new Point(event.offsetX, event.offsetY);
+        (await this.validateField());
         this.drawObjects();
     }
 
-    mouseDown(event: any) {
-        if (this.fieldParticles.Tail === null) return;
+    async mouseDown(event: any) {
+        const size = this.fieldParticles.size;
+        if (!this.fieldParticles.get(size)) return;
         this.mouseOnHold = true;
-        let clickPos = new Point(event.offsetX, event.offsetY);
-        let where = (shape: Shape | Player) => {
-            if (shape instanceof Player) return shape.Shape.pointInside(clickPos);
-            else return shape.pointInside(clickPos);
-        };
-        this.fieldParticles.toTailFirst(where);
-        if (this.fieldParticles.Tail instanceof Ellipse) {
+        const clickPos = new Point(event.offsetX, event.offsetY);
+        await this.switchParticleAtPoint(clickPos);
+        if (this.fieldParticles.get(size) instanceof Ellipse) {
             this.modifyObjectControls();
         }
-        if (this.fieldParticles.Tail instanceof Rectangle) {
+        if (this.fieldParticles.get(size) instanceof Rectangle) {
             this.modifyObjectControls();
         }
-        this.mouseMoved(event);
+        await this.mouseMoved(event);
     }
 
     modifyObjectControls() {
-        if (this.fieldParticles.Tail === null) return;
-        if (this.fieldParticles.Tail instanceof Ellipse) {
-            this.heightRange.nativeElement.value = (this.fieldParticles.Tail.Dimension.height * 2).toString();
-            this.widthRange.nativeElement.value = (this.fieldParticles.Tail.Dimension.width * 2).toString();
+        if (!this.lastParticle) return;
+        if (this.lastParticle instanceof Ellipse) {
+            this.heightRange.nativeElement.value = (this.lastParticle.Dimension.height * 2).toString();
+            this.widthRange.nativeElement.value = (this.lastParticle.Dimension.width * 2).toString();
         }
-        if (this.fieldParticles.Tail instanceof Rectangle) {
-            this.heightRange.nativeElement.value = this.fieldParticles.Tail.Dimension.height.toString();
-            this.widthRange.nativeElement.value = this.fieldParticles.Tail.Dimension.width.toString();
+        if (this.lastParticle instanceof Rectangle) {
+            this.heightRange.nativeElement.value = this.lastParticle.Dimension.height.toString();
+            this.widthRange.nativeElement.value = this.lastParticle.Dimension.width.toString();
         }
     }
     drawObjects() {
-        let ctx = this.field.nativeElement.getContext('2d');
+        const ctx = this.field.nativeElement.getContext('2d');
         if (ctx === null) return;
         ctx.clearRect(0, 0, this.field.nativeElement.width, this.field.nativeElement.height);
-        let iter = this.fieldParticles.iterator();
+        const iter = this.fieldParticles.values();
         if (iter === null) return;
-        do {
-            const loc = iter.value!.Location;
-            const dim = iter.value!.Dimension;
+        const size = this.fieldParticles.size;
+        let i = 0;
+        for(let current = iter.next(); !current.done; current = iter.next()) {
+            console.log(current)
+            const particle = current.value;
+            const done  = i === size - 1;
+            const loc = particle.Location;
+            const dim = particle.Dimension;
             ctx.beginPath();
-            let avoidLoc = new Point(iter.value!.AvoidArea.Location.x, iter.value!.AvoidArea.Location.y);
+            const avoidLoc = new Point(particle.AvoidArea.Location.x, particle.AvoidArea.Location.y);
             ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-            ctx.arc(avoidLoc.x, avoidLoc.y, iter.value!.AvoidArea.Radius, 0, 2 * Math.PI);
+            ctx.arc(avoidLoc.x, avoidLoc.y, particle.AvoidArea.Radius, 0, 2 * Math.PI);
             ctx.fill();
             ctx.closePath();
             ctx.beginPath();
-            if (iter.value instanceof Player) {
-                if (!iter.hasNext()) {
+            if (particle instanceof Player) {
+                if (done) {
                     ctx.strokeStyle = 'greenyellow';
                     ctx.fillStyle = 'greenyellow';
                 } else {
                     ctx.strokeStyle = 'green';
                     ctx.fillStyle = 'green';
                 }
-            } else if (!iter.hasNext()) {
+            } else if (done) {
                 ctx.strokeStyle = 'red';
                 ctx.fillStyle = 'red';
             } else {
                 ctx.strokeStyle = 'black';
                 ctx.fillStyle = 'black';
             }
-            if (iter.value instanceof Ellipse || iter.value instanceof Player) {
+            if (particle instanceof Ellipse || particle instanceof Player) {
                 ctx.ellipse(loc.x, loc.y, dim.width, dim.height, 0, 0, 2 * Math.PI);
-            } else if (iter.value instanceof Rectangle) ctx.rect(loc.x, loc.y, dim.width, dim.height);
+            } else if (particle instanceof Rectangle) ctx.rect(loc.x, loc.y, dim.width, dim.height);
             ctx.fill();
             ctx.closePath();
-        } while (iter.next());
+            i++;
+        }
     }
 
     get playerCount() {
-        let iter = this.fieldParticles.iterator();
-        if (iter === null) return 0;
+        const iter = this.fieldParticles.values();
+        if (!iter) return 0;
         let count = 0;
-        do {
-            if (iter.value instanceof Player) count++;
-        } while (iter.next());
+        for(let current = iter.next(); !current.done; current = iter.next()) {
+            if (current.value instanceof Player) count++;
+        }
         return count;
     }
 
     get objectsCount() {
-        let iter = this.fieldParticles.iterator();
-        if (iter === null) return 0;
+        const iter = this.fieldParticles.values();
+        if (!iter) return 0;
         let count = 0;
-        do {
-            if (iter.value instanceof Shape) count++;
-        } while (iter.next());
+        for(let current = iter.next(); !current.done; current = iter.next()) {
+            if (current.value instanceof Shape) count++;
+        }
         return count;
     }
 
@@ -279,13 +291,12 @@ export class FieldEditorComponent implements OnInit {
         this.fieldName?.markAsTouched();
     }
 
-    private fieldParticlesToJSON(): { players: PlayerInterface[]; objects: ObjectInterface[] } {
-        let players: PlayerInterface[] = this.fieldParticles
-            .filter((object: Shape | Player) => {
+    private async fieldParticlesToJSON(): Promise<{ players: PlayerInterface[]; objects: ObjectInterface[] }> {
+        const players: PlayerInterface[] = (await this.filterParticles((object: Shape | Player) => {
                 return object instanceof Player;
-            })
+            }))
             .map((player: Player | Shape) => {
-                let result: PlayerInterface = {
+                const result: PlayerInterface = {
                     location: { x: player.Location.x, y: player.Location.y },
                     dimension: { width: player.Dimension.width, height: player.Dimension.height },
                     avoidArea: {
@@ -295,17 +306,16 @@ export class FieldEditorComponent implements OnInit {
                 };
                 return result;
             });
-        let objects: ObjectInterface[] = this.fieldParticles
-            .filter((object: Shape | Player) => {
+        const objects: ObjectInterface[] = (await this.filterParticles((object: Shape | Player) => {
                 return object instanceof Shape;
-            })
+            }))
             .map((object: Shape | Player) => {
-                let type = object instanceof Rectangle ? 'Rectangle' : 'Ellipse';
-                let dimension =
+                const type = object instanceof Rectangle ? 'Rectangle' : 'Ellipse';
+                const dimension =
                     object instanceof Rectangle
                         ? object.Dimension
                         : { width: object.Dimension.width * 2, height: object.Dimension.height * 2 };
-                let result: ObjectInterface = {
+                const result: ObjectInterface = {
                     type: type,
                     location: { x: object.Location.x, y: object.Location.y },
                     dimension: dimension,
@@ -323,31 +333,36 @@ export class FieldEditorComponent implements OnInit {
     }
 
     private loadFieldParticlesFromJSON(players: PlayerInterface[], objects: ObjectInterface[]) {
-        for (const player of players) {
-            this.fieldParticles.add(new Player(new Point(player.location.x, player.location.y)));
-        }
+        let key = 1;
         for (const object of objects) {
-            if (object.type == 'Rectangle')
-                this.fieldParticles.add(
+            if (object.type == 'Rectangle'){
+                this.fieldParticles.set(key,
                     new Rectangle(new Point(object.location.x, object.location.y), {
                         width: object.dimension.width,
                         height: object.dimension.height,
                     })
                 );
-            else
-                this.fieldParticles.add(
+            }
+            else{
+                this.fieldParticles.set(key,
                     new Ellipse(new Point(object.location.x, object.location.y), {
                         width: object.dimension.width,
                         height: object.dimension.height,
                     })
                 );
+            }
+            key++;
+        }
+        for (const player of players) {
+            this.fieldParticles.set(key,new Player(new Point(player.location.x, player.location.y)));
+            key++;
         }
     }
-    validateField(): boolean {
-        let players = this.fieldParticles.filter((object: Shape | Player) => {
+    async validateField(): Promise<boolean> {
+        const players = await this.filterParticles((object: Shape | Player) => {
             return object instanceof Player;
         });
-        let objects = this.fieldParticles.filter((object: Shape | Player) => {
+        const objects = await this.filterParticles((object: Shape | Player) => {
             return object instanceof Shape;
         });
         let noIntersections = true;
@@ -365,7 +380,7 @@ export class FieldEditorComponent implements OnInit {
                 }
             }
         }
-        let valid = this.playerCount == this.playerCountRange.nativeElement.valueAsNumber && noIntersections;
+        const valid = this.playerCount == this.playerCountRange.nativeElement.valueAsNumber && noIntersections;
         if (!valid) {
             if (!noIntersections) this.fieldSubmitForm.setErrors({ noIntersections: true });
             if (this.playerCount != this.playerCountRange.nativeElement.valueAsNumber)
@@ -374,5 +389,43 @@ export class FieldEditorComponent implements OnInit {
             this.fieldSubmitForm.setErrors(null);
         }
         return valid;
+    }
+
+    async findParticleAtPoint(point: Point): Promise<{index:number,particle:Shape | Player} | null> {
+        if(this.fieldParticles.size == 0) return null;
+        const iter = this.fieldParticles.values();
+        let index = 0;
+        do {
+            const particle = iter.next().value;
+            index++;
+            if(await particle.pointInside(point)) return {index:index,particle};
+        } while (index < this.fieldParticles.size);
+        return null;
+    }
+
+    async switchParticleAtPoint(point: Point) {
+        const particle = await this.findParticleAtPoint(point);
+        console.log('found particle:')
+        console.log(particle);
+        const size = this.fieldParticles.size;
+        if(particle === null) return;
+        const tmp = this.fieldParticles.get(size)!;
+        this.fieldParticles.set(size,particle.particle);
+        this.fieldParticles.set(particle.index,tmp);
+    }
+
+    get lastParticle() {
+        return this.fieldParticles.get(this.fieldParticles.size);
+    }
+
+    async filterParticles(where:(particle: Shape | Player) => boolean) {
+        const iter = this.fieldParticles.values();
+        const result: (Shape | Player)[] = [];
+        for(let current = iter.next(); !current.done; current = iter.next()){
+            if(where(current.value)) {
+                result.push(current.value);
+            }
+        }
+        return result;
     }
 }

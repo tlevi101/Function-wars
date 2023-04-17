@@ -72,11 +72,10 @@ io.use(function (socket, next) {
             for (let i = 0; i < games.size; i++) {
                 const game = gamesIter.next().value;
                 if (game.sockets.includes(socket)) {
-                    const gameUUID = `game-${game.field.id}-${game.players.map(player => player.id).join('')}`;
-                    socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.}` });
-                    game.sockets.forEach(socket => socket.leave(gameUUID));
-                    socket.leave(gameUUID);
-                    games.delete(gameUUID);
+                    socket.to(game.UUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
+                    game.sockets.forEach(socket => socket.leave(game.UUID));
+                    socket.leave(game.UUID);
+                    games.delete(game.UUID);
                 }
             }
         });

@@ -61,8 +61,8 @@ export class FunctionCalculator {
             return points;
         }
         for (let x = firstValidPoint.x; x < this.width && x < firstValidPoint.x + this.limit; x++) {
-            console.log('x: ' + x);
-            console.log('y: ' + this.f(x));
+            // console.log('x: ' + x);
+            // console.log('y: ' + this.f(x));
             if (!Number.isFinite(this.f(x))) {
                 if (this.f(x) == Infinity) {
                     points.push({ x: x, y: 0 });
@@ -75,10 +75,10 @@ export class FunctionCalculator {
             if (Number.isInteger(this.f(x))) {
                 points.push({ x: x, y: this.f(x) });
                 if (this.f(x) >= this.height || this.f(x) <= 0) {
-                    // console.log("returning");
-                    // console.log("x: "+x);
-                    // console.log("y: "+this.f(x));
-                    // console.log(firstValidPoint);
+                    // // console.log("returning");
+                    // // console.log("x: "+x);
+                    // // console.log("y: "+this.f(x));
+                    // // console.log(firstValidPoint);
                     return points;
                 }
             }
@@ -93,9 +93,9 @@ export class FunctionCalculator {
             return points;
         }
         for (let x = firstValidPoint.x; x > 0 && x > firstValidPoint.x - this.limit; x--) {
-            console.log('x: ' + x);
-            console.log('y: ' + this.f(x));
-            console.log(firstValidPoint.x - this.limit);
+            // console.log('x: ' + x);
+            // console.log('y: ' + this.f(x));
+            // console.log(firstValidPoint.x - this.limit);
             if (!Number.isFinite(this.f(x))) {
                 if (this.f(x) == -Infinity) {
                     points.push({ x: x, y: 0 });
@@ -141,7 +141,7 @@ export class FunctionCalculator {
 
     isValidFunction(): boolean {
         try {
-            console.log(this.fn);
+            // console.log(this.fn);
             this.f(this.zeroX);
         } catch (e) {
             return false;

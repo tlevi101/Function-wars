@@ -1,6 +1,6 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-
+const Game = require('../utils/dist/Game');
 const joinWaitList = async (socket, waitList, games) => {
     socket.join('wait-list');
     console.log('joined wait-list');
@@ -34,27 +34,23 @@ const PlaceIntoGame = async (count, waitList, games) => {
     if (!field) return;
     for (let i = 0; i < count; i++) {
         const id = iter.next().value;
-        players.push(await User.findByPk(id, { attributes: ['id', 'name'] }));
+        const user = await User.findByPk(id, { attributes: ['id', 'name'] });
+        players.push(user.toJSON());
         sockets.push(waitList.get(id));
     }
 
     players.forEach(user => {
         waitList.delete(user);
     });
-
-    games.set(`game-${field.id}-${players.map(player => player.id).join('')}`, {
-        sockets: sockets,
-        players: players,
-        field: field,
-        currentPlayer: players[0],
-    });
+    const newGame =  await Game.makeGameFromField(field, players, sockets);
+    games.set(newGame.UUID, newGame);
     sockets.forEach(socket => {
         socket.leave('wait-list');
-        socket.join(`game-${field.id}-${players.map(player => player.id).join('')}`);
+        socket.join(newGame.UUID);
         socket.emit('joined game', {
-            room: `game-${field.id}-${players.map(player => player.id).join('')}`,
-            players: players,
-            field: field,
+            room: newGame.UUID,
+            players: newGame.Players,
+            field: newGame.Field,
         });
     });
 };

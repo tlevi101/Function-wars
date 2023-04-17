@@ -3,7 +3,8 @@ const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middlewares/auth');
 const gameRouter = express.Router();
-const FunctionCalculator = require('../utils/FuncCalculator');
+const FuncCalculator = require('../utils/dist/FuncCalculator');
+
 
 /**
  * @route GET games/:game_uuid/function/submit
@@ -12,34 +13,31 @@ const FunctionCalculator = require('../utils/FuncCalculator');
 gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
     const { game_uuid } = req.params;
     const { fn } = req.body;
-
     const game = req.games.get(game_uuid);
     if (!game) {
         return res.status(404).json({ message: 'Game not found.' });
     }
-    let { currentPlayer } = game;
+    let currentPlayer = game.CurrentPlayer;
     if (currentPlayer.id !== req.user.id) {
         return res.status(403).json({ message: 'It is not your turn.' });
     }
     if (!fn) {
         return res.status(400).json({ message: 'You must submit a function.' });
     }
-    const modifiedGame = await modifyGame(game);
-    const { location } = modifiedGame.currentPlayer.fieldParticle;
-    const func = new FunctionCalculator(fn, location.x, location.y);
-    let { players, field } = modifiedGame;
-    if (!func.isValidFunction()) {
+    const { location } = currentPlayer;
+    try{
+        await game.submitFunction(fn);
+    }catch (e) {
+        console.log(e);
         return res.status(400).json({ message: 'Invalid function.' });
     }
     //TODO check end of game
+    const points = await game.calculateFunctionPoints();
 
-    let nextPlayer = players[(players.indexOf(currentPlayer) + 1) % players.length];
-
-    game.currentPlayer = nextPlayer;
+    res.io.to(game_uuid).emit('receive function', { points });
+    game.changeCurrentPlayer();
     req.games.set(game_uuid, game);
-    console.log('emitting to game room');
-    res.io.to(game_uuid).emit('receive function', { function: fn, game: await modifyGame(game) });
-    return res.status(200).json({ game: await modifyGame(game) });
+    return res.status(200);
 });
 
 gameRouter.get('/:game_uuid', auth, async (req, res) => {
@@ -50,12 +48,12 @@ gameRouter.get('/:game_uuid', auth, async (req, res) => {
         //TODO Handle this on frontend
         return res.status(404).json({ message: 'Game not found.' });
     }
-    let { players, field } = game;
+    let players = game.Players;
     if (!players.find(player => player.id === req.user.id)) {
         //TODO Handle this on frontend
         return res.status(403).json({ message: 'You are not in this game.' });
     }
-    res.status(200).json(await modifyGame(game));
+    res.status(200).json(game.toFrontend());
 });
 
 const leaveGame = async (socket, games) => {
@@ -67,7 +65,7 @@ const leaveGame = async (socket, games) => {
             gameUUID = key;
         }
     });
-    if (!game) {
+    if (!game || !gameUUID) {
         return;
     }
     socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
@@ -79,22 +77,4 @@ const leaveGame = async (socket, games) => {
 module.exports = {
     leaveGame,
     gameRouter,
-};
-
-const modifyGame = async game => {
-    let { players, field } = game;
-    players = await Promise.all(
-        players.map((player, index) => {
-            return {
-                id: player.id,
-                name: player.name,
-                fieldParticle: field.field.players[index],
-            };
-        })
-    );
-    return {
-        players,
-        field,
-        currentPlayer: players.find(player => player.id === game.currentPlayer.id),
-    };
 };

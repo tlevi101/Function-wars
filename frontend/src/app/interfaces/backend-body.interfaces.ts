@@ -42,6 +42,8 @@ export interface FieldListResponseInterface {
 }
 
 export interface PlayerInterface {
+    id?: number;
+    name?: string;
     location: { x: number; y: number };
     dimension: { width: number; height: number };
     avoidArea: { location: { x: number; y: number }; radius: number };

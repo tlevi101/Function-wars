@@ -12,6 +12,9 @@ export class Player {
     public objectTooClose(object: Shape): boolean {
         return this.avoidArea.intersectsWith(object.AvoidArea);
     }
+    async pointInside(point: Point): Promise<boolean> {
+        return await this.object.pointInside(point);
+    }
     get Shape(): Ellipse {
         return this.object;
     }

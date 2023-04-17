@@ -6,7 +6,7 @@ export class Point {
         this.y = y;
     }
     public distance(p: Point): number {
-        let d = Math.sqrt(Math.pow(Math.abs(this.x - p.x), 2) + Math.pow(Math.abs(this.y - p.y), 2));
+        const d = Math.sqrt(Math.pow(Math.abs(this.x - p.x), 2) + Math.pow(Math.abs(this.y - p.y), 2));
         return d;
     }
 }
@@ -25,7 +25,7 @@ export class Shape {
         this.dimension = dimension;
         this.avoidArea = new AvoidArea(location, Math.round(dimension.width / 2) + 50);
     }
-    public pointInside(point: Point): boolean {
+    public async pointInside(point: Point): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
     get Dimension(): Dimension {
@@ -74,7 +74,7 @@ export class Ellipse extends Shape {
         super(location, { width: Math.round(dimension.width / 2), height: Math.round(dimension.height / 2) });
         this.changeAvoidAreaRadius();
     }
-    public override pointInside(point: Point): boolean {
+    public override async pointInside(point: Point): Promise<boolean> {
         const x = point.x - this.Location.x;
         const y = point.y - this.Location.y;
         const a = this.Dimension.width;
@@ -108,25 +108,22 @@ export class Ellipse extends Shape {
 }
 
 class Vector {
-    private x: number | undefined;
-    private y: number | undefined;
-    constructor() {}
-    initFromPoints(p1: Point, p2: Point): Vector {
-        this.x = p1.x - p2.x;
-        this.y = p1.y - p2.y;
-        return this;
+    private x: number;
+    private y: number;
+    constructor(x:number, y:number) {
+        this.x = x;
+        this.y = y;
     }
-    initFromPoint(p: Point): Vector {
-        this.x = p.x;
-        this.y = p.y;
-        return this;
+    public static async initFromPoints(p1: Point, p2: Point): Promise<Vector> {
+        const x = p1.x - p2.x;
+        const y = p1.y - p2.y;
+        return new Vector(x, y);
+    }
+    public static async initFromPoint(p: Point): Promise<Vector> {
+        return new Vector(p.x, p.y);
     }
     public crossProduct(vector: Vector): number {
-        if (this.x !== undefined && this.y !== undefined && vector.x != undefined && vector.y !== undefined)
-            return this.x * vector.y - this.y * vector.x;
-        else {
-            throw new Error('Vector not initialized');
-        }
+        return this.x * vector.y - this.y * vector.x;
     }
 }
 
@@ -187,15 +184,15 @@ export class Rectangle extends Shape {
      * @param point
      * @return boolean
      */
-    public override pointInside(point: Point): boolean {
-        let crossProducts: number[] = [];
+    public override async pointInside(point: Point): Promise<boolean> {
+        const crossProducts: number[] = [];
         for (let i = 0; i < this.angles.length - 1; i++) {
-            let sideVector = new Vector().initFromPoints(this.angles[i], this.angles[i + 1]);
-            let toThePoint = new Vector().initFromPoints(this.angles[i], point);
+            const sideVector = await Vector.initFromPoints(this.angles[i], this.angles[i + 1]);
+            const toThePoint = await Vector.initFromPoints(this.angles[i], point);
             crossProducts.push(sideVector.crossProduct(toThePoint));
         }
-        let sideVector = new Vector().initFromPoints(this.angles[this.angles.length - 1], this.angles[0]);
-        let toThePoint = new Vector().initFromPoints(this.angles[this.angles.length - 1], point);
+        const sideVector = await Vector.initFromPoints(this.angles[this.angles.length - 1], this.angles[0]);
+        const toThePoint = await Vector.initFromPoints(this.angles[this.angles.length - 1], point);
         crossProducts.push(sideVector.crossProduct(toThePoint));
         let alwaysLowerThanZero = true;
         let alwaysBiggerThanZero = true;
@@ -206,7 +203,7 @@ export class Rectangle extends Shape {
             alwaysBiggerThanZero = alwaysBiggerThanZero && crossProducts[i] >= 0;
             i++;
         }
-        let inside = alwaysLowerThanZero || alwaysBiggerThanZero;
+        const inside = alwaysLowerThanZero || alwaysBiggerThanZero;
         return inside;
     }
 }
@@ -219,7 +216,7 @@ export class AvoidArea {
         this.radius = r;
     }
     intersectsWith(AvoidArea: AvoidArea): boolean {
-        let distance = this.location.distance(AvoidArea.Location);
+        const distance = this.location.distance(AvoidArea.Location);
         return distance < this.radius + AvoidArea.Radius;
     }
     get Location(): Point {

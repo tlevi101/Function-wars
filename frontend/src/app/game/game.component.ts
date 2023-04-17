@@ -1,27 +1,28 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FieldService } from '../services/field.service';
 import { JwtService } from '../services/jwt.service';
-import { ObjectInterface, PlayerInterface } from '../interfaces/backend-body.interfaces';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GameService } from '../services/game.service';
-import { FunctionCalculator, Point } from './FunctionCalculator';
+import { FunctionCalculator, Point } from './utils/FunctionCalculator';
 import { ValidationService } from '../services/validation.service';
 import { InfoComponent } from '../pop-up/info/info.component';
+import {GameInterface, ObjectInterface, PlayerInterface} from "./utils/Interfaces";
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
-    playersFieldParticles: PlayerInterface[] = [];
-    players: { id: number; name: string; fieldParticle: PlayerInterface }[] = [];
+    players: PlayerInterface[] = [];
     objects: ObjectInterface[] = [];
     fieldName = '';
-    ratio = 20;
+    ratio = 35;
     functionForm: FormGroup;
-    currentPlayer: { id: number; name: string; fieldParticle: PlayerInterface } | undefined;
+    currentPlayer: PlayerInterface | undefined;
     gameUUID = '';
+    lastFunctionPoints: {leftSide: Point[], rightSide: Point[]} | undefined;
+    myLocation: Point | undefined;
 
     @ViewChild('field') field!: ElementRef<HTMLCanvasElement>;
     @ViewChild('functionDef') functionDefInput!: ElementRef<HTMLInputElement>;
@@ -65,8 +66,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             this.currentPlayer = this.players[0];
         }
         this.gameService.receiveFunction().subscribe((response: any) => {
-            this.initGameDataFromResponse(response.game);
-            this.animate(response.function);
+            const res = response as { points: { leftSide: Point[], rightSide: Point[] }};
+            this.lastFunctionPoints = res.points;
+            this.animate();
         });
         this.gameService.gameEnded().subscribe((response: any) => {
             this.infoComponent.description = response.message;
@@ -85,8 +87,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.gameService.submitFunction(this.gameUUID, this.functionDef).subscribe(
             (response: any) => {
-                this.initGameDataFromResponse(response.game);
-                // this.animate();
+                // this.initGameDataFromResponse(response.game);
             },
             (error: any) => {
                 console.log(error);
@@ -99,7 +100,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
             }
         );
-        // this.animate();
     }
     overrideInput(event: any) {
         if (event.key === 'x') {
@@ -121,30 +121,18 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         let value = this.functionDef;
         value = value.substring(0, start) + functionDef + value.substring(start);
         this.functionDefControl?.setValue(value);
-    }
-    initFunction(xLimit: number | undefined = undefined, fn?: string): FunctionCalculator {
-        console.log('initFunction');
-        console.log(fn ? fn : this.functionDef);
-        return new FunctionCalculator(
-            fn ? fn : this.functionDef,
-            this.currentPlayer!.fieldParticle.location.x,
-            this.currentPlayer!.fieldParticle.location.y,
-            this.field.nativeElement.width,
-
-            this.field.nativeElement.height,
-            this.ratio,
-            xLimit
-        );
+        this.functionDefControl?.markAsTouched();
     }
 
     sendGetGameData(gameUUID: string) {
         this.gameService.getGameData(gameUUID).subscribe(
-            (response: any) => {
-                this.initGameDataFromResponse(response);
+            async (response :any ) => {
+                const game =  response as GameInterface;
+                console.log(game);
+                this.initGameDataFromResponse(game);
                 this.draw();
             },
             (error: any) => {
-                console.log(this.infoComponent);
                 console.log(error);
                 this.infoComponent.description = error.error.message;
                 this.infoComponent.buttonText = 'Ok';
@@ -157,78 +145,83 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
-    initGameDataFromResponse(res: any) {
-        this.players = res.players;
-        this.objects = res.field.field.objects;
-        this.fieldName = res.field.field.name;
-        this.playersFieldParticles = res.field.field.players;
-        this.currentPlayer = res.currentPlayer;
+    initGameDataFromResponse(game : GameInterface) {
+        this.players = game.players;
+        this.objects = game.objects;
+        this.fieldName = game.field.name;
+        this.currentPlayer = game.currentPlayer;
+        this.myLocation = game.players.find((player : PlayerInterface) => player.id === this.jwt.getDecodedAccessToken()?.id)?.location;
         if (this.itsMyTurn) {
             this.functionDefControl?.enable();
         } else {
             this.functionDefControl?.disable();
+            this.functionDefControl?.markAsUntouched();
         }
     }
 
-    animate(fn?: string) {
-        console.log('animate');
-        console.log(fn);
+    animate() {
         let tickCount = 0;
         const ticksPerSecond = 60;
         const tickRate = 1000 / ticksPerSecond;
         const unitPerTick = 0.3;
         const timer = setInterval(() => {
             tickCount++;
-            this.draw(tickCount * this.ratio * unitPerTick, fn);
+            this.draw(tickCount * this.ratio * unitPerTick);
             if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
+                console.log('clearInterval')
+                this.sendGetGameData(this.gameUUID);
                 clearInterval(timer);
             }
         }, tickRate);
     }
 
-    drawFunction(xLimit: number, func?: string) {
-        console.log('drawFunction');
-        console.log(func);
-        //if func is undefined, then we are drawing the function of the current player
-        if ((this.functionDef === '' || !this.currentPlayer) && !func) {
+    drawFunction(xLimit: number) {
+        if (!this.lastFunctionPoints) {
             return;
         }
-        const fn = this.initFunction(xLimit, func);
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.strokeStyle = 'red';
             ctx.fillStyle = 'red';
             ctx.beginPath();
-            ctx.moveTo(fn.firstValidPoint()!.x, fn.firstValidPoint()!.y); //firstValidPoint is already validated
-            console.log(fn.firstValidPoint());
+            ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
             ctx.lineWidth = 2;
-            const rightSidePoints = fn.calculateRightSidePoints();
-            console.log(rightSidePoints);
+            const rightSidePoints = this.lastFunctionPoints.rightSide;
+            // console.log(rightSidePoints);
+            let i = 0;
             for (const point of rightSidePoints) {
+                if(point.x > this.lastFunctionPoints.rightSide[0].x + xLimit) {
+                    break;
+                }
                 ctx.lineTo(point.x, point.y);
                 ctx.moveTo(point.x, point.y);
+                i++;
             }
             if (rightSidePoints.length > 0) {
                 ctx.arc(
-                    rightSidePoints[rightSidePoints.length - 1].x,
-                    rightSidePoints[rightSidePoints.length - 1].y,
+                    rightSidePoints[i-1].x,
+                    rightSidePoints[i-1].y,
                     2,
                     0,
                     2 * Math.PI
                 );
                 ctx.fill();
             }
-            ctx.moveTo(fn.firstValidPoint()!.x, fn.firstValidPoint()!.y); //firstValidPoint is already validated
-            const leftSidePoints = fn.calculateLeftSidePoints();
-            console.log(leftSidePoints);
+            ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
+            const leftSidePoints = this.lastFunctionPoints.leftSide;
+            i = 0;
             for (const point of leftSidePoints) {
+                if(point.x < this.lastFunctionPoints.rightSide[0].x - xLimit) {
+                    break;
+                }
+                i++;
                 ctx.lineTo(point.x, point.y);
                 ctx.moveTo(point.x, point.y);
             }
             if (leftSidePoints.length > 0) {
                 ctx.arc(
-                    leftSidePoints[leftSidePoints.length - 1].x,
-                    leftSidePoints[leftSidePoints.length - 1].y,
+                    leftSidePoints[i-1].x,
+                    leftSidePoints[i-1].y,
                     2,
                     0,
                     2 * Math.PI
@@ -273,8 +266,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (ctx && this.currentPlayer) {
             const canvasWidth = this.field.nativeElement.width;
             const canvasHeight = this.field.nativeElement.height;
-            const playerX = this.currentPlayer.fieldParticle.location.x / this.ratio;
-            const playerY = this.currentPlayer.fieldParticle.location.y / this.ratio;
+            const playerX = this.myLocation ? this.myLocation.x / this.ratio : this.currentPlayer.location.x / this.ratio;
+            const playerY = this.myLocation ? this.myLocation.y / this.ratio : this.currentPlayer.location.y / this.ratio;
             for (let i = playerX; i < canvasWidth / this.ratio; i++) {
                 if (Math.round(i) == Math.round(playerX)) {
                     ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)';
@@ -320,12 +313,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (ctx) {
             ctx.fillStyle = 'yellowgreen';
             ctx.beginPath();
-            for (let i = 0; i < this.playersFieldParticles.length; i++) {
+            for (let i = 0; i < this.players.length; i++) {
                 ctx.ellipse(
-                    this.playersFieldParticles[i].location.x,
-                    this.playersFieldParticles[i].location.y,
-                    this.playersFieldParticles[i].dimension.width,
-                    this.playersFieldParticles[i].dimension.height,
+                    this.players[i].location.x,
+                    this.players[i].location.y,
+                    this.players[i].dimension.width,
+                    this.players[i].dimension.height,
                     0,
                     0,
                     2 * Math.PI
@@ -335,9 +328,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             ctx.closePath();
         }
     }
-    draw(xLimit: number = this.ratio, fn?: string) {
-        console.log('draw');
-        console.log(fn);
+    draw(xLimit: number = this.field.nativeElement.width) {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.clearRect(0, 0, this.field.nativeElement.width, this.field.nativeElement.height);
@@ -345,7 +336,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.drawObjects();
         this.drawPlayers();
         this.drawLines();
-        this.drawFunction(xLimit, fn);
+        this.drawFunction(xLimit);
     }
 
     get functionDefState(): string {
@@ -353,7 +344,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.functionDefControl?.valid ? 'is-valid' : 'is-invalid';
     }
     getFunctionDefError(): string {
-        console.log(this.functionDefControl?.errors);
+        // console.log(this.functionDefControl?.errors);
         if (this.functionDefControl?.hasError('required')) return 'Function definition is required';
         if (this.functionDefControl?.hasError('invalidMathFunction')) {
             return this.functionDefControl?.getError('invalidMathFunction');
