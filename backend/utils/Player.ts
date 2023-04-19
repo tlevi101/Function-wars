@@ -23,7 +23,7 @@ class Player {
             name: this.name,
             location: this.object.Location,
             dimension: this.object.Dimension,
-            avoidArea: this.avoidArea.toJSON()
+            avoidArea: this.avoidArea.toJSON(),
         };
     }
     async pointInside(point: Point): Promise<boolean> {

@@ -151,7 +151,7 @@ app.use(async function (err, req, res, next) {
             },
         },
     };
-    MyLogger('errors/', error)
+    MyLogger('errors/', error);
     res.status(err.status || 500).json({ error: err.message });
 });
 

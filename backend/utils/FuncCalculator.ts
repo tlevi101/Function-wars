@@ -1,5 +1,5 @@
 import { PointInterface } from './interfaces';
-import {Point} from "./Shape";
+import { Point } from './Shape';
 
 class FuncCalculator {
     private fn: string;
@@ -13,14 +13,7 @@ class FuncCalculator {
     private validOperators: string[] = ['+', '-', '*', '/', '^'];
     private invalidFunctions: string[] = ['tan', 'a/x', '[x]', '{x}'];
 
-    constructor(
-        fn: string,
-        zeroX: number,
-        zeroY: number,
-        width = 1000,
-        height = 700,
-        ratio = 35,
-    ) {
+    constructor(fn: string, zeroX: number, zeroY: number, width = 1000, height = 700, ratio = 35) {
         this.fn = fn;
         (async () => {
             await this.replaceAll();
@@ -53,30 +46,30 @@ class FuncCalculator {
     /**
      * Throws error if point not found
      */
-    public async distanceFromOrigo(point:Point): Promise<number> {
+    public async distanceFromOrigo(point: Point): Promise<number> {
         console.log('distanceFromOrigo');
         console.log('point: ' + point);
-        let distance=0;
+        let distance = 0;
         const rightSidePoints = await this.calculateRightSidePoints();
         for await (const [i, rightSidePoint] of rightSidePoints.entries()) {
-                const currentPoint = new Point(rightSidePoints[i].x, rightSidePoints[i].y);
-                const nextPoint = new Point(rightSidePoints[i+1].x, rightSidePoints[i+1].y);
-                distance += currentPoint.distance(nextPoint)/this.ratio;
-                if(nextPoint.equals(point)){
-                    console.log('distance right: ' + distance)
-                    return distance;
-                }
+            const currentPoint = new Point(rightSidePoints[i].x, rightSidePoints[i].y);
+            const nextPoint = new Point(rightSidePoints[i + 1].x, rightSidePoints[i + 1].y);
+            distance += currentPoint.distance(nextPoint) / this.ratio;
+            if (nextPoint.equals(point)) {
+                console.log('distance right: ' + distance);
+                return distance;
+            }
         }
         distance = 0;
         const leftSidePoints = await this.calculateLeftSidePoints();
         for await (const [i, _] of leftSidePoints.entries()) {
-                const currentPoint = new Point(leftSidePoints[i].x, leftSidePoints[i].y);
-                const nextPoint = new Point(leftSidePoints[i-1].x, leftSidePoints[i-1].y);
-                distance += currentPoint.distance(nextPoint)/this.ratio;
-                if(nextPoint.equals(point)){
-                    console.log('distance left: ' + distance)
-                    return distance;
-                }
+            const currentPoint = new Point(leftSidePoints[i].x, leftSidePoints[i].y);
+            const nextPoint = new Point(leftSidePoints[i - 1].x, leftSidePoints[i - 1].y);
+            distance += currentPoint.distance(nextPoint) / this.ratio;
+            if (nextPoint.equals(point)) {
+                console.log('distance left: ' + distance);
+                return distance;
+            }
         }
         return distance;
     }
@@ -102,8 +95,7 @@ class FuncCalculator {
                 if (Number.isInteger(this.f(x))) {
                     if (this.f(x) <= this.height && this.f(x) >= 0) {
                         points.push({ x: x, y: this.f(x) });
-                    }
-                    else{
+                    } else {
                         return points;
                     }
                 }
@@ -112,7 +104,10 @@ class FuncCalculator {
         return points;
     }
 
-    public async trimRightSidePoints(points:PointInterface[],point:PointInterface|Point): Promise<PointInterface[]> {
+    public async trimRightSidePoints(
+        points: PointInterface[],
+        point: PointInterface | Point
+    ): Promise<PointInterface[]> {
         return points.filter(p => p.x <= point.x);
     }
 
@@ -138,8 +133,7 @@ class FuncCalculator {
                 if (Number.isInteger(this.f(x))) {
                     if (this.f(x) <= this.height && this.f(x) >= 0) {
                         points.push({ x: x, y: this.f(x) });
-                    }
-                    else{
+                    } else {
                         return points;
                     }
                 }
@@ -148,7 +142,10 @@ class FuncCalculator {
         return points;
     }
 
-    public async trimLeftSidePoints(points:PointInterface[],point:PointInterface|Point): Promise<PointInterface[]> {
+    public async trimLeftSidePoints(
+        points: PointInterface[],
+        point: PointInterface | Point
+    ): Promise<PointInterface[]> {
         return points.filter(p => p.x >= point.x);
     }
 
@@ -221,11 +218,15 @@ class FuncCalculator {
     modifyNegativeNumbers(): void {
         const regex = /(-([1-9]+(\*|\*\*)))|((\*|\*\*)-[1-9]+)/gi;
         const regex2 = /(x(\*|\*\*))|((\*|\*\*)x)|(-x)/gi;
-        while(this.fn.search(regex) !== -1){
-            this.fn = this.fn.substring(0, this.fn.search(regex)).concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
+        while (this.fn.search(regex) !== -1) {
+            this.fn = this.fn
+                .substring(0, this.fn.search(regex))
+                .concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
         }
-        while(this.fn.search(regex2) !== -1){
-            this.fn = this.fn.substring(0, this.fn.search(regex2)).concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
+        while (this.fn.search(regex2) !== -1) {
+            this.fn = this.fn
+                .substring(0, this.fn.search(regex2))
+                .concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
         }
     }
     insertMultiplicationOperator(): void {
@@ -239,12 +240,16 @@ class FuncCalculator {
 
         caseGroup1.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with));
+                this.fn = this.fn
+                    .substring(0, this.fn.search(c))
+                    .concat(this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with));
             }
         });
         caseGroup2.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with));
+                this.fn = this.fn
+                    .substring(0, this.fn.search(c))
+                    .concat(this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with));
             }
         });
     }

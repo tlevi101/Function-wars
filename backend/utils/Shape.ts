@@ -1,4 +1,4 @@
-import {ObjectInterface, PointInterface} from "./interfaces";
+import { ObjectInterface, PointInterface } from './interfaces';
 
 export class Point {
     public x: number;
@@ -15,11 +15,11 @@ export class Point {
     public toJSON(): PointInterface {
         return {
             x: this.x,
-            y: this.y
+            y: this.y,
         };
     }
 
-    public equals(p:Point):boolean{
+    public equals(p: Point): boolean {
         return this.x === p.x && this.y === p.y;
     }
 }
@@ -45,8 +45,8 @@ export class Shape {
      * if the point is not inside the shape, it will throw an error.
      * @param point
      */
-    public damageMe(point:Point, distance:number):DamageCircle{
-        if(!this.pointInside(point)){
+    public damageMe(point: Point, distance: number): DamageCircle {
+        if (!this.pointInside(point)) {
             throw new Error('I cannot be damaged, point is not inside!');
         }
         const damage = new DamageCircle(point, distance);
@@ -59,9 +59,9 @@ export class Shape {
     public async pointInside(point: Point): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
-    protected async pointIsInsideOfADamage(point:Point):Promise<boolean>{
-        for await (const damage of this.damages){
-            if(damage.pointIsInside(point)){
+    protected async pointIsInsideOfADamage(point: Point): Promise<boolean> {
+        for await (const damage of this.damages) {
+            if (damage.pointIsInside(point)) {
                 return true;
             }
         }
@@ -117,7 +117,7 @@ export class Ellipse extends Shape {
         this.changeAvoidAreaRadius();
     }
     public override async pointInside(point: Point): Promise<boolean> {
-        if(this.damages.length>0 && await this.pointIsInsideOfADamage(point)){
+        if (this.damages.length > 0 && (await this.pointIsInsideOfADamage(point))) {
             return false;
         }
         const x = point.x - this.Location.x;
@@ -129,11 +129,11 @@ export class Ellipse extends Shape {
 
     public toJSON(): ObjectInterface {
         return {
-            type: "Ellipse",
+            type: 'Ellipse',
             location: this.location.toJSON(),
             dimension: this.dimension,
             avoidArea: this.avoidArea.toJSON(),
-            damages: this.damages.map(damage => damage.toJSON())
+            damages: this.damages.map(damage => damage.toJSON()),
         };
     }
     override get Dimension(): Dimension {
@@ -189,13 +189,13 @@ export class Rectangle extends Shape {
         this.location = new Point(location.x - this.dimension.width / 2, location.y - this.dimension.height / 2);
         this.updateAngles();
     }
-    public override toJSON() :ObjectInterface{
+    public override toJSON(): ObjectInterface {
         return {
             location: this.location.toJSON(),
             dimension: this.dimension,
             avoidArea: this.avoidArea.toJSON(),
             damages: this.damages.map(damage => damage.toJSON()),
-            type: 'Rectangle'
+            type: 'Rectangle',
         };
     }
     private updateAngles() {
@@ -248,7 +248,7 @@ export class Rectangle extends Shape {
      * @return boolean
      */
     public override async pointInside(point: Point): Promise<boolean> {
-        if(this.damages.length>0 && await this.pointIsInsideOfADamage(point)){
+        if (this.damages.length > 0 && (await this.pointIsInsideOfADamage(point))) {
             return false;
         }
         const crossProducts: number[] = [];
@@ -285,8 +285,8 @@ export class Circle {
         const distance = this.location.distance(AvoidArea.Location);
         return distance < this.radius + AvoidArea.Radius;
     }
-    public toJSON(): {location: PointInterface, radius: number} {
-        return {location: this.location.toJSON(), radius: this.radius};
+    public toJSON(): { location: PointInterface; radius: number } {
+        return { location: this.location.toJSON(), radius: this.radius };
     }
 
     get Location(): Point {
@@ -303,15 +303,15 @@ export class Circle {
     }
 }
 
-export class DamageCircle  extends Circle{
+export class DamageCircle extends Circle {
     private baseRadius = 20;
     private baseRadiusMultiplier = 0.8;
-    constructor(location: Point, pathLength:number) {
-        super(location,10);
-        this.radius = this.baseRadius+pathLength*this.baseRadiusMultiplier;
+    constructor(location: Point, pathLength: number) {
+        super(location, 10);
+        this.radius = this.baseRadius + pathLength * this.baseRadiusMultiplier;
     }
 
-    public pointIsInside(point:Point) :boolean{
+    public pointIsInside(point: Point): boolean {
         return point.distance(this.location) < this.radius;
     }
 }

@@ -7,7 +7,7 @@ import { GameService } from '../services/game.service';
 import { FunctionCalculator, Point } from './utils/FunctionCalculator';
 import { ValidationService } from '../services/validation.service';
 import { InfoComponent } from '../pop-up/info/info.component';
-import {GameInterface, ObjectInterface, PlayerInterface} from "./utils/Interfaces";
+import { GameInterface, ObjectInterface, PlayerInterface } from './utils/Interfaces';
 @Component({
     selector: 'app-game',
     templateUrl: './game.component.html',
@@ -22,10 +22,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     functionForm: FormGroup;
     currentPlayer: PlayerInterface | undefined;
     gameUUID = '';
-    lastFunctionPoints: {leftSide: Point[], rightSide: Point[]} | undefined;
+    lastFunctionPoints: { leftSide: Point[]; rightSide: Point[] } | undefined;
     myLocation: Point | undefined;
     submittedThisRound = false;
-    lastDamages: {leftSide?: {location:Point, radius:number}, rightSide?: {location:Point, radius:number}} = {};
+    lastDamages: { leftSide?: { location: Point; radius: number }; rightSide?: { location: Point; radius: number } } =
+        {};
 
     @ViewChild('field') field!: ElementRef<HTMLCanvasElement>;
     @ViewChild('functionDef') functionDefInput!: ElementRef<HTMLInputElement>;
@@ -81,7 +82,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             this.infoComponent.buttonLink = '/';
         });
         this.gameService.gameOver().subscribe(async (response: any) => {
-            const res = response as { points: { leftSide: Point[], rightSide: Point[] }, message: string };
+            const res = response as { points: { leftSide: Point[]; rightSide: Point[] }; message: string };
             this.lastFunctionPoints = res.points;
             await this.animate();
             this.infoComponent.description = res.message;
@@ -141,12 +142,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     sendGetGameData(gameUUID: string) {
         console.log('sendGetGameData');
         const subscription = this.gameService.getGameData(gameUUID).subscribe(
-            async (response :any ) => {
+            async (response: any) => {
                 this.submittedThisRound = false;
-                const game =  response as GameInterface;
+                const game = response as GameInterface;
                 this.newObjects = game.objects;
-                if(this.players.length >0)
-                    await this.animate();
+                if (this.players.length > 0) await this.animate();
                 this.initGameDataFromResponse(game);
                 this.draw();
             },
@@ -160,19 +160,21 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.infoComponent.buttonLink = '#';
                 }
             },
-            () =>{
+            () => {
                 subscription.unsubscribe();
             }
         );
     }
 
-    initGameDataFromResponse(game : GameInterface) {
+    initGameDataFromResponse(game: GameInterface) {
         this.players = game.players;
         this.objects = game.objects;
         this.newObjects = undefined;
         this.fieldName = game.field.name;
         this.currentPlayer = game.currentPlayer;
-        this.myLocation = game.players.find((player : PlayerInterface) => player.id === this.jwt.getDecodedAccessToken()?.id)?.location;
+        this.myLocation = game.players.find(
+            (player: PlayerInterface) => player.id === this.jwt.getDecodedAccessToken()?.id
+        )?.location;
         if (this.itsMyTurn) {
             this.functionDefControl?.enable();
         } else {
@@ -186,19 +188,18 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         const ticksPerSecond = 100;
         const tickRate = 1000 / ticksPerSecond;
         const unitPerTick = 0.3;
-        await new Promise<void>((resolve) =>{
+        await new Promise<void>(resolve => {
             const timer = setInterval(() => {
                 tickCount++;
                 this.draw(tickCount * this.ratio * unitPerTick);
                 if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
                     setTimeout(() => {
                         this.lastDamages = {};
-                    },100)
+                    }, 100);
                     resolve();
                     clearInterval(timer);
                 }
             }, tickRate);
-
         });
     }
 
@@ -216,7 +217,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             const rightSidePoints = this.lastFunctionPoints.rightSide;
             let i = 0;
             for (const point of rightSidePoints) {
-                if(point.x > this.lastFunctionPoints.rightSide[0].x + xLimit) {
+                if (point.x > this.lastFunctionPoints.rightSide[0].x + xLimit) {
                     break;
                 }
                 ctx.lineTo(point.x, point.y);
@@ -224,20 +225,14 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 i++;
             }
             if (rightSidePoints.length > 0) {
-                ctx.arc(
-                    rightSidePoints[i-1].x,
-                    rightSidePoints[i-1].y,
-                    2,
-                    0,
-                    2 * Math.PI
-                );
+                ctx.arc(rightSidePoints[i - 1].x, rightSidePoints[i - 1].y, 2, 0, 2 * Math.PI);
                 ctx.fill();
             }
             const leftSidePoints = this.lastFunctionPoints.leftSide;
             ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
             i = 0;
             for (const point of leftSidePoints) {
-                if(point.x < this.lastFunctionPoints.rightSide[0].x - xLimit) {
+                if (point.x < this.lastFunctionPoints.rightSide[0].x - xLimit) {
                     break;
                 }
                 i++;
@@ -245,13 +240,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 ctx.moveTo(point.x, point.y);
             }
             if (leftSidePoints.length > 0) {
-                ctx.arc(
-                    leftSidePoints[i-1].x,
-                    leftSidePoints[i-1].y,
-                    2,
-                    0,
-                    2 * Math.PI
-                );
+                ctx.arc(leftSidePoints[i - 1].x, leftSidePoints[i - 1].y, 2, 0, 2 * Math.PI);
                 ctx.fill();
             }
             ctx.stroke();
@@ -293,8 +282,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (ctx && this.currentPlayer) {
             const canvasWidth = this.field.nativeElement.width;
             const canvasHeight = this.field.nativeElement.height;
-            const playerX = this.myLocation ? this.myLocation.x / this.ratio : this.currentPlayer.location.x / this.ratio;
-            const playerY = this.myLocation ? this.myLocation.y / this.ratio : this.currentPlayer.location.y / this.ratio;
+            const playerX = this.myLocation
+                ? this.myLocation.x / this.ratio
+                : this.currentPlayer.location.x / this.ratio;
+            const playerY = this.myLocation
+                ? this.myLocation.y / this.ratio
+                : this.currentPlayer.location.y / this.ratio;
             for (let i = playerX; i < canvasWidth / this.ratio; i++) {
                 if (Math.round(i) == Math.round(playerX)) {
                     ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)';
@@ -359,23 +352,27 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.fillStyle = 'white';
-            if(this.lastFunctionPoints && xLimit+this.lastFunctionPoints.rightSide[0].x >= this.lastFunctionPoints.rightSide[this.lastFunctionPoints.rightSide.length-1].x && this.lastDamages.rightSide){
+            if (
+                this.lastFunctionPoints &&
+                xLimit + this.lastFunctionPoints.rightSide[0].x >=
+                    this.lastFunctionPoints.rightSide[this.lastFunctionPoints.rightSide.length - 1].x &&
+                this.lastDamages.rightSide
+            ) {
                 this.drawNewDamage(this.lastDamages.rightSide);
             }
-            if(this.lastFunctionPoints && xLimit+this.lastFunctionPoints.leftSide[0].x >= this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length-1].x && this.lastDamages.leftSide){
+            if (
+                this.lastFunctionPoints &&
+                xLimit + this.lastFunctionPoints.leftSide[0].x >=
+                    this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length - 1].x &&
+                this.lastDamages.leftSide
+            ) {
                 this.drawNewDamage(this.lastDamages.leftSide);
             }
-            for(const object of this.objects) {
-                for(const damage of object.damages) {
+            for (const object of this.objects) {
+                for (const damage of object.damages) {
                     ctx.fillStyle = 'white';
                     ctx.beginPath();
-                    ctx.arc(
-                        damage.location.x,
-                        damage.location.y,
-                        damage.radius,
-                        0,
-                        2 * Math.PI
-                    );
+                    ctx.arc(damage.location.x, damage.location.y, damage.radius, 0, 2 * Math.PI);
                     ctx.fill();
                     ctx.closePath();
                 }
@@ -394,21 +391,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.drawFunction(xLimit);
     }
 
-
-    drawNewDamage(damage: {location: Point, radius: number}) {
+    drawNewDamage(damage: { location: Point; radius: number }) {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.ellipse(
-                damage.location.x,
-                damage.location.y,
-                damage.radius,
-                damage.radius,
-                0,
-                0,
-                2 * Math.PI
-            );
+            ctx.ellipse(damage.location.x, damage.location.y, damage.radius, damage.radius, 0, 0, 2 * Math.PI);
             ctx.fill();
             ctx.closePath();
         }

@@ -187,11 +187,15 @@ export class FunctionCalculator {
     modifyNegativeNumbers(): void {
         const regex = /(-([1-9]+(\*|\*\*)))|((\*|\*\*)-[1-9]+)/gi;
         const regex2 = /(x(\*|\*\*))|((\*|\*\*)x)|(-x)/gi;
-        while(this.fn.search(regex) !== -1){
-            this.fn = this.fn.substring(0, this.fn.search(regex)).concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
+        while (this.fn.search(regex) !== -1) {
+            this.fn = this.fn
+                .substring(0, this.fn.search(regex))
+                .concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
         }
-        while(this.fn.search(regex2) !== -1){
-            this.fn = this.fn.substring(0, this.fn.search(regex2)).concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
+        while (this.fn.search(regex2) !== -1) {
+            this.fn = this.fn
+                .substring(0, this.fn.search(regex2))
+                .concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
         }
     }
     insertMultiplicationOperator(): void {
@@ -205,12 +209,16 @@ export class FunctionCalculator {
 
         caseGroup1.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with));
+                this.fn = this.fn
+                    .substring(0, this.fn.search(c))
+                    .concat(this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with));
             }
         });
         caseGroup2.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with));
+                this.fn = this.fn
+                    .substring(0, this.fn.search(c))
+                    .concat(this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with));
             }
         });
     }

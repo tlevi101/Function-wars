@@ -25,7 +25,7 @@ export interface ObjectInterface {
     location: PointInterface;
     dimension: { width: number; height: number };
     avoidArea: { location: PointInterface; radius: number };
-    damages: {location: PointInterface; radius: number}[];
+    damages: { location: PointInterface; radius: number }[];
 }
 export interface FieldInterface {
     id: number;

@@ -1,7 +1,7 @@
 import FuncCalculator = require('./FuncCalculator');
-import {FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface} from './interfaces';
-import Player  = require('./Player');
-import {Ellipse, Rectangle, Point, DamageCircle} from "./Shape";
+import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
+import Player = require('./Player');
+import { Ellipse, Rectangle, Point, DamageCircle } from './Shape';
 const MyLogger = require('../logs/logger.js');
 
 module.exports = class Game {
@@ -24,22 +24,19 @@ module.exports = class Game {
         this.players = players.map(
             player => new Player(new Point(player.location.x, player.location.y), player.id, player.name)
         );
-        this.objects = objects.map(
-            object =>{
-                if(object.type === 'Rectangle'){
-                    return new Rectangle(new Point(object.location.x, object.location.y), {
-                        width: object.dimension.width,
-                        height: object.dimension.height,
-                    })
-                }
-                else{
-                    return new Ellipse(new Point(object.location.x, object.location.y), {
-                        width: object.dimension.width,
-                        height: object.dimension.height,
-                    })
-                }
+        this.objects = objects.map(object => {
+            if (object.type === 'Rectangle') {
+                return new Rectangle(new Point(object.location.x, object.location.y), {
+                    width: object.dimension.width,
+                    height: object.dimension.height,
+                });
+            } else {
+                return new Ellipse(new Point(object.location.x, object.location.y), {
+                    width: object.dimension.width,
+                    height: object.dimension.height,
+                });
             }
-        );
+        });
         this.uuid = `game-${field.id}-${players.map(player => player.id).join('')}`;
         this.field = field;
         this.currentPlayer =
@@ -67,7 +64,13 @@ module.exports = class Game {
         }
     }
 
-    public async calculateFunctionPoints(): Promise<{ points:{ leftSide: PointInterface[]; rightSide: PointInterface[] }, damages: {leftSide?: {location:PointInterface, radius:number} | null, rightSide?: {location:PointInterface, radius:number} | null} }> {
+    public async calculateFunctionPoints(): Promise<{
+        points: { leftSide: PointInterface[]; rightSide: PointInterface[] };
+        damages: {
+            leftSide?: { location: PointInterface; radius: number } | null;
+            rightSide?: { location: PointInterface; radius: number } | null;
+        };
+    }> {
         if (!this.lastFunction) {
             throw new Error('No function were submitted');
         }
@@ -78,55 +81,66 @@ module.exports = class Game {
         );
         let leftSide = await funcCalculator.calculateLeftSidePoints();
         let rightSide = await funcCalculator.calculateRightSidePoints();
-        let damages: {leftSide?: {location:PointInterface, radius:number} | null, rightSide?: {location:PointInterface, radius:number} | null} = {};
+        let damages: {
+            leftSide?: { location: PointInterface; radius: number } | null;
+            rightSide?: { location: PointInterface; radius: number } | null;
+        } = {};
         const maxLen = Math.max(leftSide.length, rightSide.length);
         for (let i = 0; i < maxLen; i++) {
             if (i < leftSide.length) {
                 if (await this.isGameOver(leftSide[i])) {
                     leftSide = leftSide.slice(0, i);
-                    rightSide = rightSide.slice(0, i>rightSide.length ? undefined : i);
-                }
-                else if(await this.checkObjectCollision(leftSide[i])){
-                    const point =  new Point(leftSide[i].x, leftSide[i].y);
-                    leftSide = await funcCalculator.trimLeftSidePoints(leftSide,point);
-                    damages.leftSide =  await this.damageObject(leftSide[i], await funcCalculator.distanceFromOrigo(new Point(leftSide[i].x, leftSide[i].y)));
+                    rightSide = rightSide.slice(0, i > rightSide.length ? undefined : i);
+                } else if (await this.checkObjectCollision(leftSide[i])) {
+                    const point = new Point(leftSide[i].x, leftSide[i].y);
+                    leftSide = await funcCalculator.trimLeftSidePoints(leftSide, point);
+                    damages.leftSide = await this.damageObject(
+                        leftSide[i],
+                        await funcCalculator.distanceFromOrigo(new Point(leftSide[i].x, leftSide[i].y))
+                    );
                 }
             }
             if (i < rightSide.length) {
                 if (await this.isGameOver(rightSide[i])) {
-                    leftSide = leftSide.slice(0, i>leftSide.length ? undefined : i);
+                    leftSide = leftSide.slice(0, i > leftSide.length ? undefined : i);
                     rightSide = rightSide.slice(0, i);
-                }
-                else if(await this.checkObjectCollision(rightSide[i])){
-                    const point =  new Point(rightSide[i].x, rightSide[i].y);
-                    rightSide = await funcCalculator.trimRightSidePoints(rightSide,point);
-                    damages.rightSide = await this.damageObject(rightSide[i], await funcCalculator.distanceFromOrigo(new Point(rightSide[i].x, rightSide[i].y)));
+                } else if (await this.checkObjectCollision(rightSide[i])) {
+                    const point = new Point(rightSide[i].x, rightSide[i].y);
+                    rightSide = await funcCalculator.trimRightSidePoints(rightSide, point);
+                    damages.rightSide = await this.damageObject(
+                        rightSide[i],
+                        await funcCalculator.distanceFromOrigo(new Point(rightSide[i].x, rightSide[i].y))
+                    );
                 }
             }
         }
-        MyLogger('functionCalculations/', {gameOver: this.gameOver, leftSide, rightSide});
-        return { points:{leftSide, rightSide}, damages  };
+        MyLogger('functionCalculations/', { gameOver: this.gameOver, leftSide, rightSide });
+        return { points: { leftSide, rightSide }, damages };
     }
 
     private async checkObjectCollision(point: PointInterface): Promise<boolean> {
-        for await (const object of this.objects){
-            if(await object.pointInside(new Point(point.x, point.y))){
+        for await (const object of this.objects) {
+            if (await object.pointInside(new Point(point.x, point.y))) {
                 return true;
             }
         }
         return false;
     }
-    private async damageObject(point: PointInterface, distance:number): Promise<{location:PointInterface, radius:number}|null> {
+    private async damageObject(
+        point: PointInterface,
+        distance: number
+    ): Promise<{ location: PointInterface; radius: number } | null> {
         let damage = null;
-        try{
-            this.objects = await Promise.all(this.objects.map(async object => {
-                if(await object.pointInside(new Point(point.x, point.y))){
-                    damage = object.damageMe(new Point(point.x, point.y), distance).toJSON();
-                }
-                return object;
-            }));
-        }
-        catch (e){
+        try {
+            this.objects = await Promise.all(
+                this.objects.map(async object => {
+                    if (await object.pointInside(new Point(point.x, point.y))) {
+                        damage = object.damageMe(new Point(point.x, point.y), distance).toJSON();
+                    }
+                    return object;
+                })
+            );
+        } catch (e) {
             console.error(e);
         }
         return damage;
@@ -170,15 +184,16 @@ module.exports = class Game {
         return new Game(playerInterfaces, field.field.objects, field, sockets);
     }
 
-
-    private async isGameOver(point:PointInterface): Promise<boolean> {
-        await Promise.all(this.players.map(async player => {
-            if(!this.gameOver && player.ID !== this.currentPlayer.ID){
-                if(await player.pointInside(new Point(point.x, point.y))){
-                    this.gameOver = true;
+    private async isGameOver(point: PointInterface): Promise<boolean> {
+        await Promise.all(
+            this.players.map(async player => {
+                if (!this.gameOver && player.ID !== this.currentPlayer.ID) {
+                    if (await player.pointInside(new Point(point.x, point.y))) {
+                        this.gameOver = true;
+                    }
                 }
-            }
-        }));
+            })
+        );
         return this.gameOver;
     }
 

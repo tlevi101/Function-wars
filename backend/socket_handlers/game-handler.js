@@ -30,11 +30,10 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
         console.log(e);
         return res.status(400).json({ message: 'Invalid function.' });
     }
-    const {points, damages} = await game.calculateFunctionPoints();
-    if(game.GameOver){
+    const { points, damages } = await game.calculateFunctionPoints();
+    if (game.GameOver) {
         res.io.to(game_uuid).emit('game over', { points, message: `Game over, Winner is ${game.CurrentPlayer.Name}` });
-    }
-    else{
+    } else {
         res.io.to(game_uuid).emit('receive function', { points, damages });
     }
     game.changeCurrentPlayer();
