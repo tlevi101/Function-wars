@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { JwtService } from './jwt.service';
+import {catchError, retry, timeout} from "rxjs";
 
 @Injectable({
     providedIn: 'root',
@@ -19,7 +20,10 @@ export class GameService {
     }
 
     public getGameData(gameUUID: string) {
-        return this.http.get(`${this.url}/${gameUUID}`, { headers: this.hr });
+        return this.http.get(`${this.url}/${gameUUID}`, { headers: this.hr }).pipe(
+            timeout(1000),
+            retry(3),
+        );
     }
 
     public submitFunction(gameUUID: string, fn: string) {
@@ -31,6 +35,9 @@ export class GameService {
     }
     public gameEnded() {
         return this.socket.fromEvent('game ended');
+    }
+    public gameOver() {
+        return this.socket.fromEvent('game over');
     }
     public leaveGame() {
         this.socket.emit('leave game');

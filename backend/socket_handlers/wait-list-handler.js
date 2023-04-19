@@ -1,6 +1,6 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-const Game = require('../utils/dist/Game');
+const Game = require('../dist/Game');
 const joinWaitList = async (socket, waitList, games) => {
     socket.join('wait-list');
     console.log('joined wait-list');
@@ -42,7 +42,7 @@ const PlaceIntoGame = async (count, waitList, games) => {
     players.forEach(user => {
         waitList.delete(user);
     });
-    const newGame =  await Game.makeGameFromField(field, players, sockets);
+    const newGame = await Game.makeGameFromField(field, players, sockets);
     games.set(newGame.UUID, newGame);
     sockets.forEach(socket => {
         socket.leave('wait-list');

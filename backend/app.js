@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
 const { gameRouter, leaveGame } = require('./socket_handlers/game-handler');
+const MyLogger = require('./logs/logger');
 //Socket
 
 const io = require('socket.io')(http, {
@@ -150,14 +151,7 @@ app.use(async function (err, req, res, next) {
             },
         },
     };
-    try {
-        const log = await fs.readFile(`logs/${date.format(new Date(), 'YYYY. MM. DD')}.json`, 'utf8');
-        const json = JSON.parse(log);
-        json.push(error);
-        await fs.writeFile(`logs/${date.format(new Date(), 'YYYY. MM. DD')}.json`, JSON.stringify(json));
-    } catch (e) {
-        await fs.writeFile(`logs/${date.format(new Date(), 'YYYY. MM. DD')}.json`, JSON.stringify([error]));
-    }
+    MyLogger('errors/', error)
     res.status(err.status || 500).json({ error: err.message });
 });
 

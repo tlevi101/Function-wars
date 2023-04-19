@@ -1,25 +1,31 @@
-export interface Point {
+export interface PointInterface {
     x: number;
     y: number;
+}
+
+export interface Dimension {
+    width: number;
+    height: number;
 }
 
 export interface PlayerInterface {
     id: number;
     name: string;
-    location: { x: number; y: number };
+    location: PointInterface;
     dimension: { width: number; height: number };
-    avoidArea: { location: { x: number; y: number }; radius: number };
+    avoidArea: { location: PointInterface; radius: number };
 }
 export interface PlayerFieldInterface {
-    location: { x: number; y: number };
+    location: PointInterface;
     dimension: { width: number; height: number };
-    avoidArea: { location: { x: number; y: number }; radius: number };
+    avoidArea: { location: PointInterface; radius: number };
 }
 export interface ObjectInterface {
     type: string;
-    location: { x: number; y: number };
+    location: PointInterface;
     dimension: { width: number; height: number };
-    avoidArea: { location: { x: number; y: number }; radius: number };
+    avoidArea: { location: PointInterface; radius: number };
+    damages: {location: PointInterface; radius: number}[];
 }
 export interface FieldInterface {
     id: number;

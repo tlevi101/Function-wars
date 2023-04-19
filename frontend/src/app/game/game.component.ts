@@ -16,6 +16,7 @@ import {GameInterface, ObjectInterface, PlayerInterface} from "./utils/Interface
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     players: PlayerInterface[] = [];
     objects: ObjectInterface[] = [];
+    newObjects: ObjectInterface[] | undefined;
     fieldName = '';
     ratio = 35;
     functionForm: FormGroup;
@@ -23,6 +24,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     gameUUID = '';
     lastFunctionPoints: {leftSide: Point[], rightSide: Point[]} | undefined;
     myLocation: Point | undefined;
+    submittedThisRound = false;
+    lastDamages: {leftSide?: {location:Point, radius:number}, rightSide?: {location:Point, radius:number}} = {};
 
     @ViewChild('field') field!: ElementRef<HTMLCanvasElement>;
     @ViewChild('functionDef') functionDefInput!: ElementRef<HTMLInputElement>;
@@ -65,13 +68,23 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             this.currentPlayer = this.players[0];
         }
-        this.gameService.receiveFunction().subscribe((response: any) => {
-            const res = response as { points: { leftSide: Point[], rightSide: Point[] }};
-            this.lastFunctionPoints = res.points;
-            this.animate();
+        this.gameService.receiveFunction().subscribe(async (response: any) => {
+            console.log(response);
+            this.lastFunctionPoints = response.points;
+            this.lastDamages = response.damages;
+            this.sendGetGameData(this.gameUUID);
+            // await this.animate();
         });
         this.gameService.gameEnded().subscribe((response: any) => {
             this.infoComponent.description = response.message;
+            this.infoComponent.buttonText = 'Quit';
+            this.infoComponent.buttonLink = '/';
+        });
+        this.gameService.gameOver().subscribe(async (response: any) => {
+            const res = response as { points: { leftSide: Point[], rightSide: Point[] }, message: string };
+            this.lastFunctionPoints = res.points;
+            await this.animate();
+            this.infoComponent.description = res.message;
             this.infoComponent.buttonText = 'Quit';
             this.infoComponent.buttonLink = '/';
         });
@@ -82,9 +95,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     submitFunction() {
-        if (this.functionForm.invalid || !this.itsMyTurn) {
+        if (this.functionForm.invalid || !this.itsMyTurn || this.submittedThisRound) {
             return;
         }
+        this.submittedThisRound = true;
         this.gameService.submitFunction(this.gameUUID, this.functionDef).subscribe(
             (response: any) => {
                 // this.initGameDataFromResponse(response.game);
@@ -125,10 +139,14 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     sendGetGameData(gameUUID: string) {
-        this.gameService.getGameData(gameUUID).subscribe(
+        console.log('sendGetGameData');
+        const subscription = this.gameService.getGameData(gameUUID).subscribe(
             async (response :any ) => {
+                this.submittedThisRound = false;
                 const game =  response as GameInterface;
-                console.log(game);
+                this.newObjects = game.objects;
+                if(this.players.length >0)
+                    await this.animate();
                 this.initGameDataFromResponse(game);
                 this.draw();
             },
@@ -141,6 +159,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 } else {
                     this.infoComponent.buttonLink = '#';
                 }
+            },
+            () =>{
+                subscription.unsubscribe();
             }
         );
     }
@@ -148,6 +169,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     initGameDataFromResponse(game : GameInterface) {
         this.players = game.players;
         this.objects = game.objects;
+        this.newObjects = undefined;
         this.fieldName = game.field.name;
         this.currentPlayer = game.currentPlayer;
         this.myLocation = game.players.find((player : PlayerInterface) => player.id === this.jwt.getDecodedAccessToken()?.id)?.location;
@@ -159,23 +181,28 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    animate() {
+    async animate(newObjects?: ObjectInterface[]) {
         let tickCount = 0;
-        const ticksPerSecond = 60;
+        const ticksPerSecond = 100;
         const tickRate = 1000 / ticksPerSecond;
         const unitPerTick = 0.3;
-        const timer = setInterval(() => {
-            tickCount++;
-            this.draw(tickCount * this.ratio * unitPerTick);
-            if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
-                console.log('clearInterval')
-                this.sendGetGameData(this.gameUUID);
-                clearInterval(timer);
-            }
-        }, tickRate);
+        await new Promise<void>((resolve) =>{
+            const timer = setInterval(() => {
+                tickCount++;
+                this.draw(tickCount * this.ratio * unitPerTick);
+                if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
+                    setTimeout(() => {
+                        this.lastDamages = {};
+                    },100)
+                    resolve();
+                    clearInterval(timer);
+                }
+            }, tickRate);
+
+        });
     }
 
-    drawFunction(xLimit: number) {
+    async drawFunction(xLimit: number) {
         if (!this.lastFunctionPoints) {
             return;
         }
@@ -187,7 +214,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
             ctx.lineWidth = 2;
             const rightSidePoints = this.lastFunctionPoints.rightSide;
-            // console.log(rightSidePoints);
             let i = 0;
             for (const point of rightSidePoints) {
                 if(point.x > this.lastFunctionPoints.rightSide[0].x + xLimit) {
@@ -207,8 +233,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 );
                 ctx.fill();
             }
-            ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
             const leftSidePoints = this.lastFunctionPoints.leftSide;
+            ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
             i = 0;
             for (const point of leftSidePoints) {
                 if(point.x < this.lastFunctionPoints.rightSide[0].x - xLimit) {
@@ -229,6 +255,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 ctx.fill();
             }
             ctx.stroke();
+            ctx.closePath();
         }
     }
 
@@ -242,8 +269,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                     ctx.ellipse(
                         this.objects[i].location.x,
                         this.objects[i].location.y,
-                        this.objects[i].dimension.width / 2,
-                        this.objects[i].dimension.height / 2,
+                        this.objects[i].dimension.width,
+                        this.objects[i].dimension.height,
                         0,
                         0,
                         2 * Math.PI
@@ -328,15 +355,63 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             ctx.closePath();
         }
     }
+    drawDamages(xLimit: number = this.field.nativeElement.width) {
+        const ctx = this.field.nativeElement.getContext('2d');
+        if (ctx) {
+            ctx.fillStyle = 'white';
+            if(this.lastFunctionPoints && xLimit+this.lastFunctionPoints.rightSide[0].x >= this.lastFunctionPoints.rightSide[this.lastFunctionPoints.rightSide.length-1].x && this.lastDamages.rightSide){
+                this.drawNewDamage(this.lastDamages.rightSide);
+            }
+            if(this.lastFunctionPoints && xLimit+this.lastFunctionPoints.leftSide[0].x >= this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length-1].x && this.lastDamages.leftSide){
+                this.drawNewDamage(this.lastDamages.leftSide);
+            }
+            for(const object of this.objects) {
+                for(const damage of object.damages) {
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(
+                        damage.location.x,
+                        damage.location.y,
+                        damage.radius,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        }
+    }
     draw(xLimit: number = this.field.nativeElement.width) {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.clearRect(0, 0, this.field.nativeElement.width, this.field.nativeElement.height);
         }
         this.drawObjects();
+        this.drawDamages(xLimit);
         this.drawPlayers();
         this.drawLines();
         this.drawFunction(xLimit);
+    }
+
+
+    drawNewDamage(damage: {location: Point, radius: number}) {
+        const ctx = this.field.nativeElement.getContext('2d');
+        if (ctx) {
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.ellipse(
+                damage.location.x,
+                damage.location.y,
+                damage.radius,
+                damage.radius,
+                0,
+                0,
+                2 * Math.PI
+            );
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 
     get functionDefState(): string {

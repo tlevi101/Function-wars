@@ -3,8 +3,7 @@ const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middlewares/auth');
 const gameRouter = express.Router();
-const FuncCalculator = require('../utils/dist/FuncCalculator');
-
+const FuncCalculator = require('../dist/FuncCalculator');
 
 /**
  * @route GET games/:game_uuid/function/submit
@@ -18,42 +17,43 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
         return res.status(404).json({ message: 'Game not found.' });
     }
     let currentPlayer = game.CurrentPlayer;
-    if (currentPlayer.id !== req.user.id) {
+    if (currentPlayer.ID !== req.user.id) {
         return res.status(403).json({ message: 'It is not your turn.' });
     }
     if (!fn) {
         return res.status(400).json({ message: 'You must submit a function.' });
     }
     const { location } = currentPlayer;
-    try{
+    try {
         await game.submitFunction(fn);
-    }catch (e) {
+    } catch (e) {
         console.log(e);
         return res.status(400).json({ message: 'Invalid function.' });
     }
-    //TODO check end of game
-    const points = await game.calculateFunctionPoints();
-
-    res.io.to(game_uuid).emit('receive function', { points });
+    const {points, damages} = await game.calculateFunctionPoints();
+    if(game.GameOver){
+        res.io.to(game_uuid).emit('game over', { points, message: `Game over, Winner is ${game.CurrentPlayer.Name}` });
+    }
+    else{
+        res.io.to(game_uuid).emit('receive function', { points, damages });
+    }
     game.changeCurrentPlayer();
     req.games.set(game_uuid, game);
-    return res.status(200);
+    return res.status(200).json({ message: 'Function submitted.' });
 });
 
 gameRouter.get('/:game_uuid', auth, async (req, res) => {
     const { game_uuid } = req.params;
-
+    console.log('game_uuid: ', game_uuid);
     const game = req.games.get(game_uuid);
     if (!game) {
-        //TODO Handle this on frontend
         return res.status(404).json({ message: 'Game not found.' });
     }
     let players = game.Players;
-    if (!players.find(player => player.id === req.user.id)) {
-        //TODO Handle this on frontend
+    if (!players.find(player => player.ID === req.user.id)) {
         return res.status(403).json({ message: 'You are not in this game.' });
     }
-    res.status(200).json(game.toFrontend());
+    return res.status(200).json(game.toFrontend());
 });
 
 const leaveGame = async (socket, games) => {

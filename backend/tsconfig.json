@@ -4,15 +4,13 @@
         "moduleResolution": "Node",
         "target": "ES2021",
         "sourceMap": true,
-        "outDir": "./utils/dist",
+        "outDir": "./dist",
         "rootDir": "./utils",
         "noImplicitAny": true,
         "strict": true,
         "strictNullChecks": true,
         "noImplicitThis": true,
-        "lib": [
-            "ES2021"
-        ]
+        "lib": ["ES2021"]
     },
     "exclude": ["node_modules"]
 }

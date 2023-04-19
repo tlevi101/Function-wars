@@ -20,6 +20,7 @@ export interface ObjectInterface {
     location: { x: number; y: number };
     dimension: { width: number; height: number };
     avoidArea: { location: { x: number; y: number }; radius: number };
+    damages: { location: { x: number; y: number }; radius: number }[];
 }
 export interface FieldInterface {
     id: number;

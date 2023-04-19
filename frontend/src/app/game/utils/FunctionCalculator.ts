@@ -50,6 +50,7 @@ export class FunctionCalculator {
             this.replaceAbsWithMathAbs();
             this.replaceSqrtOperator();
             this.insertMultiplicationOperator();
+            this.modifyNegativeNumbers();
             resolve();
         });
     }
@@ -141,7 +142,7 @@ export class FunctionCalculator {
 
     isValidFunction(): boolean {
         try {
-            // console.log(this.fn);
+            console.log(this.fn);
             this.f(this.zeroX);
         } catch (e) {
             return false;
@@ -152,6 +153,7 @@ export class FunctionCalculator {
             !this.doesAnyDenominatorContainsX() &&
             !this.isContainsFloorFunction() &&
             !this.fn.includes('tan')
+            // !this.fn.includes('sin(x)/cos(x)') &&
         );
     }
 
@@ -162,6 +164,7 @@ export class FunctionCalculator {
 
     doesAnyDenominatorContainsX(): boolean {
         const regex = /(\/\(.*x.*\))|(\/x)/gi;
+        //TODO handle cases like a/cos(x)
         return this.fn.match(regex) !== null;
     }
     replacePowerOperator(): void {
@@ -181,6 +184,16 @@ export class FunctionCalculator {
         this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
         this.fn = this.fn.replaceAll('√', '');
     }
+    modifyNegativeNumbers(): void {
+        const regex = /(-([1-9]+(\*|\*\*)))|((\*|\*\*)-[1-9]+)/gi;
+        const regex2 = /(x(\*|\*\*))|((\*|\*\*)x)|(-x)/gi;
+        while(this.fn.search(regex) !== -1){
+            this.fn = this.fn.substring(0, this.fn.search(regex)).concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
+        }
+        while(this.fn.search(regex2) !== -1){
+            this.fn = this.fn.substring(0, this.fn.search(regex2)).concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
+        }
+    }
     insertMultiplicationOperator(): void {
         const case1 = /[0-9]+x/gi;
         const case2 = /\)x/gi;
@@ -192,16 +205,17 @@ export class FunctionCalculator {
 
         caseGroup1.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with);
+                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup1.replace, caseGroup1.with));
             }
         });
         caseGroup2.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
-                this.fn = this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with);
+                this.fn = this.fn.substring(0, this.fn.search(c)).concat(this.fn.substring(this.fn.search(c)).replace(caseGroup2.replace, caseGroup2.with));
             }
         });
     }
     get error(): string {
+        console.log(this.fn);
         if (this.fn === '') {
             return 'Function cannot be empty';
         }
