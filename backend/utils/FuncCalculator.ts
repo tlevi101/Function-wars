@@ -1,5 +1,6 @@
 import { PointInterface } from './interfaces';
 import { Line, Point } from './Shape';
+import Player = require("./Player");
 
 class FuncCalculator {
     private fn: string;
@@ -96,7 +97,7 @@ class FuncCalculator {
 
     public async calculateRightSidePoints(): Promise<PointInterface[]> {
         const points: PointInterface[] = [];
-        const firstValidPoint = this.firstValidPoint();
+        const firstValidPoint = await this.firstValidPoint();
         if (!firstValidPoint) {
             return points;
         }
@@ -139,7 +140,7 @@ class FuncCalculator {
 
     public async calculateLeftSidePoints(): Promise<PointInterface[]> {
         const points: PointInterface[] = [];
-        const firstValidPoint = this.firstValidPoint();
+        const firstValidPoint = await this.firstValidPoint();
         if (!firstValidPoint) {
             return points;
         }
@@ -179,14 +180,15 @@ class FuncCalculator {
         return Math.round(this.zeroY - eval(fn) * this.ratio);
     }
 
-    firstValidPoint(): PointInterface | null {
+    async firstValidPoint(): Promise<PointInterface | null> {
+        const player = new Player(new Point(this.zeroX, this.zeroY), 0, 'none');
         for (let x = this.zeroX; x < this.width; x++) {
-            if (Number.isInteger(this.f(x))) {
+            if (Number.isInteger(this.f(x)) && await player.pointInside(new Point(x, this.f(x)))){
                 return { x: x, y: this.f(x) };
             }
         }
         for (let x = this.zeroX; x > 0; x--) {
-            if (Number.isInteger(this.f(x))) {
+            if (Number.isInteger(this.f(x)) && await player.pointInside(new Point(x, this.f(x)))) {
                 return { x: x, y: this.f(x) };
             }
         }
@@ -198,14 +200,14 @@ class FuncCalculator {
         return fn;
     }
 
-    isValidFunction(): boolean {
+    async isValidFunction(): Promise<boolean> {
         try {
             console.log(this.fn);
             this.f(this.zeroX);
         } catch (e) {
             return false;
         }
-        return this.fn !== '' && this.firstValidPoint() !== null && !this.isSatisfiesAnyInvalidCase();
+        return this.fn !== '' && await this.firstValidPoint() !== null && !this.isSatisfiesAnyInvalidCase();
     }
 
     isSatisfiesAnyInvalidCase(): boolean {
@@ -266,7 +268,7 @@ class FuncCalculator {
             }
         });
     }
-    get error(): string {
+    public async error(): Promise<string> {
         if (this.fn === '') {
             return 'Function cannot be empty';
         }
@@ -282,8 +284,8 @@ class FuncCalculator {
             for (let x = 0; x <= this.width; x++) {
                 this.f(x);
             }
-            if (this.firstValidPoint() === null) {
-                return `Function does not contain any valid point in [0;${this.width}]}]`;
+            if (await this.firstValidPoint() === null) {
+                return 'Function must intersects with your base!'
             }
         } catch (e: any) {
             console.log(e);

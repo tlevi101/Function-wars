@@ -57,7 +57,7 @@ module.exports = class Game {
 
     public async submitFunction(func: string): Promise<void> {
         const funcCalculator = new FuncCalculator(func, this.currentPlayer.Location.x, this.currentPlayer.Location.y);
-        if (!funcCalculator.isValidFunction()) {
+        if (! await funcCalculator.isValidFunction()) {
             throw new Error('Invalid function');
         } else {
             this.lastFunction = func;

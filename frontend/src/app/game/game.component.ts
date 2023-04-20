@@ -45,7 +45,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 }),
             },
             {
-                validators: [this.validationService.mathFunctionValidator('functionDef')],
+                asyncValidators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
     }
