@@ -1,7 +1,7 @@
 import FuncCalculator = require('./FuncCalculator');
 import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
 import Player = require('./Player');
-import { Ellipse, Rectangle, Point, DamageCircle } from './Shape';
+import {Ellipse, Rectangle, Point, DamageCircle, Line} from './Shape';
 const MyLogger = require('../logs/logger.js');
 
 module.exports = class Game {
@@ -92,8 +92,7 @@ module.exports = class Game {
                     leftSide = leftSide.slice(0, i);
                     rightSide = rightSide.slice(0, i > rightSide.length ? undefined : i);
                 } else if (await this.checkObjectCollision(leftSide[i])) {
-                    const point = new Point(leftSide[i].x, leftSide[i].y);
-                    leftSide = await funcCalculator.trimLeftSidePoints(leftSide, point);
+                    leftSide = leftSide.slice(0, i+1);
                     damages.leftSide = await this.damageObject(
                         leftSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(leftSide[i].x, leftSide[i].y))
@@ -105,8 +104,7 @@ module.exports = class Game {
                     leftSide = leftSide.slice(0, i > leftSide.length ? undefined : i);
                     rightSide = rightSide.slice(0, i);
                 } else if (await this.checkObjectCollision(rightSide[i])) {
-                    const point = new Point(rightSide[i].x, rightSide[i].y);
-                    rightSide = await funcCalculator.trimRightSidePoints(rightSide, point);
+                    rightSide = rightSide.slice(0, i+1);
                     damages.rightSide = await this.damageObject(
                         rightSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(rightSide[i].x, rightSide[i].y))

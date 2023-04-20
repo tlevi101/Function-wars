@@ -1,5 +1,5 @@
 import { PointInterface } from './interfaces';
-import { Point } from './Shape';
+import { Line, Point } from './Shape';
 
 class FuncCalculator {
     private fn: string;
@@ -12,6 +12,20 @@ class FuncCalculator {
     private specialValidFunctions: string[] = ['√', '|X|', 'e'];
     private validOperators: string[] = ['+', '-', '*', '/', '^'];
     private invalidFunctions: string[] = ['tan', 'a/x', '[x]', '{x}'];
+    private invalidCases: { regex: RegExp; message: string }[] = [
+        { regex: /.*\[.*x.*\].*/gi, message: 'Floor function is not allowed!' },
+        { regex: /.*\{.*x.*\}.*/gi, message: 'Ceil function is not allowed!' },
+        { regex: /.*tan\(.*/gi, message: 'Tan function is not allowed!' },
+        {
+            regex: /(\/\(.*x.*\))|(\/x)|(\/Math\.[a-z]+\(.*x.*\))|((\||√|e\^)x)|((√|e\^)\(.*x.*\))|(\|.*x.*\|)/gi,
+            message: 'Division by x is not allowed!',
+        },
+        { regex: /((\*|\*\*)-[0-9]+)/gi, message: 'You cannot multiply with negative number without parentheses!' },
+        {
+            regex: /(\)[0-9]+|[0-9]+\(|\)\()/gi,
+            message: 'You cannot multiply without multiply operator! Except ax (a*x)',
+        },
+    ];
 
     constructor(fn: string, zeroX: number, zeroY: number, width = 1000, height = 700, ratio = 35) {
         this.fn = fn;
@@ -52,6 +66,9 @@ class FuncCalculator {
         let distance = 0;
         const rightSidePoints = await this.calculateRightSidePoints();
         for await (const [i, rightSidePoint] of rightSidePoints.entries()) {
+            if (i === rightSidePoints.length - 1) {
+                break;
+            }
             const currentPoint = new Point(rightSidePoints[i].x, rightSidePoints[i].y);
             const nextPoint = new Point(rightSidePoints[i + 1].x, rightSidePoints[i + 1].y);
             distance += currentPoint.distance(nextPoint) / this.ratio;
@@ -63,6 +80,9 @@ class FuncCalculator {
         distance = 0;
         const leftSidePoints = await this.calculateLeftSidePoints();
         for await (const [i, _] of leftSidePoints.entries()) {
+            if (i === 0) {
+                continue;
+            }
             const currentPoint = new Point(leftSidePoints[i].x, leftSidePoints[i].y);
             const nextPoint = new Point(leftSidePoints[i - 1].x, leftSidePoints[i - 1].y);
             distance += currentPoint.distance(nextPoint) / this.ratio;
@@ -81,26 +101,32 @@ class FuncCalculator {
             return points;
         }
         const xValues = [...Array(this.width - firstValidPoint.x).keys()].map(x => x + firstValidPoint.x);
-        await Promise.all(
-            xValues.map(x => {
-                if (!Number.isFinite(this.f(x))) {
-                    if (this.f(x) == Infinity) {
-                        points.push({ x: x, y: 0 });
-                    }
-                    if (this.f(x) == -Infinity) {
-                        points.push({ x: x, y: this.height });
-                    }
+        for await (const x of xValues) {
+            if (!Number.isFinite(this.f(x))) {
+                let last = points[points.length - 1];
+                if (!last) {
+                    last = firstValidPoint;
+                }
+                if (this.f(x) == Infinity) {
+                    const line = Line.initFromPointInterface(last, { x: x, y: 0 });
+                    let newPoints = line.separateToPoints().map(p => p.toJSON());
+                    points.push(...newPoints);
+                }
+                if (this.f(x) == -Infinity) {
+                    const line = Line.initFromPointInterface(last, { x: x, y: this.height });
+                    let newPoints = line.separateToPoints().map(p => p.toJSON());
+                    points.push(...newPoints);
+                }
+                return points;
+            }
+            if (Number.isInteger(this.f(x))) {
+                if (this.f(x) <= this.height && this.f(x) >= 0) {
+                    points.push({ x: x, y: this.f(x) });
+                } else {
                     return points;
                 }
-                if (Number.isInteger(this.f(x))) {
-                    if (this.f(x) <= this.height && this.f(x) >= 0) {
-                        points.push({ x: x, y: this.f(x) });
-                    } else {
-                        return points;
-                    }
-                }
-            })
-        );
+            }
+        }
         return points;
     }
 
@@ -119,34 +145,33 @@ class FuncCalculator {
         }
         //reverse needed for firstValidPoint.x...0 order
         const xValues = [...Array(firstValidPoint.x).keys()].reverse();
-        await Promise.all(
-            xValues.map(x => {
-                if (!Number.isFinite(this.f(x))) {
-                    if (this.f(x) == -Infinity) {
-                        points.push({ x: x, y: 0 });
-                    }
-                    if (this.f(x) == Infinity) {
-                        points.push({ x: x, y: this.height });
-                    }
+        for await (const x of xValues) {
+            if (!Number.isFinite(this.f(x))) {
+                let last = points[points.length - 1];
+                if (!last) {
+                    last = firstValidPoint;
+                }
+                if (this.f(x) == -Infinity) {
+                    const line = Line.initFromPointInterface(last, { x: x, y: 0 });
+                    let newPoints = line.separateToPoints().map(p => p.toJSON());
+                    points.push(...newPoints);
+                }
+                if (this.f(x) == Infinity) {
+                    const line = Line.initFromPointInterface(last, { x: x, y: this.height });
+                    let newPoints = line.separateToPoints().map(p => p.toJSON());
+                    points.push(...newPoints);
+                }
+                return points;
+            }
+            if (Number.isInteger(this.f(x))) {
+                if (this.f(x) <= this.height && this.f(x) >= 0) {
+                    points.push({ x: x, y: this.f(x) });
+                } else {
                     return points;
                 }
-                if (Number.isInteger(this.f(x))) {
-                    if (this.f(x) <= this.height && this.f(x) >= 0) {
-                        points.push({ x: x, y: this.f(x) });
-                    } else {
-                        return points;
-                    }
-                }
-            })
-        );
+            }
+        }
         return points;
-    }
-
-    public async trimLeftSidePoints(
-        points: PointInterface[],
-        point: PointInterface | Point
-    ): Promise<PointInterface[]> {
-        return points.filter(p => p.x >= point.x);
     }
 
     f(x: number): number {
@@ -180,24 +205,18 @@ class FuncCalculator {
         } catch (e) {
             return false;
         }
-        return (
-            this.fn !== '' &&
-            this.firstValidPoint() !== null &&
-            !this.doesAnyDenominatorContainsX() &&
-            !this.isContainsFloorFunction() &&
-            !this.fn.includes('tan')
-        );
+        return this.fn !== '' && this.firstValidPoint() !== null && !this.isSatisfiesAnyInvalidCase();
     }
 
-    isContainsFloorFunction(): boolean {
-        const regex = /.*\[.*x.*\].*/i;
-        return this.fn.includes('floor') || this.fn.match(regex) !== null;
+    isSatisfiesAnyInvalidCase(): boolean {
+        return this.invalidCases.some(invalidCase => {
+            if (this.fn.search(invalidCase.regex) !== -1) {
+                return true;
+            }
+            return false;
+        });
     }
 
-    doesAnyDenominatorContainsX(): boolean {
-        const regex = /(\/\(.*x.*\))|(\/x)/gi;
-        return this.fn.match(regex) !== null;
-    }
     replacePowerOperator(): void {
         this.fn = this.fn.replaceAll('^', '**');
     }
@@ -216,27 +235,21 @@ class FuncCalculator {
         this.fn = this.fn.replaceAll('√', '');
     }
     modifyNegativeNumbers(): void {
-        const regex = /(-([1-9]+(\*|\*\*)))|((\*|\*\*)-[1-9]+)/gi;
         const regex2 = /(x(\*|\*\*))|((\*|\*\*)x)|(-x)/gi;
-        while (this.fn.search(regex) !== -1) {
-            this.fn = this.fn
-                .substring(0, this.fn.search(regex))
-                .concat(this.fn.substring(this.fn.search(regex)).replace(/-[1-9]+/gi, '($&)'));
-        }
         while (this.fn.search(regex2) !== -1) {
             this.fn = this.fn
                 .substring(0, this.fn.search(regex2))
-                .concat(this.fn.substring(this.fn.search(regex2)).replace(/x/gi, '(X)'));
+                .concat(this.fn.substring(this.fn.search(regex2)).replace(/x/i, '(X)'));
         }
     }
     insertMultiplicationOperator(): void {
         const case1 = /[0-9]+x/gi;
         const case2 = /\)x/gi;
-        const caseGroup1 = { cases: [case1, case2], replace: /x/gi, with: '*X' };
+        const caseGroup1 = { cases: [case1, case2], replace: /x/i, with: '*X' };
 
         const case3 = /x[0-9]+/gi;
         const case4 = /x\(/gi;
-        const caseGroup2 = { cases: [case3, case4], replace: /x/gi, with: 'X*' };
+        const caseGroup2 = { cases: [case3, case4], replace: /x/i, with: 'X*' };
 
         caseGroup1.cases.forEach(c => {
             while (this.fn.search(c) !== -1) {
@@ -257,21 +270,23 @@ class FuncCalculator {
         if (this.fn === '') {
             return 'Function cannot be empty';
         }
-        if (this.doesAnyDenominatorContainsX()) {
-            return 'Function cannot contain a/x based function';
-        }
-        if (this.isContainsFloorFunction()) {
-            return 'Floor function is not allowed';
-        }
-        if (this.fn.includes('tan')) {
-            return 'Tan function is not allowed';
+        if (this.isSatisfiesAnyInvalidCase()) {
+            return this.invalidCases.find(invalidCase => {
+                if (this.fn.search(invalidCase.regex) !== -1) {
+                    return true;
+                }
+                return false;
+            })!.message;
         }
         try {
-            this.f(this.zeroX);
+            for (let x = 0; x <= this.width; x++) {
+                this.f(x);
+            }
             if (this.firstValidPoint() === null) {
                 return `Function does not contain any valid point in [0;${this.width}]}]`;
             }
         } catch (e: any) {
+            console.log(e);
             return 'Invalid function';
         }
         return '';

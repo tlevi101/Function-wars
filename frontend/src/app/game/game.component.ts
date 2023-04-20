@@ -360,9 +360,14 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             ) {
                 this.drawNewDamage(this.lastDamages.rightSide);
             }
+            if(this.lastFunctionPoints){
+            console.log(this.lastFunctionPoints!.leftSide[0].x-xLimit);
+            console.log(this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1].x);
+
+            }
             if (
                 this.lastFunctionPoints &&
-                xLimit + this.lastFunctionPoints.leftSide[0].x >=
+                this.lastFunctionPoints.leftSide[0].x -xLimit <=
                     this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length - 1].x &&
                 this.lastDamages.leftSide
             ) {
