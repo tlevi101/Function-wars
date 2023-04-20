@@ -26,6 +26,7 @@ const io = require('socket.io')(http, {
 let waitList = new Map();
 let games = new Map();
 let onlineUsers = new Map();
+let groupChats = new Map();
 
 io.use(function (socket, next) {
     if (socket.handshake.query && socket.handshake.query.token) {
@@ -52,7 +53,7 @@ io.use(function (socket, next) {
 
         socket.on('join wait list', async () => {
             console.log('joined wait list');
-            joinWaitList(socket, waitList, games);
+            joinWaitList(socket, waitList, games, groupChats);
         });
 
         socket.on('leave wait list', async () => {
