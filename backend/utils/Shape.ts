@@ -35,33 +35,33 @@ export class Line {
         return new Line(new Point(start.x, start.y), new Point(end.x, end.y));
     }
 
-   public separateToPoints(maxLenBetweenPoints:number = 10): Point[]{
+    public separateToPoints(maxLenBetweenPoints: number = 10): Point[] {
         let points: Point[] = [];
         const len = this.start.distance(this.end);
         points.push(this.start);
         const numberOfPoints = Math.round(len / maxLenBetweenPoints);
-        if(this.isParallelWithYAxis()){
-            for (let i = 1; i < numberOfPoints-1; i++) {
+        if (this.isParallelWithYAxis()) {
+            for (let i = 1; i < numberOfPoints - 1; i++) {
                 points.push(new Point(this.start.x, this.start.y + i * maxLenBetweenPoints));
             }
             points.push(this.end);
             return points;
         }
-        if(this.isParallelWithXAxis()){
-            for (let i = 1; i < numberOfPoints-1; i++) {
+        if (this.isParallelWithXAxis()) {
+            for (let i = 1; i < numberOfPoints - 1; i++) {
                 points.push(new Point(this.start.x + i * maxLenBetweenPoints, this.start.y));
             }
             points.push(this.end);
             return points;
         }
         return points;
-   }
+    }
     private isParallelWithXAxis(): boolean {
-        return Math.abs(this.start.y - this.end.y) <=1;
+        return Math.abs(this.start.y - this.end.y) <= 1;
     }
 
     private isParallelWithYAxis(): boolean {
-        return Math.abs(this.start.x - this.end.x) <=1;
+        return Math.abs(this.start.x - this.end.x) <= 1;
     }
     get length(): number {
         return this.start.distance(this.end);

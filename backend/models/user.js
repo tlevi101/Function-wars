@@ -172,7 +172,7 @@ module.exports = (sequelize, DataTypes) => {
 
         async isFriend(other_user_id) {
             const other_user = await sequelize.models.User.findByPk(other_user_id);
-            return await this.hasFriendOf(other_user) || await this.hasMyFriend(other_user);
+            return (await this.hasFriendOf(other_user)) || (await this.hasMyFriend(other_user));
         }
     }
     User.init(

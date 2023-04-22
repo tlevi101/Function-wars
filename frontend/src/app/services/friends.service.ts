@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs";
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -37,7 +37,7 @@ export class FriendsService {
         });
     }
 
-    addFriend(friendId: number):Observable<{ message:string }> {
-        return this.http.post<{message:string}>(`${this.url}/${friendId}`, {}, { headers: this.hr });
+    addFriend(friendId: number): Observable<{ message: string }> {
+        return this.http.post<{ message: string }>(`${this.url}/${friendId}`, {}, { headers: this.hr });
     }
 }

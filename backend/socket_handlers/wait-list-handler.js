@@ -1,8 +1,8 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-const { Game} = require('../dist/Game');
-const {GroupChat} = require("../dist/GroupChat");
-const chalk = require("chalk");
+const { Game } = require('../dist/Game');
+const { GroupChat } = require('../dist/GroupChat');
+const chalk = require('chalk');
 const joinWaitList = async (socket, waitList, games, groupChats) => {
     socket.join('wait-list');
     waitList.set(socket.decoded.id, socket);
@@ -33,7 +33,7 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
     let sockets = [];
     let iter = waitList.keys();
     let field = await Field.randomField(count);
-    if (!field){
+    if (!field) {
         //TODO: create seeder for fields
         //TODO: handle on frontend if no field found
         console.error(chalk.red.underline.italic(`No field found,for ${count} players`));
@@ -58,13 +58,22 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
         });
     });
     console.log(chalk.green('game created, uuid: ' + newGame.UUID));
-    placeIntoGroupChat(sockets, players, groupChats, newGame.UUID)
+    placeIntoGroupChat(sockets, players, groupChats, newGame.UUID);
 };
 
 const placeIntoGroupChat = async (sockets, players, groupChats, roomUUID) => {
     console.log(chalk.green('group chat created, uuid: chat-' + roomUUID));
-    groupChats.set('chat-'+roomUUID, new GroupChat('chat-'+roomUUID,players.map(player=> { return {id:player.id, name:player.name}}),sockets));
+    groupChats.set(
+        'chat-' + roomUUID,
+        new GroupChat(
+            'chat-' + roomUUID,
+            players.map(player => {
+                return { id: player.id, name: player.name };
+            }),
+            sockets
+        )
+    );
     sockets.forEach(socket => {
-        socket.join('chat-'+roomUUID);
+        socket.join('chat-' + roomUUID);
     });
-}
+};

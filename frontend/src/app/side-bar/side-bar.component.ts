@@ -5,7 +5,7 @@ import { ChatService } from '../services/chat.service';
 import { FriendsService } from '../services/friends.service';
 import { UsersService } from '../services/users.service';
 import { myAnimations } from './animations';
-import {InfoComponent} from "../pop-up/info/info.component";
+import { InfoComponent } from '../pop-up/info/info.component';
 
 interface Friend {
     id: number;

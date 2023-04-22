@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs";
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -19,11 +19,11 @@ export class UsersService {
         return this.http.post(`${this.url}/${id}/block`, {}, { headers: this.hr });
     }
 
-    unblockUser(id: number):Observable<{message:string}> {
-        return this.http.delete<{message:string}>(`${this.url}/${id}/unblock`, { headers: this.hr });
+    unblockUser(id: number): Observable<{ message: string }> {
+        return this.http.delete<{ message: string }>(`${this.url}/${id}/unblock`, { headers: this.hr });
     }
 
-    reportUser(id: number, description: string):Observable<{message:string}> {
-        return this.http.post<{message:string}>(`${this.url}/${id}/report`, {description}, { headers: this.hr });
+    reportUser(id: number, description: string): Observable<{ message: string }> {
+        return this.http.post<{ message: string }>(`${this.url}/${id}/report`, { description }, { headers: this.hr });
     }
 }

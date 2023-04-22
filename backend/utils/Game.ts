@@ -1,7 +1,7 @@
 import FuncCalculator = require('./FuncCalculator');
 import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
 import Player = require('./Player');
-import {Ellipse, Rectangle, Point, DamageCircle, Line} from './Shape';
+import { Ellipse, Rectangle, Point, DamageCircle, Line } from './Shape';
 const MyLogger = require('../logs/logger.js');
 
 export class Game {
@@ -57,7 +57,7 @@ export class Game {
 
     public async submitFunction(func: string): Promise<void> {
         const funcCalculator = new FuncCalculator(func, this.currentPlayer.Location.x, this.currentPlayer.Location.y);
-        if (! await funcCalculator.isValidFunction()) {
+        if (!(await funcCalculator.isValidFunction())) {
             throw new Error('Invalid function');
         } else {
             this.lastFunction = func;
@@ -92,7 +92,7 @@ export class Game {
                     leftSide = leftSide.slice(0, i);
                     rightSide = rightSide.slice(0, i > rightSide.length ? undefined : i);
                 } else if (await this.checkObjectCollision(leftSide[i])) {
-                    leftSide = leftSide.slice(0, i+1);
+                    leftSide = leftSide.slice(0, i + 1);
                     damages.leftSide = await this.damageObject(
                         leftSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(leftSide[i].x, leftSide[i].y))
@@ -104,7 +104,7 @@ export class Game {
                     leftSide = leftSide.slice(0, i > leftSide.length ? undefined : i);
                     rightSide = rightSide.slice(0, i);
                 } else if (await this.checkObjectCollision(rightSide[i])) {
-                    rightSide = rightSide.slice(0, i+1);
+                    rightSide = rightSide.slice(0, i + 1);
                     damages.rightSide = await this.damageObject(
                         rightSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(rightSide[i].x, rightSide[i].y))
@@ -199,35 +199,35 @@ export class Game {
         return player !== undefined;
     }
     public playerLeft(playerID: number): void {
-        this.players =  this.players.map(player => {
-            if(player.ID === playerID) {
+        this.players = this.players.map(player => {
+            if (player.ID === playerID) {
                 player.disconnect();
             }
             return player;
-        })
+        });
     }
 
     public playerReconnect(playerID: number): void {
-        this.players =  this.players.map(player => {
-            if(player.ID === playerID) {
+        this.players = this.players.map(player => {
+            if (player.ID === playerID) {
                 player.reconnect();
             }
             return player;
-        })
+        });
     }
 
     public updatePlayerSocket(playerID: number, socket: any): void {
-        this.sockets =  this.sockets.map(s => {
-            if(s.decoded.id === playerID) {
+        this.sockets = this.sockets.map(s => {
+            if (s.decoded.id === playerID) {
                 s = socket;
             }
             return s;
-        })
+        });
     }
 
     public playerIsOnline(playerID: number): boolean {
         const player = this.players.find(player => player.ID === playerID);
-        if(!player){
+        if (!player) {
             throw new Error('Player not found');
         }
         return player.Online;

@@ -7,7 +7,7 @@ const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
     let chat = await user.getChat(friend_id);
     if (!chat) {
         const friendship = await user.getFriendShip(friend_id);
-        if (!friendship){
+        if (!friendship) {
             console.error('Message not sent. Friendship not found.');
             return;
         }
@@ -23,8 +23,7 @@ const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
         socket
             .to(onlineUsers.get(friend_id).socketID)
             .emit('receive message', { from: user.id, message: message, seen: false });
-    }
-    else{
+    } else {
         console.log('Friend is offline.');
     }
 };
@@ -32,10 +31,10 @@ const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
 const setSeen = async (socket, friend_id) => {
     const user = await User.findOne({ where: { id: socket.decoded.id } });
     const chat = await user.getChat(friend_id);
-    if (!chat){
+    if (!chat) {
         console.error('Chat not found.');
         return;
-    };
+    }
     chat.messages = chat.messages.map(message => {
         if (message.from !== user.id) {
             message.seen = true;

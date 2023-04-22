@@ -144,18 +144,18 @@ router.delete('/friends/:id', auth, async (req, res) => {
         });
     }
     const chat = await friendship.getChat();
-    if(chat){
+    if (chat) {
         await Chat.destroy({
             where: {
                 id: chat.id,
-            }
+            },
         });
     }
     await Friendship.destroy({
         where: {
             id: friendship.id,
-        }
-    })
+        },
+    });
     res.status(200).json({ message: 'Friend deleted.' });
 });
 
@@ -235,7 +235,7 @@ router.delete('/users/:id/unblock', auth, async (req, res) => {
     if (!blockedUser) {
         return res.status(404).json({ message: 'Blocked user not found.' });
     }
-    if(!await user.hasBlocked(blockedUser)) {
+    if (!(await user.hasBlocked(blockedUser))) {
         return res.status(404).json({ message: 'User is not blocked.' });
     }
     await user.removeBlocked(blockedUser);

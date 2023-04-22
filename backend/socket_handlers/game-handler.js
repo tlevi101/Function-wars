@@ -4,9 +4,9 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const gameRouter = express.Router();
 const FuncCalculator = require('../dist/FuncCalculator');
-const {stack} = require("sequelize/lib/utils");
-const {deleteGameGroupChat} = require("./group-chat-handler");
-const chalk = require("chalk");
+const { stack } = require('sequelize/lib/utils');
+const { deleteGameGroupChat } = require('./group-chat-handler');
+const chalk = require('chalk');
 
 /**
  * @route GET games/:game_uuid/function/submit
@@ -38,7 +38,7 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
         res.io.to(game_uuid).emit('game over', { points, message: `Game over, Winner is ${game.CurrentPlayer.Name}` });
         game.Sockets.forEach(socket => {
             socket.leave(game_uuid);
-            deleteGameGroupChat(req.groupChats, 'chat-'+game_uuid);
+            deleteGameGroupChat(req.groupChats, 'chat-' + game_uuid);
         });
         req.games.delete(game_uuid);
         return res.status(200).json({ message: 'Game over.' });
@@ -60,9 +60,9 @@ gameRouter.get('/:game_uuid', auth, async (req, res) => {
     if (!players.find(player => player.ID === req.user.id)) {
         return res.status(403).json({ message: 'You are not in this game.' });
     }
-    if(game.playerCanReconnect(req.user.id)){
+    if (game.playerCanReconnect(req.user.id)) {
         console.log(chalk.green(`Player ${req.user.name} reconnected to game ${game.UUID}`));
-        game.playerReconnect(req.user.id)
+        game.playerReconnect(req.user.id);
     }
     return res.status(200).json(game.toFrontend());
 });
@@ -76,7 +76,7 @@ const leaveGame = async (socket, games) => {
     console.log(chalk.green(`Player ${socket.decoded.name} left game ${game.UUID}`));
 };
 
-const deleteGame = async (socket,games) => {
+const deleteGame = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
         return;
@@ -96,7 +96,7 @@ const getGame = async (userID, games) => {
         }
     }
     return null;
-}
+};
 const userIsOnlineInGame = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
@@ -104,7 +104,7 @@ const userIsOnlineInGame = async (socket, games) => {
         throw new Error('Game not found.');
     }
     return game.playerIsOnline(socket.decoded.id);
-}
+};
 
 const reconnectToGame = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
@@ -113,17 +113,17 @@ const reconnectToGame = async (socket, games) => {
         return;
     }
     socket.join(game.UUID);
-    game.updatePlayerSocket(socket.decoded.id,socket)
+    game.updatePlayerSocket(socket.decoded.id, socket);
     console.log(chalk.green(`Player ${socket.decoded.name} socket updated in game to game ${game.UUID}`));
-}
+};
 const updateGameSocket = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
         console.debug('game not found');
         return;
     }
-    game.updatePlayerSocket(socket.decoded.id,socket)
-}
+    game.updatePlayerSocket(socket.decoded.id, socket);
+};
 
 module.exports = {
     leaveGame,
