@@ -3,11 +3,14 @@ const { Op } = require('sequelize');
 
 const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
     console.log(onlineUsers);
-    const user = onlineUsers.get(socket.decoded.id).user;
+    const user = await User.findByPk(onlineUsers.get(socket.decoded.id).user.id);
     let chat = await user.getChat(friend_id);
     if (!chat) {
         const friendship = await user.getFriendShip(friend_id);
-        if (!friendship) return;
+        if (!friendship){
+            console.error('Message not sent. Friendship not found.');
+            return;
+        }
         let newMessages = [];
         newMessages.push({ from: user.id, message: message, seen: false });
         const newChat = await Chat.create({ friendship_id: friendship.id, messages: newMessages });
@@ -16,16 +19,23 @@ const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
     chat.messages.push({ from: user.id, message: message, seen: false });
     await Chat.update({ messages: chat.messages }, { where: { id: chat.id } });
     if (onlineUsers.has(friend_id)) {
+        console.log('Friend is online.');
         socket
-            .to(onlineUsers.get(friend_id).socketId)
+            .to(onlineUsers.get(friend_id).socketID)
             .emit('receive message', { from: user.id, message: message, seen: false });
+    }
+    else{
+        console.log('Friend is offline.');
     }
 };
 
 const setSeen = async (socket, friend_id) => {
     const user = await User.findOne({ where: { id: socket.decoded.id } });
     const chat = await user.getChat(friend_id);
-    if (!chat) return;
+    if (!chat){
+        console.error('Chat not found.');
+        return;
+    };
     chat.messages = chat.messages.map(message => {
         if (message.from !== user.id) {
             message.seen = true;

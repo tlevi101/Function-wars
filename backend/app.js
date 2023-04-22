@@ -14,7 +14,9 @@ const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
 const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
 const { gameRouter, leaveGame, userIsOnlineInGame, getGame, reconnectToGame, deleteGame, updateGameSocket} = require('./socket_handlers/game-handler');
 const MyLogger = require('./logs/logger');
-const {sendGroupMessage, leaveGroupChat, deleteGameGroupChat, reconnectToGroupChat, deleteGameGroupChatByUserID} = require("./socket_handlers/group-chat-handler");
+const {sendGroupMessage, leaveGroupChat, deleteGameGroupChat, reconnectToGroupChat, deleteGameGroupChatByUserID,
+    groupChatRouter
+} = require("./socket_handlers/group-chat-handler");
 const chalk = require("chalk");
 //Socket
 
@@ -43,8 +45,8 @@ io.use(function (socket, next) {
     }
 })
     .on('connection', async socket => {
-        console.log(chalk.blue('user connected'));
-        onlineUsers.set(socket.decoded.id, { user: await User.findByPk(socket.decoded.id), socketId: socket.id });
+        console.debug(chalk.blue('user connected'));
+        onlineUsers.set(socket.decoded.id, { user: socket.decoded , socketID: socket.id});
         await updateGameSocket(socket, games);
         await reconnectToGroupChat(socket, groupChats);
         //TODO update only socket in group chat, dont reconnect here
@@ -58,7 +60,6 @@ io.use(function (socket, next) {
         });
 
         socket.on('join wait list', async () => {
-            console.log('joined wait list');
             joinWaitList(socket, waitList, games, groupChats);
         });
 
@@ -137,6 +138,7 @@ app.use('/', require('./routes/user'));
 
 //socket router
 app.use('/games', gameRouter);
+app.use('/group-chat', groupChatRouter);
 
 app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });

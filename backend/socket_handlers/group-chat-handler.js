@@ -56,7 +56,7 @@ const joinGroupChat = async (socket, groupChats, groupChatUUID) => {
 const reconnectToGroupChat = async (socket, groupChats) => {
     const groupChat = await getCroupChat(socket.decoded.id, groupChats);
     if (!groupChat) {
-        console.log(chalk.red('chat not found'));
+        console.debug('chat not found')
         return;
     }
     socket.join(groupChat.chatUUID);
@@ -80,7 +80,7 @@ const sendGroupMessage = async (socket, message, groupChats ) => {
         return;
     }
     await new Promise((resolve) =>{
-        groupChat.addMessage({id:socket.decoded.id, name:socket.decoded.name}, message)
+        groupChat.addMessage({from:{id:socket.decoded.id, name:socket.decoded.name}, message})
         resolve();
     });
     groupChat.Sockets.forEach(async s => {
@@ -102,17 +102,17 @@ groupChatRouter.post('/:roomUUID/mute/:userID', auth, async (req, res) => {
     if (!groupChat) {
         return res.status(404).json({ message: 'Group chat not found.' });
     }
-    let users = groupChat.Users;
-    if (groupChat.userIsInChat(user.id)) {
+    if (!groupChat.userIsInChat(user.id)) {
         return res.status(403).json({ message: 'You are not in this group chat.' });
     }
-    if (groupChat.userIsInChat(userID)) {
+    if (!groupChat.userIsInChat(userID)) {
         return res.status(404).json({ message: 'User not found.' });
     }
     try{
         groupChat.muteUser(user.id, userID);
     }
     catch(e) {
+        console.error(e.message);
         return res.status(400).json({ message: e.message });
     }
     return res.status(200).json({ message: 'User muted.' });
@@ -125,11 +125,12 @@ groupChatRouter.post('/:roomUUID/unmute/:userID', auth, async (req, res) => {
     if (!groupChat) {
         return res.status(404).json({ message: 'Group chat not found.' });
     }
-    let users = groupChat.Users;
-    if (groupChat.userIsInChat(user.id)) {
+    console.debug(groupChat.userIsInChat(user.id));
+    if (!groupChat.userIsInChat(user.id)) {
         return res.status(403).json({ message: 'You are not in this group chat.' });
     }
-    if (groupChat.userIsInChat(userID)) {
+    console.debug(groupChat.userIsInChat(userID));
+    if (!groupChat.userIsInChat(userID)) {
         return res.status(404).json({ message: 'User not found.' });
     }
     try{
@@ -148,11 +149,25 @@ groupChatRouter.get('/:roomUUID/messages', auth, async (req, res) => {
     if (!groupChat) {
         return res.status(404).json({ message: 'Group chat not found.' });
     }
-    if (groupChat.userIsInChat(user.id)) {
+    if (!groupChat.userIsInChat(user.id)) {
         return res.status(403).json({ message: 'You are not in this group chat.' });
     }
     //TODO reconnect user here if they are not connected
     return res.status(200).json({ messages: groupChat.getMessagesForUser(user.id) });
+});
+
+groupChatRouter.get('/:roomUUID/users-status', auth, async (req, res) => {
+    const { roomUUID } = req.params;
+    const { user } = req;
+    const groupChat = req.groupChats.get(roomUUID);
+    if (!groupChat) {
+        return res.status(404).json({ message: 'Group chat not found.' });
+    }
+    console.debug(!groupChat.userIsInChat(user.id))
+    if (!groupChat.userIsInChat(user.id)) {
+        return res.status(403).json({ message: 'You are not in this group chat.' });
+    }
+    return res.status(200).json({ users: await groupChat.getOtherUsersStatusForUser(user.id) });
 });
 
 module.exports={

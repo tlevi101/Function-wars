@@ -29,7 +29,7 @@ const slashedChatHTML = `
 <i class=" fs-4 bi bi-chat position-absolute" ></i>
 <div class="slashRotate position-absolute">
 	<i class="fs-2 bi bi-slash-lg"></i>
-</div>	
+</div>
 </div>
 `;
 const singularActions: Action[] = [

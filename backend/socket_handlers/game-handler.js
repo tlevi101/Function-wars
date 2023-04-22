@@ -52,7 +52,6 @@ gameRouter.post('/:game_uuid/function/submit', auth, async (req, res) => {
 
 gameRouter.get('/:game_uuid', auth, async (req, res) => {
     const { game_uuid } = req.params;
-    console.log('game_uuid: ', game_uuid);
     const game = req.games.get(game_uuid);
     if (!game) {
         return res.status(404).json({ message: 'Game not found.' });
@@ -62,6 +61,7 @@ gameRouter.get('/:game_uuid', auth, async (req, res) => {
         return res.status(403).json({ message: 'You are not in this game.' });
     }
     if(game.playerCanReconnect(req.user.id)){
+        console.log(chalk.green(`Player ${req.user.name} reconnected to game ${game.UUID}`));
         game.playerReconnect(req.user.id)
     }
     return res.status(200).json(game.toFrontend());
@@ -73,6 +73,7 @@ const leaveGame = async (socket, games) => {
         return;
     }
     game.playerLeft(socket.decoded.id);
+    console.log(chalk.green(`Player ${socket.decoded.name} left game ${game.UUID}`));
 };
 
 const deleteGame = async (socket,games) => {
@@ -85,6 +86,7 @@ const deleteGame = async (socket,games) => {
     game.Sockets.forEach(socket => socket.leave(gameUUID));
     socket.leave(game.room);
     games.delete(gameUUID);
+    console.log(chalk.green(`Game ${gameUUID} deleted.`));
 };
 
 const getGame = async (userID, games) => {
@@ -98,6 +100,7 @@ const getGame = async (userID, games) => {
 const userIsOnlineInGame = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
+        console.debug('game not found');
         throw new Error('Game not found.');
     }
     return game.playerIsOnline(socket.decoded.id);
@@ -106,16 +109,17 @@ const userIsOnlineInGame = async (socket, games) => {
 const reconnectToGame = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
-        console.log(chalk.red('game not found'));
+        console.debug('game not found');
         return;
     }
     socket.join(game.UUID);
     game.updatePlayerSocket(socket.decoded.id,socket)
+    console.log(chalk.green(`Player ${socket.decoded.name} socket updated in game to game ${game.UUID}`));
 }
 const updateGameSocket = async (socket, games) => {
     let game = await getGame(socket.decoded.id, games);
     if (!game) {
-        console.log(chalk.red('game not found'));
+        console.debug('game not found');
         return;
     }
     game.updatePlayerSocket(socket.decoded.id,socket)

@@ -201,7 +201,6 @@ export class Game {
     public playerLeft(playerID: number): void {
         this.players =  this.players.map(player => {
             if(player.ID === playerID) {
-                console.log('player left from game');
                 player.disconnect();
             }
             return player;
@@ -211,7 +210,6 @@ export class Game {
     public playerReconnect(playerID: number): void {
         this.players =  this.players.map(player => {
             if(player.ID === playerID) {
-                console.log('player reconnected to game');
                 player.reconnect();
             }
             return player;

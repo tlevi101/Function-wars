@@ -7,7 +7,7 @@
 					<p [innerHTML]="message"></p>
 					<input #confirmInput type="{{inputType}}" class="form-control" placeholder="{{inputPlaceHolder}}">
 					<div class="d-flex justify-content-center">
-						<button type="button" class="btn btn-danger btn-sm" (click)="confirm()">{{confirmButtonText}}</button>
+						<button type="button" class="{{confirmInput.value==='' ? 'disabled':''}}btn btn-danger btn-sm" (click)="confirm()">{{confirmButtonText}}</button>
 						<button type="button" class="btn btn-primary btn-sm" (click)="cancel()">{{cancelButtonText}}</button>
 					</div>
 				</div>

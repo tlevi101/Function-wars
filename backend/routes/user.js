@@ -143,8 +143,20 @@ router.delete('/friends/:id', auth, async (req, res) => {
             message: 'You are not the recipient of this friendship request.',
         });
     }
-    await friendship.destroy();
-    res.status(200).json({ message: 'Friendship deleted.' });
+    const chat = await friendship.getChat();
+    if(chat){
+        await Chat.destroy({
+            where: {
+                id: chat.id,
+            }
+        });
+    }
+    await Friendship.destroy({
+        where: {
+            id: friendship.id,
+        }
+    })
+    res.status(200).json({ message: 'Friend deleted.' });
 });
 
 router.post('/friends/:id', auth, async (req, res) => {
@@ -210,6 +222,24 @@ router.post('/users/:id/block', auth, async (req, res) => {
     }
     await user.addBlocked(blockedUser);
     res.status(200).json({ message: 'User blocked.' });
+});
+
+router.delete('/users/:id/unblock', auth, async (req, res) => {
+    const { email } = req.user;
+    const { id } = req.params;
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+    const blockedUser = await User.findByPk(id);
+    if (!blockedUser) {
+        return res.status(404).json({ message: 'Blocked user not found.' });
+    }
+    if(!await user.hasBlocked(blockedUser)) {
+        return res.status(404).json({ message: 'User is not blocked.' });
+    }
+    await user.removeBlocked(blockedUser);
+    res.status(200).json({ message: 'User unblocked.' });
 });
 
 module.exports = router;
