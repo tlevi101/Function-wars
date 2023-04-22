@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -8,7 +8,9 @@ import { Observable } from 'rxjs';
 export class FriendsService {
     private hr;
     private url;
+    public friendDeleted : EventEmitter<number>;
     constructor(private http: HttpClient) {
+        this.friendDeleted = new EventEmitter();
         this.url = 'http://localhost:4000/friends';
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
@@ -20,6 +22,7 @@ export class FriendsService {
     }
 
     deleteFriend(friendId: number) {
+        this.friendDeleted.emit(friendId);
         return this.http.delete(`${this.url}/${friendId}`, { headers: this.hr });
     }
 

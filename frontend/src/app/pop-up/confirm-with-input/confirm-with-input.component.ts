@@ -28,6 +28,7 @@ export class ConfirmWithInputComponent {
     @Output() confirmEvent: EventEmitter<string> = new EventEmitter();
     @Output() cancelEvent = new EventEmitter();
     @ViewChild('confirmInput') input!: ElementRef;
+    valid = false;
     constructor() {}
 
     confirm() {
