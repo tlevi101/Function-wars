@@ -1,6 +1,7 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-const Game = require('../dist/Game');
+const { Game} = require('../dist/Game');
+const {GroupChat} = require("../dist/GroupChat");
 const joinWaitList = async (socket, waitList, games, groupChats) => {
     socket.join('wait-list');
     console.log('joined wait-list');
@@ -9,7 +10,6 @@ const joinWaitList = async (socket, waitList, games, groupChats) => {
         PlaceIntoGame(4, waitList, games, groupChats);
     }
     if (waitList.size >= 3) {
-        PlaceIntoGame(3, waitList, games, groupChats);
     }
     if (waitList.size >= 2) {
         PlaceIntoGame(2, waitList, games, groupChats);
@@ -39,13 +39,10 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
         sockets.push(waitList.get(id));
     }
 
-    players.forEach(user => {
-        waitList.delete(user);
-    });
     const newGame = await Game.makeGameFromField(field, players, sockets);
     games.set(newGame.UUID, newGame);
     sockets.forEach(socket => {
-        socket.leave('wait-list');
+        leaveWaitList(socket, waitList);
         socket.join(newGame.UUID);
         socket.emit('joined game', {
             room: newGame.UUID,
@@ -57,12 +54,8 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
 };
 
 const placeIntoGroupChat = async (sockets, players, groupChats, roomUUID) => {
-    groupChats.set(roomUUID, { sockets: sockets, players: players, messages: [] });
+    groupChats.set('chat-'+roomUUID, new GroupChat('chat-'+roomUUID,players.map(player=> { return {id:player.id, name:player.name}}),sockets));
     sockets.forEach(socket => {
         socket.join('chat-'+roomUUID);
-        socket.emit('joined chat', {
-            room: 'chat-'+roomUUID,
-            players: players,
-        });
     });
 }

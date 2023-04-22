@@ -1,10 +1,14 @@
 require('dotenv').config();
 const { io, app } = require('./app');
 const { instrument } = require('@socket.io/admin-ui');
-
+const {overrideConsole} = require('nodejs-better-console');
+overrideConsole();
 instrument(io, {
     auth: false,
 });
+
+
+//Then redefine the old console
 
 io.listen(3000);
 

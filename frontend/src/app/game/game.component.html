@@ -4,9 +4,9 @@
 
 		</canvas>
 	</div>
-	<div class="controls p-3">
+	<div class="d-flex flex-column controls p-3">
 
-		<form [formGroup]="functionForm">
+		<form [formGroup]="functionForm" class="mb-auto">
             <div class="d-flex gap-3 mb-3">
                 <button *ngFor="let fn of validFunctions" type="button" class="btn btn-primary btn-sm {{itsMyTurn? '':'disabled'}}" (click)="insertFunction(fn)" [innerHTML]="fn"></button>
             </div>
@@ -18,6 +18,7 @@
                 {{getFunctionDefError()}}
 			</div>
 		</form>
+        <app-group-chat class="mh-75" [roomUUID]="'chat-'+gameUUID"></app-group-chat>
 
 	</div>
 </div>

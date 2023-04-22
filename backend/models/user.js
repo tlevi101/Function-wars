@@ -163,6 +163,12 @@ module.exports = (sequelize, DataTypes) => {
             });
             return friendship;
         }
+
+        async isBlocked(other_user_id) {
+            const other_user = await sequelize.models.User.findByPk(other_user_id);
+            console.log(await this.hasBlocked(other_user));
+            return await this.hasBlocked(other_user);
+        }
     }
     User.init(
         {

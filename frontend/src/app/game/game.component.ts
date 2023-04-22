@@ -48,6 +48,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 asyncValidators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
+        console.log(this.gameService.Socket);
     }
 
     ngOnDestroy(): void {

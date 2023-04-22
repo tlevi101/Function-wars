@@ -8,6 +8,7 @@ class Player {
     private name: string;
     private object: Ellipse;
     private avoidArea: Circle;
+    private online: boolean = true;
     constructor(location: Point, id: number, name: string) {
         this.object = new Ellipse(location, { width: 80, height: 80 });
         this.avoidArea = new Circle(location, 130);
@@ -26,6 +27,7 @@ class Player {
             avoidArea: this.avoidArea.toJSON(),
         };
     }
+
     async pointInside(point: Point): Promise<boolean> {
         return await this.object.pointInside(point);
     }
@@ -50,6 +52,15 @@ class Player {
     }
     get Name(): string {
         return this.name;
+    }
+    get Online(): boolean {
+        return this.online;
+    }
+    public disconnect(): void {
+        this.online = false;
+    }
+    public reconnect(): void {
+        this.online = true;
     }
 }
 export = Player;

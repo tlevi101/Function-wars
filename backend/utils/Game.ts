@@ -4,7 +4,7 @@ import Player = require('./Player');
 import {Ellipse, Rectangle, Point, DamageCircle, Line} from './Shape';
 const MyLogger = require('../logs/logger.js');
 
-module.exports = class Game {
+export class Game {
     private players: Player[];
     private objects: (Rectangle | Ellipse)[];
     private currentPlayer: Player;
@@ -194,6 +194,46 @@ module.exports = class Game {
         );
         return this.gameOver;
     }
+    public playerCanReconnect(playerID: number): boolean {
+        const player = this.players.find(player => player.ID === playerID);
+        return player !== undefined;
+    }
+    public playerLeft(playerID: number): void {
+        this.players =  this.players.map(player => {
+            if(player.ID === playerID) {
+                console.log('player left from game');
+                player.disconnect();
+            }
+            return player;
+        })
+    }
+
+    public playerReconnect(playerID: number): void {
+        this.players =  this.players.map(player => {
+            if(player.ID === playerID) {
+                console.log('player reconnected to game');
+                player.reconnect();
+            }
+            return player;
+        })
+    }
+
+    public updatePlayerSocket(playerID: number, socket: any): void {
+        this.sockets =  this.sockets.map(s => {
+            if(s.decoded.id === playerID) {
+                s = socket;
+            }
+            return s;
+        })
+    }
+
+    public playerIsOnline(playerID: number): boolean {
+        const player = this.players.find(player => player.ID === playerID);
+        if(!player){
+            throw new Error('Player not found');
+        }
+        return player.Online;
+    }
 
     get CurrentPlayer(): Player {
         return this.currentPlayer;
@@ -219,4 +259,4 @@ module.exports = class Game {
     get GameOver(): boolean {
         return this.gameOver;
     }
-};
+}
