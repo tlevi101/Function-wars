@@ -31,6 +31,7 @@ const {
     groupChatRouter,
 } = require('./socket_handlers/group-chat-handler');
 const chalk = require('chalk');
+const {CustomGameController} = require("./types/controllers/CustomGameController");
 //Socket
 
 const io = require('socket.io')(http, {
@@ -44,6 +45,8 @@ let waitList = new Map();
 let games = new Map();
 let onlineUsers = new Map();
 let groupChats = new Map();
+let waitingRooms = new Map();
+
 const TIME_TO_RECONNECT = 10000;
 
 io.use(function (socket, next) {
@@ -63,6 +66,14 @@ io.use(function (socket, next) {
         await updateGameSocket(socket, games);
         await reconnectToGroupChat(socket, groupChats);
         //TODO update only socket in group chat, dont reconnect here
+
+        socket.on('create custom game', async ({ fieldID, isPrivate }) => {
+            await CustomGameController.createCustomGame(socket, fieldID, isPrivate, waitingRooms,groupChats);
+        })
+
+        socket.on('join custom game', async ({ roomUUID }) => {
+            await CustomGameController.joinWaitingRoom(socket, roomUUID, waitingRooms,groupChats);
+        });
 
         socket.on('send chat message', async ({ message, friend_id }) => {
             sendChatMessage(socket, message, friend_id, onlineUsers);
@@ -131,6 +142,7 @@ app.use(function (req, res, next) {
     req.waitList = waitList;
     req.games = games;
     req.groupChats = groupChats;
+    req.waitingRooms = waitingRooms;
     next();
 });
 
@@ -141,6 +153,7 @@ app.use(cors());
 //routers
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
+app.use('/', require('./routes/customGame'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));
 

@@ -1,0 +1,15 @@
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.container{
+    max-width: fit-content;
+}
+
+.chat{
+    background-color: rgb(0, 0, 118);
+    width: 500px;
+    border-radius: 10px;
+}

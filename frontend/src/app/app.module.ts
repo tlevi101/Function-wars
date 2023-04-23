@@ -30,6 +30,7 @@ import { GameComponent } from './game/game.component';
 import { GroupChatComponent } from './chats/group-chat/group-chat.component';
 import { CreateCustomGameComponent } from './pop-up/create-custom-game/create-custom-game.component';
 import { ScaleAbleFieldComponent } from './scale-able-field/scale-able-field.component';
+import { WaitRoomComponent } from './wait-room/wait-room.component';
 
 const config: SocketIoConfig = {
     url: 'http://localhost:3000',
@@ -64,6 +65,7 @@ const config: SocketIoConfig = {
         GroupChatComponent,
         CreateCustomGameComponent,
         ScaleAbleFieldComponent,
+        WaitRoomComponent,
     ],
     imports: [
         BrowserModule,

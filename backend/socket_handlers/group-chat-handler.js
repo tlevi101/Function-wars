@@ -2,7 +2,6 @@ const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middlewares/auth');
-const { stack } = require('sequelize/lib/utils');
 const chalk = require('chalk');
 const groupChatRouter = express.Router();
 

@@ -58,3 +58,11 @@ export interface MessageInterface {
     from: UserInterface;
     message: string;
 }
+
+export interface GroupChatInterface {
+    messages: MessageInterface[];
+    users: UserInterface[];
+    mutes: MutesInterface[];
+    sockets: any[];
+    roomUUID: string;
+}

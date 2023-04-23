@@ -30,7 +30,7 @@ router.get('/fields', auth, async (req, res) => {
             ['updatedAt', 'DESC'],
         ],
     });
-    res.status(200).json({ fields: fields });
+    return res.status(200).json({ fields: fields });
 });
 
 router.get('/fields/:id', auth, async (req, res) => {
@@ -47,9 +47,21 @@ router.get('/fields/:id', auth, async (req, res) => {
     if ((field.is_admin_field && !user.is_admin) || (!field.is_admin_field && field.user_id != user.id)) {
         return res.status(403).json({ message: 'Access denied.' });
     }
-    res.status(200).json({ field: field });
+    return res.status(200).json({ field: field });
 });
-
+router.get('/fields/:id/show', auth, async (req, res) => {
+    const { email } = req.user;
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+    }
+    const { id } = req.params;
+    const field = await Field.findOne({ where: { id: id } });
+    if (!field) {
+        return res.status(404).json({ message: 'Field not found.' });
+    }
+    return res.status(200).json({ field: field });
+})
 router.post('/fields', auth, async (req, res) => {
     const { email } = req.user;
     const user = await User.findOne({ where: { email: email } });
@@ -66,7 +78,7 @@ router.post('/fields', auth, async (req, res) => {
         user_id: user.id,
         is_admin_field: user.is_admin,
     });
-    res.status(201).json({ field: field });
+    return res.status(201).json({ field: field });
 });
 
 router.put('/fields/:id', auth, async (req, res) => {
@@ -88,7 +100,7 @@ router.put('/fields/:id', auth, async (req, res) => {
         return res.status(400).json({ message: 'Invalid field.', detail: validated.error.details });
     }
     await field.update({ name: validated.value.name, field: validated.value.field });
-    res.status(200).json({ field: field });
+    return res.status(200).json({ field: field });
 });
 
 router.delete('/fields/:id', auth, async (req, res) => {
@@ -110,7 +122,7 @@ router.delete('/fields/:id', auth, async (req, res) => {
     } else {
         await field.destroy();
     }
-    res.status(200).json({ message: 'Field deleted.' });
+    return res.status(200).json({ message: 'Field deleted.' });
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-const { Game } = require('../dist/Game');
-const { GroupChat } = require('../dist/GroupChat');
+const { Game } = require('../types/utils/Game');
+const { GroupChat } = require('../types/utils/GroupChat');
 const chalk = require('chalk');
 const joinWaitList = async (socket, waitList, games, groupChats) => {
     socket.join('wait-list');

@@ -2,7 +2,7 @@ import FuncCalculator = require('./FuncCalculator');
 import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
 import Player = require('./Player');
 import { Ellipse, Rectangle, Point, DamageCircle, Line } from './Shape';
-const MyLogger = require('../logs/logger.js');
+const MyLogger = require('../../logs/logger.js');
 
 export class Game {
     private players: Player[];

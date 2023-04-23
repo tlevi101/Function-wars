@@ -1,0 +1,8 @@
+<div class="container center p-4">
+    <div class="d-flex gap-2">
+        <app-scale-able-field [scale]="0.7"></app-scale-able-field>
+        <div class="d-flex flex-column chat p-4">
+            <app-group-chat *ngIf="chatRoomUUID!==''" [roomUUID]="chatRoomUUID" [chatMessagesMaxHeight]="700*0.7-30" class="mt-auto"></app-group-chat>
+        </div>
+    </div>
+</div>
