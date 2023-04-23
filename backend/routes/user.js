@@ -4,8 +4,9 @@ const { User, Friendship, Report, Chat } = require('../models');
 const auth = require('../middlewares/auth');
 const { Op } = require('sequelize');
 
-router.get('/friends', auth, async (req, res) => {
+router.get('/friends/:online?', auth, async (req, res) => {
     const { email } = req.user;
+    const { online } = req.params;
     const user = await User.findOne({ where: { email: email } });
     let friends = await user.getFriends();
     friends = await Promise.all(
@@ -20,6 +21,10 @@ router.get('/friends', auth, async (req, res) => {
             return { name: friend.name, id: friend.id, unreadMessages: unreadMessages };
         })
     );
+    console.debug(online)
+    if(online) {
+        friends = friends.filter(friend => !!req.onlineUsers.get(friend.id));
+    }
     res.status(200).json({ friends: friends });
 });
 

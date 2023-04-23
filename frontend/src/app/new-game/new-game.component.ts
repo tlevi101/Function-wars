@@ -13,6 +13,7 @@ import { OnWaitingComponent } from '../on-waiting/on-waiting.component';
 export class NewGameComponent implements OnInit {
     canCreateGame = false;
     showWaiting = false;
+    showCreateCustomGame = false;
     @ViewChild('onWaiting') onWaiting!: OnWaitingComponent;
     constructor(
         private jwtService: JwtService,
@@ -48,4 +49,6 @@ export class NewGameComponent implements OnInit {
     cancelWaiting() {
         this.showWaiting = false;
     }
+
+    protected readonly onpageshow = onpageshow;
 }

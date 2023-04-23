@@ -21,6 +21,10 @@ export class FriendsService {
         return this.http.get(`${this.url}`, { headers: this.hr });
     }
 
+    getOnlineFriends():Observable<{friends: {id:number, name:string, unreadMessages:number}[]}> {
+        return this.http.get<{friends: {id:number, name:string, unreadMessages:number}[]}>(`${this.url}/online`, { headers: this.hr });
+    }
+
     deleteFriend(friendId: number) {
         this.friendDeleted.emit(friendId);
         return this.http.delete(`${this.url}/${friendId}`, { headers: this.hr });
