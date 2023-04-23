@@ -39,4 +39,7 @@ export class GameService {
     public leaveGame() {
         this.socket.emit('leave game');
     }
+    get Socket() {
+        return this.socket;
+    }
 }

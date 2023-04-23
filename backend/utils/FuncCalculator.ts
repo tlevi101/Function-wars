@@ -1,6 +1,6 @@
 import { PointInterface } from './interfaces';
 import { Line, Point } from './Shape';
-import Player = require("./Player");
+import Player = require('./Player');
 
 class FuncCalculator {
     private fn: string;
@@ -183,12 +183,12 @@ class FuncCalculator {
     async firstValidPoint(): Promise<PointInterface | null> {
         const player = new Player(new Point(this.zeroX, this.zeroY), 0, 'none');
         for (let x = this.zeroX; x < this.width; x++) {
-            if (Number.isInteger(this.f(x)) && await player.pointInside(new Point(x, this.f(x)))){
+            if (Number.isInteger(this.f(x)) && (await player.pointInside(new Point(x, this.f(x))))) {
                 return { x: x, y: this.f(x) };
             }
         }
         for (let x = this.zeroX; x > 0; x--) {
-            if (Number.isInteger(this.f(x)) && await player.pointInside(new Point(x, this.f(x)))) {
+            if (Number.isInteger(this.f(x)) && (await player.pointInside(new Point(x, this.f(x))))) {
                 return { x: x, y: this.f(x) };
             }
         }
@@ -207,7 +207,7 @@ class FuncCalculator {
         } catch (e) {
             return false;
         }
-        return this.fn !== '' && await this.firstValidPoint() !== null && !this.isSatisfiesAnyInvalidCase();
+        return this.fn !== '' && (await this.firstValidPoint()) !== null && !this.isSatisfiesAnyInvalidCase();
     }
 
     isSatisfiesAnyInvalidCase(): boolean {
@@ -284,8 +284,8 @@ class FuncCalculator {
             for (let x = 0; x <= this.width; x++) {
                 this.f(x);
             }
-            if (await this.firstValidPoint() === null) {
-                return 'Function must intersects with your base!'
+            if ((await this.firstValidPoint()) === null) {
+                return 'Function must intersects with your base!';
             }
         } catch (e: any) {
             console.log(e);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AbstractControl, AsyncValidatorFn, ValidationErrors, ValidatorFn} from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { FunctionCalculator } from '../game/utils/FunctionCalculator';
 
 @Injectable({
@@ -41,8 +41,8 @@ export class ValidationService {
             if (!controlErrors) {
                 controlErrors = {};
             }
-            if (!await functionCalculator.isValidFunction()) {
-                   controlErrors!['invalidMathFunction'] = await functionCalculator.error();
+            if (!(await functionCalculator.isValidFunction())) {
+                controlErrors!['invalidMathFunction'] = await functionCalculator.error();
             } else {
                 delete controlErrors['invalidMathFunction'];
                 if (Object.keys(controlErrors).length === 0) controlErrors = null;

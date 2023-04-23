@@ -48,6 +48,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 asyncValidators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
+        console.log(this.gameService.Socket);
     }
 
     ngOnDestroy(): void {
@@ -252,8 +253,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.fillStyle = 'blue';
-            ctx.beginPath();
             for (let i = 0; i < this.objects.length; i++) {
+                ctx.beginPath();
                 if (this.objects[i].type == 'Ellipse') {
                     ctx.ellipse(
                         this.objects[i].location.x,
@@ -273,8 +274,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                         this.objects[i].dimension.height
                     );
                 }
+                ctx.closePath();
             }
-            ctx.closePath();
         }
     }
     drawLines() {
@@ -360,14 +361,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             ) {
                 this.drawNewDamage(this.lastDamages.rightSide);
             }
-            if(this.lastFunctionPoints){
-            console.log(this.lastFunctionPoints!.leftSide[0].x-xLimit);
-            console.log(this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1].x);
-
+            if (this.lastFunctionPoints) {
+                console.log(this.lastFunctionPoints!.leftSide[0].x - xLimit);
+                console.log(this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1].x);
             }
             if (
                 this.lastFunctionPoints &&
-                this.lastFunctionPoints.leftSide[0].x -xLimit <=
+                this.lastFunctionPoints.leftSide[0].x - xLimit <=
                     this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length - 1].x &&
                 this.lastDamages.leftSide
             ) {

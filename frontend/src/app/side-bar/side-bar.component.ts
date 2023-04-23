@@ -5,6 +5,7 @@ import { ChatService } from '../services/chat.service';
 import { FriendsService } from '../services/friends.service';
 import { UsersService } from '../services/users.service';
 import { myAnimations } from './animations';
+import { InfoComponent } from '../pop-up/info/info.component';
 
 interface Friend {
     id: number;
@@ -34,6 +35,7 @@ interface FriendRequest {
 export class SideBarComponent {
     @ViewChild('confirm', { static: true }) confirm!: ConfirmComponent;
     @ViewChild('friendChat', { static: true }) friendChat!: FriendChatComponent;
+    @ViewChild('infoComponent') infoComponent!: InfoComponent;
     myFriendsHovered = false;
     friends: Friend[];
     friendCurrentState: string[];
@@ -105,9 +107,11 @@ export class SideBarComponent {
             (res: any) => {
                 this.friends = this.friends.filter(f => f.id !== this.selectedFriend.friend.id);
                 this.friendCurrentState = this.friendCurrentState.filter((f, i) => i !== this.selectedFriend.index);
+                this.infoComponent.description = res.message;
             },
             (err: any) => {
                 console.log(err);
+                this.infoComponent.description = err.error.message;
                 //TODO Create an error message component
             }
         );

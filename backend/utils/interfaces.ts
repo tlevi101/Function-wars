@@ -45,3 +45,16 @@ export interface GameInterface {
     field: FieldInterface;
     uuid: string;
 }
+
+export interface UserInterface {
+    id: number;
+    name: string;
+}
+export interface MutesInterface {
+    mutedBy: UserInterface;
+    mutedUser: UserInterface;
+}
+export interface MessageInterface {
+    from: UserInterface;
+    message: string;
+}

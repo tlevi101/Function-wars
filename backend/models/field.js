@@ -16,8 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         static async randomField(playerLimit = 2) {
             let fields = await this.findAll({ where: { is_admin_field: true } });
             fields = await Promise.all(fields.filter(field => field.field.players.length === playerLimit));
-            let randomField = fields[Math.floor(Math.random() * fields.length)];
-            return randomField;
+            return fields[Math.floor(Math.random() * fields.length)];
         }
     }
     Field.init(

@@ -27,6 +27,7 @@ import { FieldListComponent } from './list-component/field-list/field-list.compo
 import { NewGameComponent } from './new-game/new-game.component';
 import { OnWaitingComponent } from './on-waiting/on-waiting.component';
 import { GameComponent } from './game/game.component';
+import { GroupChatComponent } from './chats/group-chat/group-chat.component';
 
 const config: SocketIoConfig = {
     url: 'http://localhost:3000',
@@ -58,6 +59,7 @@ const config: SocketIoConfig = {
         NewGameComponent,
         OnWaitingComponent,
         GameComponent,
+        GroupChatComponent,
     ],
     imports: [
         BrowserModule,

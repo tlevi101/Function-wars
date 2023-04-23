@@ -55,3 +55,11 @@ export interface ObjectInterface {
     dimension: { width: number; height: number };
     avoidArea: { location: { x: number; y: number }; radius: number };
 }
+
+export interface OtherUsersStatusInterface {
+    id: number;
+    name: string;
+    blocked: boolean;
+    muted: boolean;
+    isFriend: boolean;
+}

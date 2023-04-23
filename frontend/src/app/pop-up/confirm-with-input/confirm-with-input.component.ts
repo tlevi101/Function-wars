@@ -6,6 +6,7 @@ export interface ConfirmWithInputData {
     message: string;
     inputPlaceHolder: string;
     inputType: string;
+    inputRequired?: boolean;
     confirmButtonText: string;
     cancelButtonText: string;
 }
@@ -23,9 +24,11 @@ export class ConfirmWithInputComponent {
     @Input() inputType = 'text';
     @Input() confirmButtonText = 'Confirm';
     @Input() cancelButtonText = 'Cancel';
+    @Input() inputRequired = false;
     @Output() confirmEvent: EventEmitter<string> = new EventEmitter();
     @Output() cancelEvent = new EventEmitter();
     @ViewChild('confirmInput') input!: ElementRef;
+    valid = false;
     constructor() {}
 
     confirm() {
@@ -46,5 +49,6 @@ export class ConfirmWithInputComponent {
         this.inputType = data.inputType;
         this.confirmButtonText = data.confirmButtonText;
         this.cancelButtonText = data.cancelButtonText;
+        this.inputRequired = data.inputRequired || false;
     }
 }

@@ -2,11 +2,11 @@ export interface Point {
     x: number;
     y: number;
 }
-class PointClass implements Point{
+class PointClass implements Point {
     public x: number;
     public y: number;
 
-    constructor(x:number, y:number) {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -16,17 +16,17 @@ class PointClass implements Point{
         return d;
     }
 }
-class Player{
-    private location:PointClass;
-    private radius:number;
+class Player {
+    private location: PointClass;
+    private radius: number;
 
-    constructor(point:Point | PointClass, radius = 40) {
+    constructor(point: Point | PointClass, radius = 40) {
         this.location = new PointClass(point.x, point.y);
-        this.radius =  radius;
+        this.radius = radius;
     }
 
-    public pointInside(p:Point){
-        return this.location.distance(p)<=this.radius;
+    public pointInside(p: Point) {
+        return this.location.distance(p) <= this.radius;
     }
 }
 
@@ -41,13 +41,19 @@ export class FunctionCalculator {
     private specialValidFunctions: string[] = ['√', '|X|', 'e'];
     private validOperators: string[] = ['+', '-', '*', '/', '^'];
     private invalidFunctions: string[] = ['tan', 'a/x', '[x]', '{x}'];
-    private invalidCases: {regex:RegExp, message:string}[] = [
+    private invalidCases: { regex: RegExp; message: string }[] = [
         { regex: /.*\[.*x.*\].*/gi, message: 'Floor function is not allowed!' },
         { regex: /.*\{.*x.*\}.*/gi, message: 'Ceil function is not allowed!' },
         { regex: /.*tan\(.*/gi, message: 'Tan function is not allowed!' },
-        { regex: /(\/\(.*x.*\))|(\/x)|(\/Math\.[a-z]+\(.*x.*\))|((\||√|e\^)x)|((√|e\^)\(.*x.*\))|(\|.*x.*\|)/gi, message: 'Division by x is not allowed!' },
+        {
+            regex: /(\/\(.*x.*\))|(\/x)|(\/Math\.[a-z]+\(.*x.*\))|((\||√|e\^)x)|((√|e\^)\(.*x.*\))|(\|.*x.*\|)/gi,
+            message: 'Division by x is not allowed!',
+        },
         { regex: /((\*|\*\*)-[0-9]+)/gi, message: 'You cannot multiply with negative number without parentheses!' },
-        { regex: /(\)[0-9]+|[0-9]+\(|\)\()/gi, message: 'You cannot multiply without multiply operator! Except ax (a*x)' },
+        {
+            regex: /(\)[0-9]+|[0-9]+\(|\)\()/gi,
+            message: 'You cannot multiply without multiply operator! Except ax (a*x)',
+        },
     ];
 
     constructor(fn: string, zeroX: number, zeroY: number, width = 1000, height = 700, ratio = 35) {
@@ -88,12 +94,12 @@ export class FunctionCalculator {
     async firstValidPoint(): Promise<Point | null> {
         const player = new Player(new PointClass(this.zeroX, this.zeroY));
         for (let x = this.zeroX; x < this.width; x++) {
-            if (Number.isInteger(this.f(x)) && await player.pointInside(new PointClass(x, this.f(x)))){
+            if (Number.isInteger(this.f(x)) && (await player.pointInside(new PointClass(x, this.f(x))))) {
                 return { x: x, y: this.f(x) };
             }
         }
         for (let x = this.zeroX; x > 0; x--) {
-            if (Number.isInteger(this.f(x)) && await player.pointInside(new PointClass(x, this.f(x)))) {
+            if (Number.isInteger(this.f(x)) && (await player.pointInside(new PointClass(x, this.f(x))))) {
                 return { x: x, y: this.f(x) };
             }
         }
@@ -112,7 +118,7 @@ export class FunctionCalculator {
         } catch (e) {
             return false;
         }
-        return this.fn !== '' && await this.firstValidPoint() !== null && !this.isSatisfiesAnyInvalidCase();
+        return this.fn !== '' && (await this.firstValidPoint()) !== null && !this.isSatisfiesAnyInvalidCase();
     }
 
     isSatisfiesAnyInvalidCase(): boolean {
@@ -189,8 +195,8 @@ export class FunctionCalculator {
             for (let x = 0; x <= this.width; x++) {
                 this.f(x);
             }
-            if (await this.firstValidPoint() === null) {
-                return 'Function must intersects with your base!'
+            if ((await this.firstValidPoint()) === null) {
+                return 'Function must intersects with your base!';
             }
         } catch (e: any) {
             console.log(e);
@@ -205,4 +211,3 @@ export class FunctionCalculator {
         return [...validFunctions, ...specialValidFunctions];
     }
 }
-

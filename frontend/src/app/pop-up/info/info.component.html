@@ -1,16 +1,14 @@
-<div *ngIf="description!==''">
-	<div class="bg-popUp"></div>
-	<div class="popUp">
-		<div class="d-flex justify-content-center">
-			<div class="row">
-				<div class="col-md-12">
-					<p [innerHTML]="description"></p>
-					<a *ngIf="buttonLink!=='#'" [routerLink]="[buttonLink]">
-						<button class="btn btn-primary" (click)="close()">{{buttonText}}</button>
-					</a>
-					<button *ngIf="buttonLink==='#'" class="btn btn-primary" (click)="close()"> {{buttonText}} </button>
-				</div>
-			  </div>
-		</div>
-	</div>
+<div *ngIf="description !== ''">
+    <div class="bg-popUp"></div>
+    <div class="popUp center">
+        <div class="row">
+            <div class="col-md-12">
+                <p [innerHTML]="description"></p>
+                <a *ngIf="buttonLink !== '#'" [routerLink]="[buttonLink]">
+                    <button class="btn btn-primary" (click)="close()">{{ buttonText }}</button>
+                </a>
+                <button *ngIf="buttonLink === '#'" class="btn btn-primary" (click)="close()">{{ buttonText }}</button>
+            </div>
+        </div>
+    </div>
 </div>
