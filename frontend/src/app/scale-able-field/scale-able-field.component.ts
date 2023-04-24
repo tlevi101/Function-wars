@@ -23,7 +23,7 @@ export class ScaleAbleFieldComponent implements OnInit, AfterViewInit {
     }
 
     sendGetFieldRequest() {
-        const subscription = this.fieldService.getField(this.fieldId).subscribe(
+        const subscription = this.fieldService.showField(this.fieldId).subscribe(
             (res: any) => {
                 this.field = res.field;
                 this.draw();

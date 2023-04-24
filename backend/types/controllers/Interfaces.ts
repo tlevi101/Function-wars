@@ -1,7 +1,22 @@
 import { Game } from '../utils/Game';
 import { GroupChat } from '../utils/GroupChat';
 import { Request, Response } from 'express';
-import {WaitingRoom} from "../utils/WaitingRoom";
+import { WaitingRoom } from '../utils/WaitingRoom';
+
+export type AppType = any & {
+    locals: any & {
+        games: GamesMap;
+        groupChats: GroupChatsMap;
+        waitList: WaitListMap;
+        onlineUsers: OnlineUsersMap;
+        waitingRooms: WaitingRoomsMap;
+        io: any & {
+            to(socketID: string): Function;
+            emit(event: string, data?: Object): Function;
+            in(roomID: string): Function;
+        };
+    };
+};
 
 export type MyRequest = Request & {
     user: DecodedToken;
@@ -14,11 +29,11 @@ export type MyRequest = Request & {
 
 export type MyResponse = Response & {
     io: any & {
-        to(socketID:string): Function;
-        emit(event:string, data?:Object): Function;
-        in(roomID:string): Function;
+        to(socketID: string): Function;
+        emit(event: string, data?: Object): Function;
+        in(roomID: string): Function;
     };
-}
+};
 export interface DecodedToken {
     id: number;
     name: string;
@@ -34,11 +49,11 @@ export interface DecodedToken {
 export type socket = any & {
     decoded: DecodedToken;
     id: string;
-    emit(event:string, data?:Object): Function;
+    emit(event: string, data?: Object): Function;
     on(): Function;
-    join(roomID:string): Function;
-    leave(roomID:string): Function;
-    to(socketID:number): Function;
+    join(roomID: string): Function;
+    leave(roomID: string): Function;
+    to(socketID: number): Function;
 };
 
 type userID = number;

@@ -13,10 +13,17 @@ export interface WaitRoomResponseInterface {
     userCount: number;
     capacity: number;
 }
+export interface CustomGameListItemInterface {
+    owner: DecodedTokenInterface;
+    roomUUID: string;
+    userCount: number;
+    capacity: number;
+    fieldID: number;
+}
 @Injectable({
     providedIn: 'root',
 })
-export class WaitRoomService {
+export class CustomGameService {
     private hr: HttpHeaders;
     private url: string;
     private token: string;
@@ -35,22 +42,26 @@ export class WaitRoomService {
         this.socket.emit('create custom game', { fieldID, isPrivate });
     }
     public waitRoomCreated() {
-        return this.socket.fromEvent<{ roomUUID: string, groupChatUUID:string }>('waiting room created');
+        return this.socket.fromEvent<{ roomUUID: string; groupChatUUID: string }>('waiting room created');
     }
     public joinCustomGame(roomUUID: string) {
         this.socket.emit('join custom game', { roomUUID });
     }
-    public waitRoomJoined() {
+    public customGameJoined() {
         return this.socket.fromEvent('waiting room joined');
+    }
+
+    public leaveCustomGame(roomUUID: string) {
+        this.socket.emit('leave custom game', { roomUUID });
     }
 
     public getCustomGames() {
         return this.http.get<{
-            customGames: { owner: DecodedTokenInterface; roomUUID: string; userCount: number; capacity: number }[];
+            customGames: CustomGameListItemInterface[];
         }>(`${this.url}`, { headers: this.hr });
     }
 
     public getWaitingRoom(roomUUID: string) {
-        return this.http.get<{waitRoom:WaitRoomResponseInterface}>(`${this.url}/${roomUUID}`, { headers: this.hr });
+        return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/${roomUUID}`, { headers: this.hr });
     }
 }

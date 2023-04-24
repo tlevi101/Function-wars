@@ -11,6 +11,7 @@ import { FieldListComponent } from './list-component/field-list/field-list.compo
 import { FieldEditorComponent } from './field-editor/field-editor.component';
 import { GameComponent } from './game/game.component';
 import {WaitRoomComponent} from "./wait-room/wait-room.component";
+import {CustomGamesComponent} from "./list-component/custom-games/custom-games.component";
 
 const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
     { path: 'field/new', component: FieldEditorComponent },
     { path: 'game/:uuid', component: GameComponent },
     { path: 'wait-room/:uuid', component: WaitRoomComponent },
+    { path: 'custom-games', component: CustomGamesComponent },
 ];
 
 @NgModule({

@@ -1,0 +1,32 @@
+<nav *ngIf="pagination.collectionSize > 0" aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {{ pagination.page !== 1 ? '' : 'disabled' }}">
+            <a class="page-link" (click)="turnPagePrevious()">Previous</a>
+        </li>
+        <li class="page-item {{ 1 === pagination.page ? 'active' : '' }}">
+            <a class="page-link" (click)="turnPageTo(1)">{{ 1 }}</a>
+        </li>
+        <li *ngIf="1 !== pagination.first - 1" class="page-item disabled"><a class="page-link">...</a></li>
+        <li
+            *ngFor="let j of [].constructor(pagination.SliderSize); let i = index"
+            class="page-item {{ pagination.first + i === pagination.page ? 'active' : '' }}">
+            <a class="page-link" (click)="turnPageTo(pagination.first + i)">{{ pagination.first + i }}</a>
+        </li>
+        <li *ngIf="pagination.pageCount > pagination.first + pagination.SliderSize" class="page-item disabled">
+            <a class="page-link">...</a>
+        </li>
+        <li
+            *ngIf="pagination.pageCount !== 1"
+            class="page-item {{ pagination.pageCount === pagination.page ? 'active' : '' }}">
+            <a class="page-link" (click)="turnPageTo(pagination.pageCount)">{{ pagination.pageCount }}</a>
+        </li>
+
+        <li class="page-item">
+            <a
+                class="page-link {{ pagination.page !== pagination.pageCount ? '' : 'disabled' }}"
+                (click)="turnPageNext()"
+                >Next</a
+            >
+        </li>
+    </ul>
+</nav>

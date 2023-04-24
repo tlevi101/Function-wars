@@ -3,7 +3,7 @@ import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@a
 import {FriendsService} from "../../services/friends.service";
 import {InfoComponent} from "../info/info.component";
 import {FieldService} from "../../services/field.service";
-import {WaitRoomService} from "../../services/wait-room.service";
+import {CustomGameService} from "../../services/custom-game.service";
 import {Router} from "@angular/router";
 
 interface Friend{
@@ -31,7 +31,7 @@ export class CreateCustomGameComponent implements AfterViewInit{
     constructor(
         private friendsService: FriendsService,
         private fieldService: FieldService,
-        private waitRoomService: WaitRoomService,
+        private waitRoomService: CustomGameService,
         private router: Router
     ){
         this.customGameCreation = new FormGroup({

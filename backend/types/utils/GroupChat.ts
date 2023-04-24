@@ -29,6 +29,15 @@ export class GroupChat {
         this.messages.push(message);
     }
 
+    public destroy() {
+        this.messages = [];
+        this.users = [];
+        this.mutes = [];
+        this.sockets.forEach(s => {
+            s.leave(this.roomUUID);
+        });
+    }
+
     async getOtherUsersStatusForUser(userID: number) {
         const otherUsers = this.users.filter(u => u.id !== userID);
         const otherUsersStatus = await Promise.all(

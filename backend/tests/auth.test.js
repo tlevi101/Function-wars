@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../app');
+const app = require('../types/controllers/app');
 const { User } = require('../models');
 
 describe('POST /', () => {

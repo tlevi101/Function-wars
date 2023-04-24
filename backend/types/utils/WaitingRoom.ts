@@ -25,6 +25,13 @@ export class WaitingRoom{
         this.privateRoom = privateRoom;
     }
 
+    destroy() {
+        this.sockets.forEach(s => {
+            s.leave(this.roomUUID);
+        });
+        this.players = [];
+    }
+
 
     public leave(playerID:number) {
         this.players = this.players.filter(p => p.id !== playerID);
@@ -47,6 +54,10 @@ export class WaitingRoom{
     public isFull() {
         return this.players.length >= this.capacity;
     }
+
+    public isOwner(playerID: number) {
+        return this.owner.id === playerID;
+    }
     toFrontend(){
         return {
             roomUUID: this.roomUUID,
@@ -66,6 +77,7 @@ export class WaitingRoom{
                 roomUUID: r.roomUUID,
                 userCount: r.players.length,
                 capacity: r.capacity,
+                fieldID: r.fieldID,
             };
         });
     }

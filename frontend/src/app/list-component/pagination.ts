@@ -4,9 +4,10 @@ export class Pagination {
     collectionSize: number;
     private SLIDER_SIZE = 4;
     first: number;
-    constructor(collectionSize: number) {
+    constructor(collectionSize: number, pageSize = 7, page = 1) {
         this.first = 2;
-        this.pageSize = 7;
+        this.pageSize = pageSize;
+        this.page = page;
         this.collectionSize = collectionSize;
         if (this.pageCount - this.SLIDER_SIZE - 1 <= 0)
             this.SLIDER_SIZE = this.pageCount - 2 < 0 ? 0 : this.pageCount - 2;

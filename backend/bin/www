@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../types/controllers/app');
 var debug = require('debug')('function-wars:server');
 var http = require('http');
 

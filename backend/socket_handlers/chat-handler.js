@@ -1,9 +1,10 @@
 const { Friendship, User, Chat } = require('../models');
 const { Op } = require('sequelize');
+const {RuntimeMaps} = require("../types/RuntimeMaps");
 
-const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
-    console.log(onlineUsers);
-    const user = await User.findByPk(onlineUsers.get(socket.decoded.id).user.id);
+const sendChatMessage = async (socket, message, friend_id) => {
+    console.log(RuntimeMaps.onlineUsers);
+    const user = await User.findByPk(RuntimeMaps.onlineUsers.get(socket.decoded.id).user.id);
     let chat = await user.getChat(friend_id);
     if (!chat) {
         const friendship = await user.getFriendShip(friend_id);
@@ -18,10 +19,10 @@ const sendChatMessage = async (socket, message, friend_id, onlineUsers) => {
     }
     chat.messages.push({ from: user.id, message: message, seen: false });
     await Chat.update({ messages: chat.messages }, { where: { id: chat.id } });
-    if (onlineUsers.has(friend_id)) {
+    if (RuntimeMaps.onlineUsers.has(friend_id)) {
         console.log('Friend is online.');
         socket
-            .to(onlineUsers.get(friend_id).socketID)
+            .to(RuntimeMaps.onlineUsers.get(friend_id).socketID)
             .emit('receive message', { from: user.id, message: message, seen: false });
     } else {
         console.log('Friend is offline.');

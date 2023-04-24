@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {WaitRoomService} from "../services/wait-room.service";
+import {CustomGameService} from "../services/custom-game.service";
 import {FieldService} from "../services/field.service";
 
 @Component({
@@ -8,13 +8,13 @@ import {FieldService} from "../services/field.service";
   templateUrl: './wait-room.component.html',
   styleUrls: ['./wait-room.component.scss']
 })
-export class WaitRoomComponent implements OnInit{
+export class WaitRoomComponent implements OnInit, OnDestroy{
 
     roomUUID = '';
     chatRoomUUID = '';
     constructor(
         private activatedRoute: ActivatedRoute,
-        private waitRoomService: WaitRoomService,
+        private waitRoomService: CustomGameService,
         private fieldService: FieldService,
     ) {
         //TODO listen errors
@@ -34,8 +34,12 @@ export class WaitRoomComponent implements OnInit{
         })
     }
 
+    ngOnDestroy(): void {
+        this.waitRoomService.leaveCustomGame(this.roomUUID);
+    }
+
     private listenWaitRoomJoined(){
-        const subscription = this.waitRoomService.waitRoomJoined().subscribe(
+        const subscription = this.waitRoomService.customGameJoined().subscribe(
             () => {
                 this.sendGetWaitingRoomRequest();
             },

@@ -1,7 +1,8 @@
-import { DecodedToken, GroupChatsMap, MyRequest, MyResponse, socket, WaitingRoomsMap } from './Interfaces';
+import {DecodedToken, GamesMap, GroupChatsMap, MyRequest, MyResponse, socket, WaitingRoomsMap} from './Interfaces';
 import { WaitingRoom } from '../utils/WaitingRoom';
 import { GroupChat } from '../utils/GroupChat';
-
+import {RuntimeMaps} from "../RuntimeMaps";
+// const { app } = require('../../app
 export class CustomGameController {
     //*****************//
     //Route controllers//
@@ -41,38 +42,30 @@ export class CustomGameController {
      * @param socket: socket
      * @param fieldID: number
      * @param isPrivate: boolean
-     * @param waitingRooms: WaitingRoomsMap
-     * @param groupChats: GroupChatsMap
      */
     public static async createCustomGame(
         socket: socket,
         fieldID: number,
         isPrivate:boolean,
-        waitingRooms: WaitingRoomsMap,
-        groupChats: GroupChatsMap
     ) {
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
         const room = new WaitingRoom(socket.decoded, fieldID, socket, isPrivate);
-        waitingRooms.set(room.UUID, room);
-        groupChats.set(room.ChatUUID, new GroupChat(room.ChatUUID, room.playersToUserInterface(), room.Sockets));
+        RuntimeMaps.waitingRooms.set(room.UUID, room);
+        RuntimeMaps.groupChats.set(room.ChatUUID, new GroupChat(room.ChatUUID, room.playersToUserInterface(), room.Sockets));
         socket.emit('waiting room created', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
     }
 
     /**
      * @event join waiting room
      * @param socket: socket
-     * @param owner: DecodedToken
-     * @param waitingRooms: WaitingRoomsMap
-     * @param groupChats: GroupChatsMap
+     * @param roomUUID: string
      */
     public static async joinWaitingRoom(
         socket: socket,
         roomUUID: string,
-        waitingRooms: WaitingRoomsMap,
-        groupChats: GroupChatsMap
     ) {
-        const room = waitingRooms.get(roomUUID);
-        const groupChat = groupChats.get(room?.ChatUUID || '');
+        const room = RuntimeMaps.waitingRooms.get(roomUUID);
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
             socket.emit('error', {message: 'Custom game not found.'});
@@ -96,33 +89,35 @@ export class CustomGameController {
      * @event leave waiting room
      * @param socket
      * @param owner
-     * @param waitingRooms
-     * @param groupChats
      */
-    public static async leaveWaitingRoom(socket:socket, owner: DecodedToken, waitingRooms: WaitingRoomsMap, groupChats: GroupChatsMap) {
-        //TODO if owner leaves, delete room
-        const room = await CustomGameController.getWaitingRoomByOwner(owner, waitingRooms);
-        const groupChat = groupChats.get(room?.ChatUUID || '');
+    public static async leaveWaitingRoom(socket:socket, owner: DecodedToken) {
+
+        const room = await CustomGameController.getWaitingRoomByOwner(owner);
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
             socket.emit('error', {message: 'Room not found'});
             return;
         }
+        if(room.isOwner(user.id)) {
+            room.destroy();
+            groupChat.destroy();
+            RuntimeMaps.waitingRooms.delete(room.UUID);
+            RuntimeMaps.groupChats.delete(room.ChatUUID);
+        }
         socket.leave(room.UUID);
         socket.leave(room.ChatUUID);
         room.leave(user.id);
         groupChat.leave(user.id, socket);
-        socket.emit('waiting room left', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
     }
 
     /**
      *
      * @param owner
-     * @param waitingRooms
      * @private
      */
-    private static async getWaitingRoomByOwner(owner: DecodedToken, waitingRooms: WaitingRoomsMap) {
-        for await (const [key, value] of waitingRooms.entries()) {
+    private static async getWaitingRoomByOwner(owner: DecodedToken) {
+        for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
             if (value.Players.some(p => p.id === owner.id)) {
                 return value;
             }
