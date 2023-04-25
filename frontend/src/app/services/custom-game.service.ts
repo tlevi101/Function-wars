@@ -28,7 +28,7 @@ export class CustomGameService {
     private url: string;
     private token: string;
     constructor(private jwt: JwtService, private http: HttpClient, private socket: Socket) {
-        this.url = 'http://localhost:4000/custom-games';
+        this.url = 'http://localhost:4000';
         this.token = jwt.getToken();
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
@@ -58,10 +58,10 @@ export class CustomGameService {
     public getCustomGames() {
         return this.http.get<{
             customGames: CustomGameListItemInterface[];
-        }>(`${this.url}`, { headers: this.hr });
+        }>(`${this.url}/custom-games`, { headers: this.hr });
     }
 
     public getWaitingRoom(roomUUID: string) {
-        return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/${roomUUID}`, { headers: this.hr });
+        return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/wait-rooms/${roomUUID}`, { headers: this.hr });
     }
 }

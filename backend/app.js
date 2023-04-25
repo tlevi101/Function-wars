@@ -113,7 +113,7 @@ app.use(cors());
 //routers
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
-app.use('/custom-games', require('./routes/customGame'));
+app.use('/', require('./routes/customGame'));
 app.use('/group-chats', require('./routes/groupChats'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));

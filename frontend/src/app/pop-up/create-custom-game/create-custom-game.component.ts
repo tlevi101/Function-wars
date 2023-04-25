@@ -72,8 +72,8 @@ export class CreateCustomGameComponent implements AfterViewInit{
         //send invite to friends
         this.waitRoomService.createCustomGame(fieldId, isPrivate);
         const subscription = this.waitRoomService.waitRoomCreated().subscribe(
-            ({roomUUID, groupChatUUID})=>{
-                this.router.navigate(['/wait-room', roomUUID]);
+            ({roomUUID})=>{
+                this.router.navigate(['/wait-rooms', roomUUID]);
             },
             (err:any)=>{
                 this.infoComponent.description = err.error.message;

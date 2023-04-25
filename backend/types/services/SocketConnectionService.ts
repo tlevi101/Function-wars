@@ -17,9 +17,19 @@ export class SocketConnectionService{
     public static async userNavigated(socket:socket, url:string){
         const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         if(user){
+            console.log(`User (${socket.decoded.name}) navigated to ${url}`);
             if(user.currentURL !== url){
                 await GameController.leaveGame(socket);
                 await CustomGameController.leaveWaitingRoom(socket);
+                setTimeout(async ()=>{
+                    if(await this.userLeftTheGame(socket)){
+                        GameController.deleteGame(socket);
+                    }
+                    if(await this.ownerLeftWaitingRoom(socket)){
+                        CustomGameController.deleteWaitingRoom(socket);
+                    }
+
+                }, this.TIME_TO_RECONNECT)
             }
             user.currentURL = url;
             const gameUUID = this.getGameUUIDFromURL(url);
@@ -80,7 +90,7 @@ export class SocketConnectionService{
     }
 
     private static getWaitRoomUUIDFromURL(url:string):string|null{
-        const regex = /\/waiting-room\/([a-zA-Z0-9\-]+)/;
+        const regex = /\/wait-rooms\/([a-zA-Z0-9\-]+)/;
         const match = url.match(regex);
         if(match){
             return match[1];

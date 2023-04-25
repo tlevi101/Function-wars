@@ -18,7 +18,7 @@ export class CustomGameController {
         return res.status(200).json({ customGames: WaitingRoom.toFrontendAll(waitingRooms)});
     }
     /**
-     * @route GET /custom-games/:roomUUID
+     * @route GET /wait-rooms/:roomUUID
      * @param req
      * @param res
      */
@@ -68,13 +68,13 @@ export class CustomGameController {
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
-            socket.emit('error', {message: 'Custom game not found.'});
+            socket.emit('error', {message: 'Custom game not found.',code:404});
             console.debug('Custom game not found.');
             //TODO: add error handling on client side
             return;
         }
         if (room.isFull()) {
-            socket.emit('error', { message: 'Custom game is full' });
+            socket.emit('error', { message: 'Custom game is full', code:403});
             console.debug('Custom game is full');
             return;
         }
@@ -96,7 +96,6 @@ export class CustomGameController {
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
-            socket.emit('error', {message: 'Room not found'});
             return;
         }
         room.leave(user.id);

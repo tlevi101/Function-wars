@@ -4,8 +4,8 @@ const auth = require("../middlewares/auth");
 const chalk = require("chalk");
 const {GameController} = require("../types/controllers/GameController");
 
-router.post('/:game_uuid/function', auth, GameController.functionSubmitRequest);
+router.post('/:gameUUID/function', auth, GameController.functionSubmitRequest);
 
-router.get('/:game_uuid', auth, GameController.getGameRequest);
+router.get('/:gameUUID', auth, GameController.getGameRequest);
 
 module.exports = router;

@@ -21,6 +21,7 @@ export class GameController{
         const { fn } = req.body;
         const game = req.games.get(gameUUID);
         if (!game) {
+            console.debug(gameUUID)
             return res.status(404).json({ message: 'Game not found.' });
         }
         let currentPlayer = game.CurrentPlayer;
@@ -60,8 +61,8 @@ export class GameController{
      * @route /games/:gameUUID
      */
     public static async getGameRequest(req: MyRequest, res: MyResponse){
-        const { game_uuid } = req.params;
-        const game = req.games.get(game_uuid);
+        const { gameUUID } = req.params;
+        const game = req.games.get(gameUUID);
         if (!game) {
             return res.status(404).json({ message: 'Game not found.' });
         }
@@ -82,6 +83,7 @@ export class GameController{
             return;
         }
         game.playerLeft(socket.decoded.id);
+        socket.leave(game.UUID);
         console.log(chalk.green(`Player ${socket.decoded.name} left game ${game.UUID}`));
     }
 
@@ -96,12 +98,13 @@ export class GameController{
             return;
         }
         game.playerReconnect(socket.decoded.id, socket);
-        console.log(chalk.green(`Player ${socket.decoded.name} socket updated in game to game ${game.UUID}`));
+        GroupChatController.joinGroupChat(socket, game.ChatUUID);
+        console.log(chalk.green(`Player ${socket.decoded.name} socket updated in ${game.UUID}`));
     }
 
-    public static async getGame(socket: socket){
+    public static async getGame(playerID: number){
         for await (const [key, game] of RuntimeMaps.games) {
-            if (game.Players.find(player => player.ID === socket.decoded.id)) {
+            if (game.Players.find(player => player.ID === playerID)) {
                 return game;
             }
         }
