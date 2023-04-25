@@ -4,7 +4,6 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const gameRouter = express.Router();
 const FuncCalculator = require('../types/utils/FuncCalculator');
-const { stack } = require('sequelize/lib/utils');
 const { deleteGameGroupChat } = require('./group-chat-handler');
 const chalk = require('chalk');
 const { RuntimeMaps } = require('../types/RuntimeMaps');
@@ -125,12 +124,3 @@ const updateGameSocket = async (socket) => {
     game.updatePlayerSocket(socket.decoded.id, socket);
 };
 
-module.exports = {
-    leaveGame,
-    deleteGame,
-    getGame,
-    userIsOnlineInGame,
-    reconnectToGame,
-    updateGameSocket,
-    gameRouter,
-};

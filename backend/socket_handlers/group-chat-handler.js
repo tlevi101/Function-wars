@@ -4,6 +4,7 @@ const express = require('express');
 const auth = require('../middlewares/auth');
 const chalk = require('chalk');
 const {RuntimeMaps} = require("../types/RuntimeMaps");
+import GroupChat  from "../types/utils/GroupChat";
 const groupChatRouter = express.Router();
 
 const leaveGroupChat = async (socket) => {
@@ -26,12 +27,12 @@ const leaveGroupChat = async (socket) => {
 };
 
 const deleteGameGroupChat = async (groupChatUUID) => {
-    const groupChat = RungroupChats.groupChats.get(groupChatUUID);
+    const groupChat = RuntimeMaps.groupChats.get(groupChatUUID);
     if (!groupChat) {
         return;
     }
     groupChat.Sockets.forEach(socket => socket.leave(groupChatUUID));
-    RungroupChats.groupChats.delete(groupChatUUID);
+    RuntimeMaps.groupChats.delete(groupChatUUID);
 };
 
 const deleteGameGroupChatByUserID = async (userID) => {
@@ -168,17 +169,6 @@ groupChatRouter.get('/:roomUUID/users-status', auth, async (req, res) => {
     }
     return res.status(200).json({ users: await groupChat.getOtherUsersStatusForUser(user.id) });
 });
-
-module.exports = {
-    leaveGroupChat,
-    deleteGameGroupChat,
-    joinGroupChat,
-    sendGroupMessage,
-    reconnectToGroupChat,
-    getCroupChat,
-    deleteGameGroupChatByUserID,
-    groupChatRouter,
-};
 
 const findUserInGroupChats = async (userID) => {
     for await (const [key, groupChat] of RuntimeMaps.groupChats) {

@@ -1,6 +1,9 @@
-import {MyRequest, MyResponse, socket} from "./Interfaces";
+import {DecodedToken, MyRequest, MyResponse, socket} from "./Interfaces";
 import {GroupChatController} from "./GroupChatController";
 import {RuntimeMaps} from "../RuntimeMaps";
+import {Game} from "../utils/Game";
+import {PlayerInterface, UserInterface} from "../utils/interfaces";
+const { Field } = require('../../models');
 const chalk = require("chalk");
 
 
@@ -103,6 +106,28 @@ export class GameController{
             }
         }
         return null;
+    }
+
+    public static async createGame(sockets:socket[]){
+        const players :UserInterface[] = [];
+        const field = await Field.randomField(sockets.length);
+        sockets.forEach(async socket => {
+            const player : DecodedToken = socket.decoded;
+            players.push(player);
+        })
+        const game = await Game.makeGameFromField(field, players, sockets);
+        RuntimeMaps.games.set(game.UUID, game);
+        console.log(chalk.green('game created, uuid: ' + game.UUID));
+        sockets.forEach(socket => {
+            socket.join(game.UUID);
+            socket.emit('joined game', {
+                room: game.UUID,
+                players: game.Players,
+                field: game.Field,
+            });
+        });
+        GroupChatController.createGroupChat(sockets, players,game.UUID);
+
     }
 
     public static async deleteGame(socket:socket) {

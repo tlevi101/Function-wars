@@ -3,7 +3,6 @@ const { Op } = require('sequelize');
 const {RuntimeMaps} = require("../types/RuntimeMaps");
 
 const sendChatMessage = async (socket, message, friend_id) => {
-    console.log(RuntimeMaps.onlineUsers);
     const user = await User.findByPk(RuntimeMaps.onlineUsers.get(socket.decoded.id).user.id);
     let chat = await user.getChat(friend_id);
     if (!chat) {
@@ -45,7 +44,3 @@ const setSeen = async (socket, friend_id) => {
     await Chat.update({ messages: chat.messages }, { where: { id: chat.id } });
 };
 
-module.exports = {
-    sendChatMessage,
-    setSeen,
-};

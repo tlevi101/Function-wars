@@ -1,17 +1,17 @@
 import {RuntimeMaps} from "../RuntimeMaps";
 import {socket} from "../controllers/Interfaces";
-import {leaveWaitList} from "../../socket_handlers/wait-list-handler";
 import {CustomGameController} from "../controllers/CustomGameController";
-import {deleteGame, getGame} from "../../socket_handlers/game-handler";
 import {GroupChatController} from "../controllers/GroupChatController";
 import {Game} from "../utils/Game";
-import {GroupChat} from "../utils/GroupChat";
 import {GameController} from "../controllers/GameController";
+import {WaitListController} from "../controllers/WaitListController";
+const  chalk = require("chalk");
 
 
 export class SocketConnectionService{
     private static TIME_TO_RECONNECT = 10*1000;
     public static userConnected(socket: socket) {
+        console.debug(chalk.blue(`user (id:${socket.decoded.id}, name:${socket.decoded.name}) connected`));
         RuntimeMaps.onlineUsers.set(socket.decoded.id, { user: socket.decoded, socketID: socket.id, currentURL: '' });
     }
     public static async userNavigated(socket:socket, url:string){
@@ -38,7 +38,7 @@ export class SocketConnectionService{
     public static userDisconnected(socket:socket){
         console.log(`User (${socket.decoded.name}) disconnected`);
         RuntimeMaps.onlineUsers.delete(socket.decoded.id);
-        leaveWaitList(socket);
+        WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);
         GroupChatController.leaveGroupChat(socket);
         GameController.leaveGame(socket);
@@ -54,7 +54,7 @@ export class SocketConnectionService{
     }
 
     private static async userLeftTheGame(socket:socket){
-        const game:Game| null = await getGame(socket.decoded.id);
+        const game:Game| null = await GameController.getGame(socket.decoded.id);
         if(!game){
             //user is not in any game
             return;

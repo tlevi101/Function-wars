@@ -1,7 +1,7 @@
 import FuncCalculator = require('./FuncCalculator');
 import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
 import Player = require('./Player');
-import { Ellipse, Rectangle, Point, DamageCircle, Line } from './Shape';
+import { Ellipse, Rectangle, Point } from './Shape';
 import {socket} from "../controllers/Interfaces";
 import {RuntimeMaps} from "../RuntimeMaps";
 const MyLogger = require('../../logs/logger.js');

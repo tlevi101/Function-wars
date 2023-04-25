@@ -1,8 +1,7 @@
-import {DecodedToken, GamesMap, GroupChatsMap, MyRequest, MyResponse, socket, WaitingRoomsMap} from './Interfaces';
+import {DecodedToken, MyRequest, MyResponse, socket} from './Interfaces';
 import { WaitingRoom } from '../utils/WaitingRoom';
 import { GroupChat } from '../utils/GroupChat';
 import {RuntimeMaps} from "../RuntimeMaps";
-// const { app } = require('../../app
 export class CustomGameController {
     //*****************//
     //Route controllers//
