@@ -36,7 +36,7 @@ export class CustomGameService {
     }
 
     public listenError() {
-        return this.socket.fromEvent<{ message: string }>('error');
+        return this.socket.fromEvent<{ message: string, code?:number }>('error');
     }
     public createCustomGame(fieldID: number, isPrivate: boolean) {
         this.socket.emit('create custom game', { fieldID, isPrivate });

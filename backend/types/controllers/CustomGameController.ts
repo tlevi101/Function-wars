@@ -70,7 +70,9 @@ export class CustomGameController {
         if(!room || !groupChat) {
             socket.emit('error', {message: 'Custom game not found.',code:404});
             console.debug('Custom game not found.');
-            //TODO: add error handling on client side
+            return;
+        }
+        if(room.userIsInRoom(user.id)){
             return;
         }
         if (room.isFull()) {

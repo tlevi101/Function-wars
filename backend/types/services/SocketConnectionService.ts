@@ -18,10 +18,12 @@ export class SocketConnectionService{
         const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         if(user){
             console.log(`User (${socket.decoded.name}) navigated to ${url}`);
-            if(user.currentURL !== url){
+            if(user.currentURL !== url && this.userLeftFromWaitRoomOrGame(user.currentURL)){
                 await GameController.leaveGame(socket);
                 await CustomGameController.leaveWaitingRoom(socket);
+                console.log('user left game or waiting room');
                 setTimeout(async ()=>{
+                    console.log('timeout');
                     if(await this.userLeftTheGame(socket)){
                         GameController.deleteGame(socket);
                     }
@@ -47,7 +49,11 @@ export class SocketConnectionService{
 
     public static userDisconnected(socket:socket){
         console.log(`User (${socket.decoded.name}) disconnected`);
+        const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         RuntimeMaps.onlineUsers.delete(socket.decoded.id);
+        if(user && !this.userLeftFromWaitRoomOrGame(user.currentURL)){
+            return;
+        }
         WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);
         GroupChatController.leaveGroupChat(socket);
@@ -96,5 +102,10 @@ export class SocketConnectionService{
             return match[1];
         }
         return null;
+    }
+
+    private static userLeftFromWaitRoomOrGame(url:string){
+        const regex = /(\/wait-rooms\/[a-zA-Z0-9\-]+)|\/games\/([a-zA-Z0-9\-]+)/;
+        return url.search(regex)!==-1;
     }
 }

@@ -1,8 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
 import {FieldService} from "../services/field.service";
 import {GroupChatService} from "../services/group-chat.service";
+import {InfoComponent} from "../pop-up/info/info.component";
 
 @Component({
   selector: 'app-wait-room',
@@ -13,14 +14,14 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
 
     roomUUID = '';
     chatRoomUUID = '';
+    @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
         private activatedRoute: ActivatedRoute,
         private waitRoomService: CustomGameService,
     ) {
-        this.waitRoomService.listenError().subscribe(({message}) => {
-            console.log(message);
+        this.waitRoomService.listenError().subscribe(({message, code}) => {
+            this.displayInfo(message, code)
         });
-        //TODO listen errors
     }
 
     ngOnInit(): void {
@@ -47,7 +48,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
                 this.sendGetWaitingRoomRequest();
             },
             (err:any) => {
-                console.log(err);
+                this.displayInfo(err.error.message);
             },
             () => {
                 subscription.unsubscribe();
@@ -62,12 +63,22 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
                 console.log(waitRoom);
             },
             (err:any) => {
-                console.log(err);
+                this.displayInfo(err.error.message, err.status);
             },
             () => {
                 subscription.unsubscribe();
             }
         );
+    }
+
+    displayInfo(message: string, code?: number){
+        if(code===403 || code===404){
+            this.infoComponent.description = message;
+            this.infoComponent.buttonLink = '/';
+            this.infoComponent.buttonText = 'Quit';
+            return;
+        }
+        this.infoComponent.description = message;
     }
 
 }

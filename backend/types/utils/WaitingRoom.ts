@@ -59,6 +59,9 @@ export class WaitingRoom{
             } as UserInterface;
         });
     }
+    public userIsInRoom(playerID: number) {
+        return this.players.some(p => p.id === playerID);
+    }
     public isFull() {
         return this.players.length >= this.capacity;
     }
