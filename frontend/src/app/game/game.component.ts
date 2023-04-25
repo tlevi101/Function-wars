@@ -51,7 +51,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.gameService.leaveGame();
     }
 
     ngOnInit() {

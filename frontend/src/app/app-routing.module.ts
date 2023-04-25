@@ -25,8 +25,8 @@ const routes: Routes = [
     { path: 'my-fields', component: FieldListComponent },
     { path: 'field/edit/:id', component: FieldEditorComponent },
     { path: 'field/new', component: FieldEditorComponent },
-    { path: 'game/:uuid', component: GameComponent },
-    { path: 'wait-room/:uuid', component: WaitRoomComponent },
+    { path: 'games/:uuid', component: GameComponent },
+    { path: 'wait-rooms/:uuid', component: WaitRoomComponent },
     { path: 'custom-games', component: CustomGamesComponent },
 ];
 

@@ -28,6 +28,7 @@ export class WaitingRoom{
 
     destroy() {
         this.sockets.forEach(s => {
+            s.emit('owner left');
             s.leave(this.roomUUID);
         });
         RuntimeMaps.waitingRooms.delete(this.roomUUID);
@@ -94,6 +95,9 @@ export class WaitingRoom{
         return rooms.filter(r => r.isPublic && !r.isFull());
     }
 
+    get ownerIsOnline(){
+        return this.players.some(p => p.id === this.owner.id);
+    }
     get isPrivate(): boolean {
         return this.privateRoom;
     }

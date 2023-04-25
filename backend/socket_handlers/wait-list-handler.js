@@ -26,10 +26,6 @@ const leaveWaitList = async (socket) => {
     RuntimeMaps.waitList.delete(socket.decoded.id);
 };
 
-module.exports = {
-    joinWaitList,
-    leaveWaitList,
-};
 const PlaceIntoGame = async (count) => {
     let players = [];
     let sockets = [];
@@ -47,7 +43,6 @@ const PlaceIntoGame = async (count) => {
         players.push(user.toJSON());
         sockets.push(RuntimeMaps.waitList.get(id));
     }
-
     const newGame = await Game.makeGameFromField(field, players, sockets);
     RuntimeMaps.games.set(newGame.UUID, newGame);
     sockets.forEach(socket => {

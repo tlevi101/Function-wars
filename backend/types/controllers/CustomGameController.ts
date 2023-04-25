@@ -1,8 +1,7 @@
-import {DecodedToken, GamesMap, GroupChatsMap, MyRequest, MyResponse, socket, WaitingRoomsMap} from './Interfaces';
+import {DecodedToken, MyRequest, MyResponse, socket} from './Interfaces';
 import { WaitingRoom } from '../utils/WaitingRoom';
 import { GroupChat } from '../utils/GroupChat';
 import {RuntimeMaps} from "../RuntimeMaps";
-// const { app } = require('../../app
 export class CustomGameController {
     //*****************//
     //Route controllers//
@@ -19,7 +18,7 @@ export class CustomGameController {
         return res.status(200).json({ customGames: WaitingRoom.toFrontendAll(waitingRooms)});
     }
     /**
-     * @route GET /custom-games/:roomUUID
+     * @route GET /wait-rooms/:roomUUID
      * @param req
      * @param res
      */
@@ -69,13 +68,13 @@ export class CustomGameController {
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
-            socket.emit('error', {message: 'Custom game not found.'});
+            socket.emit('error', {message: 'Custom game not found.',code:404});
             console.debug('Custom game not found.');
             //TODO: add error handling on client side
             return;
         }
         if (room.isFull()) {
-            socket.emit('error', { message: 'Custom game is full' });
+            socket.emit('error', { message: 'Custom game is full', code:403});
             console.debug('Custom game is full');
             return;
         }
@@ -97,15 +96,34 @@ export class CustomGameController {
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
-            socket.emit('error', {message: 'Room not found'});
             return;
-        }
-        if(room.isOwner(user.id)) {
-            room.destroy();
-            groupChat.destroy();
         }
         room.leave(user.id);
         groupChat.leave(user.id, socket);
+    }
+
+
+    public static async ownerLeft(socket:socket) {
+        const room = await this.getWaitingRoomByUser(socket.decoded)
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
+        if(!room) {
+            return;
+        }
+
+        return !room.ownerIsOnline;
+    }
+
+    public static async deleteWaitingRoom(socket:socket) {
+        const room = await this.getWaitingRoomByUser(socket.decoded)
+        if(!room) {
+            return;
+        }
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
+        room.destroy();
+        if(!groupChat){
+            return;
+        }
+        groupChat.destroy();
     }
 
     /**
@@ -113,7 +131,7 @@ export class CustomGameController {
      * @param user : DecodedToken
      * @private
      */
-    private static async getWaitingRoomByUser(user: DecodedToken) {
+    public static async getWaitingRoomByUser(user: DecodedToken) {
         for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
             if (value.Players.some(p => p.id === user.id)) {
                 return value;
