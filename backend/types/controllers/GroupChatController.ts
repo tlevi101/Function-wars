@@ -148,15 +148,6 @@ export class GroupChatController{
         }
     }
 
-    public static async reconnectGroupChat(socket: socket){
-        const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
-        if (!groupChat) {
-            console.debug('chat not found');
-            return;
-        }
-        groupChat.reconnect(socket.decoded.id, socket);
-    }
-
     public static async sendMessage(socket: socket, message: string){
         const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
         if (!groupChat) {
@@ -170,7 +161,7 @@ export class GroupChatController{
         groupChat.sendMessage({from:{id: socket.decoded.id, name: socket.decoded.name}, message: message});
     }
 
-    private static async getGroupChatByUser(userID:number) {
+    public static async getGroupChatByUser(userID:number) {
         for await (const groupChat of RuntimeMaps.groupChats.values()) {
             if (groupChat.Users.find(user => user.id === userID)) {
                 return groupChat;

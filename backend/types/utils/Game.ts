@@ -2,6 +2,8 @@ import FuncCalculator = require('./FuncCalculator');
 import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
 import Player = require('./Player');
 import { Ellipse, Rectangle, Point, DamageCircle, Line } from './Shape';
+import {socket} from "../controllers/Interfaces";
+import {RuntimeMaps} from "../RuntimeMaps";
 const MyLogger = require('../../logs/logger.js');
 
 export class Game {
@@ -194,6 +196,10 @@ export class Game {
         );
         return this.gameOver;
     }
+    public destroy(){
+        this.sockets.forEach(socket => socket.leave(this.uuid));
+        RuntimeMaps.games.delete(this.uuid);
+    }
     public playerCanReconnect(playerID: number): boolean {
         const player = this.players.find(player => player.ID === playerID);
         return player !== undefined;
@@ -207,13 +213,15 @@ export class Game {
         });
     }
 
-    public playerReconnect(playerID: number): void {
+    public playerReconnect(playerID: number, socket:socket): void {
         this.players = this.players.map(player => {
             if (player.ID === playerID) {
                 player.reconnect();
             }
             return player;
         });
+        this.updatePlayerSocket(playerID, socket);
+        socket.join(this.uuid);
     }
 
     public updatePlayerSocket(playerID: number, socket: any): void {
@@ -225,7 +233,7 @@ export class Game {
         });
     }
 
-    public playerIsOnline(playerID: number): boolean {
+    public playerIsOnline(playerID: number): never | boolean {
         const player = this.players.find(player => player.ID === playerID);
         if (!player) {
             throw new Error('Player not found');
@@ -252,6 +260,10 @@ export class Game {
     }
     get UUID(): string {
         return this.uuid;
+    }
+
+    get ChatUUID(): string {
+        return 'chat-'+this.uuid;
     }
 
     get GameOver(): boolean {

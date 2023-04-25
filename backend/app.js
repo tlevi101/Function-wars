@@ -102,7 +102,7 @@ io.use(function (socket, next) {
             setTimeout(async () => {
                 try {
                     if (RuntimeMaps.onlineUsers.has(socket.decoded.id) && (await userIsOnlineInGame(socket, RuntimeMaps.games))) {
-                        console.log(chalk.blue(`User (${socket.decoded.name}) reconnected to game in time`));
+                        consoleog(chalk.blue(`User (${socket.decoded.name}) reconnected to game in time`));
                         return;
                     }
                 } catch (e) {

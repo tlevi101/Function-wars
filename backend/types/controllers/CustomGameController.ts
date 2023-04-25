@@ -100,12 +100,32 @@ export class CustomGameController {
             socket.emit('error', {message: 'Room not found'});
             return;
         }
-        if(room.isOwner(user.id)) {
-            room.destroy();
-            groupChat.destroy();
-        }
         room.leave(user.id);
         groupChat.leave(user.id, socket);
+    }
+
+
+    public static async ownerLeft(socket:socket) {
+        const room = await this.getWaitingRoomByUser(socket.decoded)
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
+        if(!room) {
+            return;
+        }
+
+        return !room.ownerIsOnline;
+    }
+
+    public static async deleteWaitingRoom(socket:socket) {
+        const room = await this.getWaitingRoomByUser(socket.decoded)
+        if(!room) {
+            return;
+        }
+        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
+        room.destroy();
+        if(!groupChat){
+            return;
+        }
+        groupChat.destroy();
     }
 
     /**
@@ -113,7 +133,7 @@ export class CustomGameController {
      * @param user : DecodedToken
      * @private
      */
-    private static async getWaitingRoomByUser(user: DecodedToken) {
+    public static async getWaitingRoomByUser(user: DecodedToken) {
         for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
             if (value.Players.some(p => p.id === user.id)) {
                 return value;
