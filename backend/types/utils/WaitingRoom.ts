@@ -1,5 +1,6 @@
 import {DecodedToken, socket} from "../controllers/Interfaces";
 import {UserInterface} from "./interfaces";
+import {RuntimeMaps} from "../RuntimeMaps";
 const { faker } = require('@faker-js/faker');
 const {Field} = require("../../models");
 
@@ -29,13 +30,19 @@ export class WaitingRoom{
         this.sockets.forEach(s => {
             s.leave(this.roomUUID);
         });
-        this.players = [];
+        RuntimeMaps.waitingRooms.delete(this.roomUUID);
     }
 
 
     public leave(playerID:number) {
         this.players = this.players.filter(p => p.id !== playerID);
-        this.sockets = this.sockets.filter(s => s.decoded.id !== playerID);
+        this.sockets = this.sockets.filter(s => {
+            if(s.decoded.id !== playerID){
+                return true;
+            }
+            s.leave(this.roomUUID);
+            return false;
+        });
     }
     public join(player:DecodedToken, socket: socket) {
         if(this.players.some(p => p.id === player.id)) return;

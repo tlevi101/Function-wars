@@ -11,7 +11,7 @@ import { OtherUsersStatusInterface } from '../interfaces/backend-body.interfaces
 })
 export class GroupChatService {
     private hr: HttpHeaders;
-    private url = 'http://localhost:4000/group-chat';
+    private url = 'http://localhost:4000/group-chats';
     constructor(private http: HttpClient, private jwt: JwtService, private socket: Socket) {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
@@ -22,6 +22,10 @@ export class GroupChatService {
         return this.http.get<{ messages: MessageInterface[] }>(`${this.url}/${roomUUID}/messages`, {
             headers: this.hr,
         });
+    }
+
+    public joinGroupChat(roomUUID: string) {
+        this.socket.emit('join group chat', { roomUUID });
     }
 
     public getOtherUsersStatus(roomUUID: string) {

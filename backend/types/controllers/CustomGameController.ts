@@ -25,6 +25,7 @@ export class CustomGameController {
      */
     public static async getWaitingRoom(req: MyRequest, res: MyResponse) {
         const { roomUUID } = req.params;
+        console.debug(`Getting waiting room ${roomUUID}`)
         const room = req.waitingRooms.get(roomUUID||'');
         if(!room) {
             return res.status(404).json({message: 'Room not found'});
@@ -90,9 +91,9 @@ export class CustomGameController {
      * @param socket
      * @param owner
      */
-    public static async leaveWaitingRoom(socket:socket, owner: DecodedToken) {
+    public static async leaveWaitingRoom(socket:socket) {
 
-        const room = await CustomGameController.getWaitingRoomByOwner(owner);
+        const room = await CustomGameController.getWaitingRoomByUser(socket.decoded);
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
         if(!room || !groupChat) {
@@ -102,23 +103,19 @@ export class CustomGameController {
         if(room.isOwner(user.id)) {
             room.destroy();
             groupChat.destroy();
-            RuntimeMaps.waitingRooms.delete(room.UUID);
-            RuntimeMaps.groupChats.delete(room.ChatUUID);
         }
-        socket.leave(room.UUID);
-        socket.leave(room.ChatUUID);
         room.leave(user.id);
         groupChat.leave(user.id, socket);
     }
 
     /**
      *
-     * @param owner
+     * @param user : DecodedToken
      * @private
      */
-    private static async getWaitingRoomByOwner(owner: DecodedToken) {
+    private static async getWaitingRoomByUser(user: DecodedToken) {
         for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
-            if (value.Players.some(p => p.id === owner.id)) {
+            if (value.Players.some(p => p.id === user.id)) {
                 return value;
             }
         }

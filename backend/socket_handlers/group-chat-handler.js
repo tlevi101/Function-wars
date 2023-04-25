@@ -62,8 +62,8 @@ const reconnectToGroupChat = async (socket) => {
     groupChat.reconnect(socket.decoded.id, socket);
 };
 
-const getCroupChat = async (userID, groupChats) => {
-    for await (const groupChat of groupChats.values()) {
+const getCroupChat = async (userID) => {
+    for await (const groupChat of RuntimeMaps.groupChats.values()) {
         if (groupChat.Users.find(user => user.id === userID)) {
             return groupChat;
         }
@@ -74,6 +74,7 @@ const sendGroupMessage = async (socket, message) => {
     const groupChat = await findUserInGroupChats(socket.decoded.id);
     if (!groupChat) {
         return;
+
     }
     if (!(await groupChat.userCanSendMessage(socket.decoded.id))) {
         return;

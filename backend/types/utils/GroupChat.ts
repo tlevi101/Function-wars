@@ -1,4 +1,5 @@
 import { MessageInterface, MutesInterface, UserInterface } from './interfaces';
+import {RuntimeMaps} from "../RuntimeMaps";
 const { User } = require('../../models');
 
 export class GroupChat {
@@ -25,17 +26,22 @@ export class GroupChat {
     get chatUUID(): string {
         return this.roomUUID;
     }
-    public addMessage(message: MessageInterface) {
+    public sendMessage(message: MessageInterface) {
         this.messages.push(message);
+        this.sockets.forEach(async s => {
+            if(s.decoded.id !== message.from.id && await this.userWantToReceiveMessagesFrom(s.decoded.id, message.from.id) ){
+                s.emit('receive group message',
+                    message
+                );
+            }
+        });
     }
 
     public destroy() {
-        this.messages = [];
-        this.users = [];
-        this.mutes = [];
         this.sockets.forEach(s => {
             s.leave(this.roomUUID);
         });
+        RuntimeMaps.groupChats.delete(this.roomUUID);
     }
 
     async getOtherUsersStatusForUser(userID: number) {
@@ -66,15 +72,22 @@ export class GroupChat {
 
     public reconnect(userID: number, socket: any) {
         this.updatePlayerSocket(userID, socket);
+        socket.join(this.roomUUID);
     }
 
     public join(user: UserInterface, socket: any) {
+        if(this.users.find(u => u.id === user.id)){
+            this.updatePlayerSocket(user.id, socket);
+            return;
+        }
         this.sockets.push(socket);
+        socket.join(this.roomUUID);
         this.users.push(user);
     }
 
     public leave(user: UserInterface | number, socket: any) {
         this.sockets = this.sockets.filter(s => s.id !== socket.id);
+        socket.leave(this.roomUUID);
         if (typeof user === 'number') {
             this.users = this.users.filter(u => u.id !== user);
             return;

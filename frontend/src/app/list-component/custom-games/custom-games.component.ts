@@ -46,7 +46,7 @@ export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
     joinGame(roomUUID: string) {
         this.customGameService.joinCustomGame(roomUUID);
         const subscription = this.customGameService.customGameJoined().subscribe(() => {
-                this.router.navigate(['/custom-games', roomUUID]);
+                this.router.navigate(['/wait-room', roomUUID]);
         },
         (error) => {
                 console.log(error);

@@ -33,6 +33,7 @@ const {
 const chalk = require('chalk');
 const {CustomGameController} = require("./types/controllers/CustomGameController");
 const {RuntimeMaps} = require("./types/RuntimeMaps");
+const {GroupChatController} = require("./types/controllers/GroupChatController");
 //Socket
 
 const io = require('socket.io')(http, {
@@ -67,11 +68,17 @@ io.use(function (socket, next) {
         })
 
         socket.on('join custom game', async ({ roomUUID }) => {
+            console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
             await CustomGameController.joinWaitingRoom(socket, roomUUID);
+            await GroupChatController.joinGroupChat(socket, 'chat-'+roomUUID);
         });
 
         socket.on('leave custom game', async ({ roomUUID }) => {
             await CustomGameController.leaveWaitingRoom(socket, roomUUID);
+        });
+
+        socket.on('join group chat', async ({ roomUUID }) => {
+            await GroupChatController.joinGroupChat(socket, roomUUID);
         });
 
         socket.on('send chat message', async ({ message, friend_id }) => {
@@ -107,21 +114,23 @@ io.use(function (socket, next) {
         });
 
         socket.on('send group chat message', async ({ message }) => {
-            sendGroupMessage(socket, message);
+            GroupChatController.sendMessage(socket, message);
         });
 
         socket.on('disconnect', async () => {
             console.log(`User (${socket.decoded.name}) disconnected`);
             leaveWaitList(socket);
             RuntimeMaps.onlineUsers.delete(socket.decoded.id);
+            CustomGameController.leaveWaitingRoom(socket);
             setTimeout(async () => {
                 if (RuntimeMaps.onlineUsers.has(socket.decoded.id)) {
                     console.log(chalk.blue.underline(`User (${socket.decoded.name}) reconnected`));
                     return;
                 }
-                await deleteGame(socket, RuntimeMaps.games);
+                await deleteGame(socket);
                 for (const [uuid, groupChat] of RuntimeMaps.groupChats) {
                     if (groupChat.sockets.includes(socket)) {
+                        GroupChatController.leaveGroupChat(socket);
                         leaveGroupChat(socket);
                     }
                 }
@@ -153,13 +162,13 @@ app.use(cors());
 //routers
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
-app.use('/', require('./routes/customGame'));
+app.use('/custom-games', require('./routes/customGame'));
+app.use('/group-chats', require('./routes/groupChats'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));
 
 //socket router
 app.use('/games', gameRouter);
-app.use('/group-chat', groupChatRouter);
 
 app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });

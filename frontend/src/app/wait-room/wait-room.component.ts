@@ -2,6 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
 import {FieldService} from "../services/field.service";
+import {GroupChatService} from "../services/group-chat.service";
 
 @Component({
   selector: 'app-wait-room',
@@ -15,8 +16,10 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
     constructor(
         private activatedRoute: ActivatedRoute,
         private waitRoomService: CustomGameService,
-        private fieldService: FieldService,
     ) {
+        this.waitRoomService.listenError().subscribe(({message}) => {
+            console.log(message);
+        });
         //TODO listen errors
     }
 

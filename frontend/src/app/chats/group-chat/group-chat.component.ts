@@ -59,6 +59,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
 
     ngOnInit(): void {
         this.groupChat.receiveMessage().subscribe((message: MessageInterface) => {
+            console.log(message);
             this.messages.push(message);
             this.scrollToBottom();
         });

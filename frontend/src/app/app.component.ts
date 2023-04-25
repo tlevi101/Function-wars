@@ -19,6 +19,11 @@ export class AppComponent implements OnInit {
         if (token) {
             this.user = this.getDecodedAccessToken();
         }
+        this.router.events.subscribe(
+            (event) =>{
+                console.log(event);
+            }
+        )
     }
 
     ngOnInit(): void {

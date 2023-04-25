@@ -5,8 +5,8 @@ const auth = require('../middlewares/auth');
 const { Op } = require('sequelize');
 const {CustomGameController} = require("../types/controllers/CustomGameController");
 
-router.get('/custom-games', auth, CustomGameController.getCustomGames);
+router.get('/', auth, CustomGameController.getCustomGames);
 
-router.get('/custom-games/:roomUUID', auth, CustomGameController.getWaitingRoom);
-
+router.get('/:roomUUID', auth, CustomGameController.getWaitingRoom);
+//TODO kick user from waiting room
 module.exports = router;

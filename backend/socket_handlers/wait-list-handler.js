@@ -4,6 +4,7 @@ const { Game } = require('../types/utils/Game');
 const { GroupChat } = require('../types/utils/GroupChat');
 const chalk = require('chalk');
 const { RuntimeMaps } = require('../types/RuntimeMaps');
+const {GroupChatController} = require("../types/controllers/GroupChatController");
 const joinWaitList = async (socket) => {
     socket.join('wait-list');
     RuntimeMaps.waitList.set(socket.decoded.id, socket);
@@ -59,22 +60,7 @@ const PlaceIntoGame = async (count) => {
         });
     });
     console.log(chalk.green('game created, uuid: ' + newGame.UUID));
-    placeIntoGroupChat(sockets, players, newGame.UUID);
-};
-
-const placeIntoGroupChat = async (sockets, players, roomUUID) => {
-    console.log(chalk.green('group chat created, uuid: chat-' + roomUUID));
-    RuntimeMaps.groupChats.set(
-        'chat-' + roomUUID,
-        new GroupChat(
-            'chat-' + roomUUID,
-            players.map(player => {
-                return { id: player.id, name: player.name };
-            }),
-            sockets
-        )
-    );
-    sockets.forEach(socket => {
-        socket.join('chat-' + roomUUID);
-    });
+    GroupChatController.createGroupChat(sockets, players.map(p => {
+        return {id: p.id, name: p.name};
+    }), newGame.UUID)
 };
