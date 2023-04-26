@@ -20,6 +20,9 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         this.waitRoomService.listenError().subscribe(({message, code}) => {
             this.displayInfo(message, code)
         });
+        this.waitRoomService.waitRoomDeleted().subscribe(()=>{
+            this.displayInfo('Owner left the wait room.', 404);
+        })
     }
 
     ngOnInit(): void {

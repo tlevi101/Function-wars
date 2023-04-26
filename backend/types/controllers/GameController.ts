@@ -146,7 +146,7 @@ export class GameController{
         const chatUUID =  game.ChatUUID;
         game.destroy();
         socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
-        GroupChatController.deleteGameGroupChat(chatUUID);
+        await GroupChatController.deleteGameGroupChat(chatUUID);
         console.log(chalk.green(`Game ${gameUUID} deleted.`));
     }
 

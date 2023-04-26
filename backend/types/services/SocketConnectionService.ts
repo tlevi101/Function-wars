@@ -20,8 +20,11 @@ export class SocketConnectionService{
             console.log(`User (${socket.decoded.name}) navigated to ${url}`);
             if(user.currentURL !== url && this.userLeftFromWaitRoomOrGame(user.currentURL)){
                 console.log('user left game or waiting room');
-                GameController.deleteGame(socket);
-                CustomGameController.deleteWaitingRoom(socket);
+                await GameController.deleteGame(socket);
+                await CustomGameController.leaveWaitingRoom(socket);
+                if(await CustomGameController.ownerLeft(socket)){
+                    await CustomGameController.deleteWaitingRoom(socket);
+                }
             }
             user.currentURL = url;
             const gameUUID = this.getGameUUIDFromURL(url);

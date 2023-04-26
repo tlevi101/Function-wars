@@ -44,6 +44,9 @@ export class CustomGameService {
     public waitRoomCreated() {
         return this.socket.fromEvent<{ roomUUID: string; groupChatUUID: string }>('waiting room created');
     }
+    public waitRoomDeleted(){
+        return this.socket.fromEvent('wait room owner left')
+    }
     public joinCustomGame(roomUUID: string) {
         this.socket.emit('join custom game', { roomUUID });
     }
