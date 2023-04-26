@@ -1,0 +1,21 @@
+<div id="customGamesList" class="center container p-3 mt-5">
+    <div class="d-flex flex-wrap justify-content-center mb-3 gap-3">
+        <div *ngFor="let customGame of customGames | slice : (page - 1) * pageSize : page * pageSize">
+            <div class="d-flex flex-column align-items-center">
+                <h6>
+                    {{customGame.owner.name}}
+                    <span class="text-muted"><strong>Capacity:</strong>{{customGame.userCount}}/{{customGame.capacity}}</span>
+                </h6>
+                <app-scale-able-field class="mb-2" [scale]="0.4" [fieldId]="customGame.fieldID"></app-scale-able-field>
+                <div class="d-flex flex-row gap-3">
+                    <button class="btn btn-primary ms-auto {{customGame.userCount>=customGame.capacity? 'disabled':''}}" (click)="joinGame(customGame.roomUUID)" >Join</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <app-pagination *ngIf="customGames.length>0" [pageSize]="pageSize" [collectionSize]="customGames.length" (pageChanged)="page = $event"></app-pagination>
+    </div>
+</div>
+
+<app-info #infoComponent></app-info>

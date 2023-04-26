@@ -1,0 +1,38 @@
+.chat-messages {
+    margin: 0 0 0 0 !important;
+    width: auto;
+    overflow-y: scroll;
+}
+
+.chat-message{
+    margin: 0;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    max-width: 70%;
+}
+.from-me{
+    background-color: #21659d;
+    color: white;
+    margin-left: 30%;
+}
+.from-other{
+    background-color: #7e57c28e;
+    color: white;
+}
+p{
+    margin: 0 !important;
+    word-break: break-word;
+}
+.slashedChat{
+    width: 20px;
+    height: 20px;
+}
+.slashRotate{
+    top: -4px;
+    left: -4px;
+    transform: scaleX(-1);
+    -moz-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    -ms-transform: scaleX(-1);
+}

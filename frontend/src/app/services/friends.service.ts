@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
+import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {Socket} from "ngx-socket-io";
 
 @Injectable({
     providedIn: 'root',
@@ -9,7 +11,7 @@ export class FriendsService {
     private hr;
     private url;
     public friendDeleted : EventEmitter<number>;
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private socket: Socket) {
         this.friendDeleted = new EventEmitter();
         this.url = 'http://localhost:4000/friends';
         this.hr = new HttpHeaders()
@@ -19,6 +21,10 @@ export class FriendsService {
 
     getFriends() {
         return this.http.get(`${this.url}`, { headers: this.hr });
+    }
+
+    getOnlineFriends():Observable<{friends: {id:number, name:string, unreadMessages:number}[]}> {
+        return this.http.get<{friends: {id:number, name:string, unreadMessages:number}[]}>(`${this.url}/online`, { headers: this.hr });
     }
 
     deleteFriend(friendId: number) {
@@ -42,5 +48,13 @@ export class FriendsService {
 
     addFriend(friendId: number): Observable<{ message: string }> {
         return this.http.post<{ message: string }>(`${this.url}/${friendId}`, {}, { headers: this.hr });
+    }
+
+    receiveInvite(): Observable<{inviter:DecodedTokenInterface, customGameUUID:string}> {
+        return this.socket.fromEvent('receive invite');
+    }
+
+    inviteRejected(invite:{inviterID:number, invitedID:number}){
+        this.socket.emit('reject invite', {invite});
     }
 }

@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FieldService } from '../services/field.service';
 import { JwtService } from '../services/jwt.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { GameService } from '../services/game.service';
@@ -52,7 +51,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.gameService.leaveGame();
     }
 
     ngOnInit() {

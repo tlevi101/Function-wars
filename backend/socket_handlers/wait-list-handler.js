@@ -1,37 +1,35 @@
 const { Friendship, User, Chat, Field } = require('../models');
 const { Op } = require('sequelize');
-const { Game } = require('../dist/Game');
-const { GroupChat } = require('../dist/GroupChat');
+const { Game } = require('../types/utils/Game');
+const { GroupChat } = require('../types/utils/GroupChat');
 const chalk = require('chalk');
-const joinWaitList = async (socket, waitList, games, groupChats) => {
+const { RuntimeMaps } = require('../types/RuntimeMaps');
+const {GroupChatController} = require("../types/controllers/GroupChatController");
+const joinWaitList = async (socket) => {
     socket.join('wait-list');
-    waitList.set(socket.decoded.id, socket);
+    RuntimeMaps.waitList.set(socket.decoded.id, socket);
     console.log(`User (${socket.decoded.name}) joined wait list`);
-    if (waitList.size >= 4) {
-        PlaceIntoGame(4, waitList, games, groupChats);
+    if (RuntimeMaps.waitList.size >= 4) {
+        PlaceIntoGame(4);
     }
-    if (waitList.size >= 3) {
-        PlaceIntoGame(3, waitList, games, groupChats);
+    if (RuntimeMaps.waitList.size >= 3) {
+        PlaceIntoGame(3);
     }
-    if (waitList.size >= 2) {
-        PlaceIntoGame(2, waitList, games, groupChats);
+    if (RuntimeMaps.waitList.size >= 2) {
+        PlaceIntoGame(2);
     }
 };
 
-const leaveWaitList = async (socket, waitList) => {
+const leaveWaitList = async (socket) => {
     socket.leave('wait-list');
     console.log(`User (${socket.decoded.name}) left wait list`);
-    waitList.delete(socket.decoded.id);
+    RuntimeMaps.waitList.delete(socket.decoded.id);
 };
 
-module.exports = {
-    joinWaitList,
-    leaveWaitList,
-};
-const PlaceIntoGame = async (count, waitList, games, groupChats) => {
+const PlaceIntoGame = async (count) => {
     let players = [];
     let sockets = [];
-    let iter = waitList.keys();
+    let iter = RuntimeMaps.waitList.keys();
     let field = await Field.randomField(count);
     if (!field) {
         //TODO: create seeder for fields
@@ -43,13 +41,12 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
         const id = iter.next().value;
         const user = await User.findByPk(id, { attributes: ['id', 'name'] });
         players.push(user.toJSON());
-        sockets.push(waitList.get(id));
+        sockets.push(RuntimeMaps.waitList.get(id));
     }
-
     const newGame = await Game.makeGameFromField(field, players, sockets);
-    games.set(newGame.UUID, newGame);
+    RuntimeMaps.games.set(newGame.UUID, newGame);
     sockets.forEach(socket => {
-        leaveWaitList(socket, waitList);
+        leaveWaitList(socket);
         socket.join(newGame.UUID);
         socket.emit('joined game', {
             room: newGame.UUID,
@@ -58,22 +55,7 @@ const PlaceIntoGame = async (count, waitList, games, groupChats) => {
         });
     });
     console.log(chalk.green('game created, uuid: ' + newGame.UUID));
-    placeIntoGroupChat(sockets, players, groupChats, newGame.UUID);
-};
-
-const placeIntoGroupChat = async (sockets, players, groupChats, roomUUID) => {
-    console.log(chalk.green('group chat created, uuid: chat-' + roomUUID));
-    groupChats.set(
-        'chat-' + roomUUID,
-        new GroupChat(
-            'chat-' + roomUUID,
-            players.map(player => {
-                return { id: player.id, name: player.name };
-            }),
-            sockets
-        )
-    );
-    sockets.forEach(socket => {
-        socket.join('chat-' + roomUUID);
-    });
+    GroupChatController.createGroupChat(sockets, players.map(p => {
+        return {id: p.id, name: p.name};
+    }), newGame.UUID)
 };

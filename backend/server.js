@@ -6,7 +6,6 @@ overrideConsole();
 instrument(io, {
     auth: false,
 });
-
 //Then redefine the old console
 
 io.listen(3000);

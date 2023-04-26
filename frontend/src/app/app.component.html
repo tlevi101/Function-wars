@@ -1,6 +1,9 @@
 <app-nav-bar *ngIf="isAuthorized"></app-nav-bar>
 <app-side-bar *ngIf="isAuthorized && !isAdmin"></app-side-bar>
-<app-users *ngIf="isAuthorized && isAdmin && activateRoute=='/'"></app-users>
+<app-users *ngIf="isAuthorized && isAdmin && activateRoute==='/'"></app-users>
 <router-outlet></router-outlet>
 <!-- <app-game *ngIf="isAuthorized && !isAdmin"></app-game> -->
-<app-new-game *ngIf="isAuthorized && !isAdmin && activateRoute=='/'"></app-new-game>
+<app-new-game *ngIf="isAuthorized && !isAdmin && activateRoute==='/'"></app-new-game>
+
+<app-info #infoComponent></app-info>
+

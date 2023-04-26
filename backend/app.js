@@ -10,27 +10,14 @@ const app = express();
 const cors = require('cors');
 const http = require('http').createServer();
 const jwt = require('jsonwebtoken');
-const { sendChatMessage, setSeen } = require('./socket_handlers/chat-handler');
-const { joinWaitList, leaveWaitList } = require('./socket_handlers/wait-list-handler');
-const {
-    gameRouter,
-    leaveGame,
-    userIsOnlineInGame,
-    getGame,
-    reconnectToGame,
-    deleteGame,
-    updateGameSocket,
-} = require('./socket_handlers/game-handler');
 const MyLogger = require('./logs/logger');
-const {
-    sendGroupMessage,
-    leaveGroupChat,
-    deleteGameGroupChat,
-    reconnectToGroupChat,
-    deleteGameGroupChatByUserID,
-    groupChatRouter,
-} = require('./socket_handlers/group-chat-handler');
 const chalk = require('chalk');
+const {CustomGameController} = require("./types/controllers/CustomGameController");
+const {RuntimeMaps} = require("./types/RuntimeMaps");
+const {GroupChatController} = require("./types/controllers/GroupChatController");
+const {SocketConnectionService} = require("./types/services/SocketConnectionService");
+const {FriendChatController} = require("./types/controllers/FriendChatController");
+const {WaitListController} = require("./types/controllers/WaitListController");
 //Socket
 
 const io = require('socket.io')(http, {
@@ -40,10 +27,6 @@ const io = require('socket.io')(http, {
     },
 });
 
-let waitList = new Map();
-let games = new Map();
-let onlineUsers = new Map();
-let groupChats = new Map();
 const TIME_TO_RECONNECT = 10000;
 
 io.use(function (socket, next) {
@@ -58,64 +41,58 @@ io.use(function (socket, next) {
     }
 })
     .on('connection', async socket => {
-        console.debug(chalk.blue(`user (id:${socket.decoded.id}, name:${socket.decoded.name}) connected`));
-        onlineUsers.set(socket.decoded.id, { user: socket.decoded, socketID: socket.id });
-        await updateGameSocket(socket, games);
-        await reconnectToGroupChat(socket, groupChats);
-        //TODO update only socket in group chat, dont reconnect here
+        SocketConnectionService.userConnected(socket);
+
+        socket.on('route change', async ({url}) => {
+            SocketConnectionService.userNavigated(socket, url);
+        });
+        socket.on('create custom game', async ({ fieldID, isPrivate, friendIDs }) => {
+            await CustomGameController.createCustomGame(socket, fieldID, isPrivate, friendIDs);
+        })
+
+        socket.on('join custom game', async ({ roomUUID }) => {
+            console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
+            await CustomGameController.joinWaitingRoom(socket, roomUUID);
+            await GroupChatController.joinGroupChat(socket, 'chat-'+roomUUID);
+        });
+
+        socket.on('start custom game', async () => {
+            CustomGameController.startGame(socket);
+        });
+        socket.on('leave custom game', async ({ roomUUID }) => {
+            await CustomGameController.leaveWaitingRoom(socket, roomUUID);
+        });
+
+        socket.on('join group chat', async ({ roomUUID }) => {
+            await GroupChatController.joinGroupChat(socket, roomUUID);
+        });
+
+        socket.on('reject invite', async ({ invite }) => {
+            RuntimeMaps.invites.delete(invite);
+        });
 
         socket.on('send chat message', async ({ message, friend_id }) => {
-            sendChatMessage(socket, message, friend_id, onlineUsers);
+            FriendChatController.sendMessage(socket, message, friend_id);
         });
 
         socket.on('set seen', async ({ friend_id }) => {
-            setSeen(socket, friend_id);
+            FriendChatController.setSeen(socket, friend_id);
         });
 
         socket.on('join wait list', async () => {
-            joinWaitList(socket, waitList, games, groupChats);
+            WaitListController.joinWaitList(socket);
         });
 
         socket.on('leave wait list', async () => {
-            leaveWaitList(socket, waitList, games);
-        });
-
-        socket.on('leave game', async () => {
-            leaveGame(socket, games);
-            setTimeout(async () => {
-                try {
-                    if (onlineUsers.has(socket.decoded.id) && (await userIsOnlineInGame(socket, games))) {
-                        console.log(chalk.blue(`User (${socket.decoded.name}) reconnected to game in time`));
-                        return;
-                    }
-                } catch (e) {
-                    console.error(chalk.red(e.message));
-                }
-                deleteGame(socket, games);
-                deleteGameGroupChatByUserID(groupChats, socket.decoded.id);
-            }, TIME_TO_RECONNECT);
+            WaitListController.leaveWaitList(socket);
         });
 
         socket.on('send group chat message', async ({ message }) => {
-            sendGroupMessage(socket, message, groupChats);
+            GroupChatController.sendMessage(socket, message);
         });
 
         socket.on('disconnect', async () => {
-            console.log(`User (${socket.decoded.name}) disconnected`);
-            leaveWaitList(socket, waitList);
-            onlineUsers.delete(socket.decoded.id);
-            setTimeout(async () => {
-                if (onlineUsers.has(socket.decoded.id)) {
-                    console.log(chalk.blue.underline(`User (${socket.decoded.name}) reconnected`));
-                    return;
-                }
-                await deleteGame(socket, games);
-                for (const [uuid, groupChat] of groupChats) {
-                    if (groupChat.sockets.includes(socket)) {
-                        leaveGroupChat(socket, groupChats);
-                    }
-                }
-            }, TIME_TO_RECONNECT);
+            SocketConnectionService.userDisconnected(socket);
         });
     })
     .on('disconnect', socket => {});
@@ -127,12 +104,14 @@ app.use(function (req, res, next) {
 });
 //use socket maps in routes
 app.use(function (req, res, next) {
-    req.onlineUsers = onlineUsers;
-    req.waitList = waitList;
-    req.games = games;
-    req.groupChats = groupChats;
+    req.onlineUsers = RuntimeMaps.onlineUsers;
+    req.waitList = RuntimeMaps.waitList;
+    req.games = RuntimeMaps.games;
+    req.groupChats = RuntimeMaps.groupChats;
+    req.waitingRooms = RuntimeMaps.waitingRooms;
     next();
 });
+
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -141,12 +120,12 @@ app.use(cors());
 //routers
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
+app.use('/', require('./routes/customGame'));
+app.use('/group-chats', require('./routes/groupChats'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));
+app.use('/games', require('./routes/games'));
 
-//socket router
-app.use('/games', gameRouter);
-app.use('/group-chat', groupChatRouter);
 
 app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });

@@ -32,6 +32,10 @@ export class FieldService {
         return this.http.get(`${this.url}/${fieldId}`, { headers: this.hr });
     }
 
+    showField(fieldId: number) {
+        return this.http.get(`${this.url}/${fieldId}/show`, { headers: this.hr });
+    }
+
     deleteField(fieldId: number) {
         return this.http.delete(`${this.url}/${fieldId}`, { headers: this.hr });
     }

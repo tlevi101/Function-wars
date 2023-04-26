@@ -15,7 +15,7 @@
         "test": "npm run db:test && npx jest --watchAll",
         "start": "node server.js",
         "build": "tsc",
-        "compile": "tsc && node server.js"
+        "compile": "tsc && node --trace-warnings ./dist/server.js"
     },
     "repository": {
         "type": "git",

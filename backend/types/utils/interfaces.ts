@@ -46,6 +46,10 @@ export interface GameInterface {
     uuid: string;
 }
 
+/**
+ * @property id number
+ * @property name number
+ */
 export interface UserInterface {
     id: number;
     name: string;
@@ -57,4 +61,12 @@ export interface MutesInterface {
 export interface MessageInterface {
     from: UserInterface;
     message: string;
+}
+
+export interface GroupChatInterface {
+    messages: MessageInterface[];
+    users: UserInterface[];
+    mutes: MutesInterface[];
+    sockets: any[];
+    roomUUID: string;
 }

@@ -1,0 +1,41 @@
+<div #chatContainer class="chat-messages" style="max-height: {{chatMessagesMaxHeight}}px;">
+    <div
+        *ngFor="let message of messages"
+        class="chat-message {{ message.from.id === user?.id ? 'from-me' : 'from-other' }}">
+        <div class="d-flex flex-wrap">
+            <h5 class="mt-sm-1 me-2">{{ message.from.name }}</h5>
+            <div *ngIf="message.from.id !== user?.id" class="d-flex gap-2 mt-1">
+                <i *ngIf="!getUser(message.from.id)?.isFriend" class="fs-6 bi bi-person-fill-add" ngbTooltip="Send friend request!" (click)="addFriend(message.from.id)"></i>
+                <i *ngIf="getUser(message.from.id)?.isFriend" class="fs-6 bi bi-person-check-fill" ngbTooltip="You are already friends!"></i>
+                <div *ngIf="!getUser(message.from.id)?.muted" class="slashedChat position-relative" ngbTooltip="Mute" (click)="muteUser(message.from.id)">
+                    <i class="fs-6 bi bi-chat position-absolute"></i>
+                    <div class="slashRotate position-absolute">
+                        <i class="fs-4 bi bi-slash-lg"></i>
+                    </div>
+                </div>
+                <i *ngIf="getUser(message.from.id)?.muted" class="fs-6 bi bi-chat" ngbTooltip="Unmute" (click)="unmuteUser(message.from.id)"></i>
+                <i class="fs-6 bi bi-megaphone-fill" ngbTooltip="Report" (click)="reportUser(message.from.id)"></i>
+                <span *ngIf="!getUser(message.from.id)?.blocked" class="fs-6" (click)="blockUser(message.from.id)">Block</span>
+                <span *ngIf="getUser(message.from.id)?.blocked" class="fs-6" (click)="unblockUser(message.from.id)">Unblock</span>
+            </div>
+        </div>
+        <p>{{ message.message }}</p>
+    </div>
+</div>
+<form class="d-flex w-100">
+    <input
+        #sendInput
+        type="text"
+        class="form-control me-auto w-75"
+        [attr.disabled]="chatRestricted ? '' : null"
+        placeholder="{{ chatRestricted ? 'You are muted!' : 'Type your message here...' }}" />
+    <button
+        type="submit"
+        class="btn btn-primary {{ chatRestricted ? 'disabled' : '' }}"
+        (click)="sendMessage(sendInput.value)">
+        Send
+    </button>
+</form>
+
+<app-info #infoComponent></app-info>
+<app-confirm-with-input #confirmWithInputComponent ></app-confirm-with-input>

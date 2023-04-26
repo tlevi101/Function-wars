@@ -24,7 +24,7 @@ export class GameService {
     }
 
     public submitFunction(gameUUID: string, fn: string) {
-        return this.http.post(`${this.url}/${gameUUID}/function/submit`, { fn }, { headers: this.hr });
+        return this.http.post(`${this.url}/${gameUUID}/function`, { fn }, { headers: this.hr });
     }
 
     public receiveFunction() {
@@ -35,9 +35,6 @@ export class GameService {
     }
     public gameOver() {
         return this.socket.fromEvent('game over');
-    }
-    public leaveGame() {
-        this.socket.emit('leave game');
     }
     get Socket() {
         return this.socket;

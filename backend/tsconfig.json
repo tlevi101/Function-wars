@@ -2,15 +2,19 @@
     "compilerOptions": {
         "module": "commonjs",
         "moduleResolution": "Node",
+        "allowJs": true,
         "target": "ES2021",
         "sourceMap": true,
         "outDir": "./dist",
-        "rootDir": "./utils",
+        "rootDir": "./",
         "noImplicitAny": true,
         "strict": true,
         "strictNullChecks": true,
         "noImplicitThis": true,
         "lib": ["ES2021"]
     },
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }
