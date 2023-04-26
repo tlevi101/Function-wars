@@ -59,6 +59,14 @@ export class CustomGameService {
         this.socket.emit('leave custom game', { roomUUID });
     }
 
+    public newUserJoined(){
+        return this.socket.fromEvent('user joined waiting room');
+    }
+
+    public userLeftWaitRoom(){
+        return this.socket.fromEvent('user left wait room');
+    }
+
     public getCustomGames() {
         return this.http.get<{
             customGames: CustomGameListItemInterface[];
@@ -67,5 +75,9 @@ export class CustomGameService {
 
     public getWaitingRoom(roomUUID: string) {
         return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/wait-rooms/${roomUUID}`, { headers: this.hr });
+    }
+
+    public startGame(){
+        this.socket.emit('start custom game');
     }
 }

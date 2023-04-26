@@ -122,4 +122,8 @@ export class WaitingRoom{
     get ChatUUID(): string {
         return `chat-${this.roomUUID}`;
     }
+
+    get FieldID(): number {
+        return this.fieldID;
+    }
 }

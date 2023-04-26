@@ -3,6 +3,7 @@ import { WaitingRoom } from '../utils/WaitingRoom';
 import { GroupChat } from '../utils/GroupChat';
 import {RuntimeMaps} from "../RuntimeMaps";
 import {GroupChatController} from "./GroupChatController";
+import {GameController} from "./GameController";
 export class CustomGameController {
     //*****************//
     //Route controllers//
@@ -86,6 +87,7 @@ export class CustomGameController {
         socket.join(room.UUID);
         room.join(user, socket);
         GroupChatController.joinGroupChat(socket,room.ChatUUID);
+        socket.to(room.UUID).emit('user joined waiting room');
         socket.emit('waiting room joined');
     }
 
@@ -102,6 +104,7 @@ export class CustomGameController {
         if(!room || !groupChat) {
             return;
         }
+        socket.to(room.UUID).emit('user left waiting room');
         room.leave(user.id);
         groupChat.leave(user.id, socket);
     }
@@ -126,7 +129,16 @@ export class CustomGameController {
         console.log(`Wait room (${room.UUID} deleted`);
         socket.to(room.UUID).emit('wait room owner left');
         room.destroy();
-        await GroupChatController.deleteGroupChat(socket);
+        await GroupChatController.deleteGroupChatByUUID(room.ChatUUID);
+    }
+
+    public static async startGame(socket:socket) {
+        const room = await this.getWaitingRoomByOwner(socket.decoded)
+        if(!room) {
+            console.error(`Wait room for user ${socket.decoded.name} not found`);
+            return;
+        }
+        await GameController.createGame(room.Sockets, room.FieldID);
     }
 
     /**

@@ -1,4 +1,4 @@
-<div #chatContainer class="chat-messages" style="max-height: {{chatMessagesMaxHeight}}px">
+<div #chatContainer class="chat-messages" style="max-height: {{chatMessagesMaxHeight}}px;">
     <div
         *ngFor="let message of messages"
         class="chat-message {{ message.from.id === user?.id ? 'from-me' : 'from-other' }}">

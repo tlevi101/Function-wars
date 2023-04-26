@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-center mt-5">
-    <div class="container overflow-x-scroll p-4">
+    <div class="overflow-x-scroll p-4">
         <div class="d-flex gap-2 ">
             <app-scale-able-field [scale]="0.7"></app-scale-able-field>
             <div class="d-flex flex-column chat p-4">
@@ -8,6 +8,12 @@
                     [roomUUID]="chatRoomUUID"
                     [chatMessagesMaxHeight]="700 * 0.7 - 30"
                     class="mt-auto"></app-group-chat>
+                <div  class="d-flex gap-3 mt-2">
+                    <button *ngIf="ownerID === user?.id" type="button" class="btn btn-primary" (click)="cancelCustomGame()">Cancel custom game</button>
+                    <span class="text-center mt-auto  mb-auto">Users in game: {{userCount+'/'+capacity}}</span>
+                    <button *ngIf="ownerID === user?.id" type="button" class="btn btn-primary {{capacity === userCount ? '' : 'disabled'}}" (click)="startGame()" ngbTooltip="Start Game"><strong>Start Game</strong></button>
+                </div>
+
             </div>
         </div>
     </div>

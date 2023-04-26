@@ -135,7 +135,15 @@ export class GroupChatController{
     public static async deleteGroupChat(socket:socket){
         const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
         if(!groupChat){
-            console.error(groupChat);
+            console.error('groupChat not found');
+            return;
+        }
+        groupChat.destroy();
+    }
+    public static async deleteGroupChatByUUID(uuid:string){
+        const groupChat = RuntimeMaps.groupChats.get(uuid);
+        if(!groupChat){
+            console.error('groupChat not found');
             return;
         }
         groupChat.destroy();

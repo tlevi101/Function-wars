@@ -62,6 +62,8 @@ export class GameController{
      */
     public static async getGameRequest(req: MyRequest, res: MyResponse){
         const { gameUUID } = req.params;
+        console.log(gameUUID);
+        console.log(Array.from(req.games.keys()));
         const game = req.games.get(gameUUID);
         if (!game) {
             return res.status(404).json({ message: 'Game not found.' });
@@ -111,7 +113,7 @@ export class GameController{
         return null;
     }
 
-    public static async createGame(sockets:socket[]){
+    public static async createGame(sockets:socket[], fieldID?:number){
         const players :UserInterface[] = [];
         const field = await Field.randomField(sockets.length);
         sockets.forEach(async socket => {
@@ -130,7 +132,6 @@ export class GameController{
             });
         });
         GroupChatController.createGroupChat(sockets, players,game.UUID);
-
     }
 
     /**

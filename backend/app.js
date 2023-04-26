@@ -56,6 +56,9 @@ io.use(function (socket, next) {
             await GroupChatController.joinGroupChat(socket, 'chat-'+roomUUID);
         });
 
+        socket.on('start custom game', async () => {
+            CustomGameController.startGame(socket);
+        });
         socket.on('leave custom game', async ({ roomUUID }) => {
             await CustomGameController.leaveWaitingRoom(socket, roomUUID);
         });

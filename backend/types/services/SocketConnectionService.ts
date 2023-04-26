@@ -18,9 +18,12 @@ export class SocketConnectionService{
         const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         if(user){
             console.log(`User (${socket.decoded.name}) navigated to ${url}`);
-            if(user.currentURL !== url && this.userLeftFromWaitRoomOrGame(user.currentURL)){
-                console.log('user left game or waiting room');
+            if(user.currentURL !== url && this.userLeftFromGame(user.currentURL)){
+                console.log('user left game');
                 await GameController.deleteGame(socket);
+            }
+            if(user.currentURL !== url && this.userLeftFromWaitRoom(user.currentURL)){
+                console.log('user left wait room');
                 await CustomGameController.leaveWaitingRoom(socket);
                 if(await CustomGameController.ownerLeft(socket)){
                     await CustomGameController.deleteWaitingRoom(socket);
@@ -42,11 +45,7 @@ export class SocketConnectionService{
 
     public static userDisconnected(socket:socket){
         console.log(`User (${socket.decoded.name}) disconnected`);
-        const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         RuntimeMaps.onlineUsers.delete(socket.decoded.id);
-        if(user && !this.userLeftFromWaitRoomOrGame(user.currentURL)){
-            return;
-        }
         WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);
         GroupChatController.leaveGroupChat(socket);
@@ -57,7 +56,6 @@ export class SocketConnectionService{
             }
             if(await this.ownerLeftWaitingRoom(socket)){
                 CustomGameController.deleteWaitingRoom(socket);
-                GroupChatController.deleteGroupChat(socket);
             }
 
         }, this.TIME_TO_RECONNECT)
@@ -98,8 +96,12 @@ export class SocketConnectionService{
         return null;
     }
 
-    private static userLeftFromWaitRoomOrGame(url:string){
-        const regex = /(\/wait-rooms\/[a-zA-Z0-9\-]+)|\/games\/([a-zA-Z0-9\-]+)/;
+    private static userLeftFromWaitRoom(url:string){
+        const regex = /\/wait-rooms\/[a-zA-Z0-9\-]+/;
+        return url.search(regex)!==-1;
+    }
+    private static userLeftFromGame(url:string){
+        const regex = /\/games\/[a-zA-Z0-9\-]+/;
         return url.search(regex)!==-1;
     }
 }

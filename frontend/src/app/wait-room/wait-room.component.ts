@@ -1,7 +1,11 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
 import {InfoComponent} from "../pop-up/info/info.component";
+import {JwtService} from "../services/jwt.service";
+import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {GameService} from "../services/game.service";
+import {WaitListService} from "../services/wait-list.service";
 
 @Component({
   selector: 'app-wait-room',
@@ -12,10 +16,17 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
 
     roomUUID = '';
     chatRoomUUID = '';
+    ownerID:number|undefined;
+    user : DecodedTokenInterface | undefined;
+    capacity = 2;
+    userCount = 0;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
         private activatedRoute: ActivatedRoute,
         private waitRoomService: CustomGameService,
+        private router:Router,
+        private jwt:JwtService,
+        private waitListService: WaitListService
     ) {
         this.waitRoomService.listenError().subscribe(({message, code}) => {
             this.displayInfo(message, code)
@@ -23,6 +34,17 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         this.waitRoomService.waitRoomDeleted().subscribe(()=>{
             this.displayInfo('Owner left the wait room.', 404);
         })
+        this.waitRoomService.userLeftWaitRoom().subscribe(()=>{
+            this.userCount--;
+        });
+        this.waitRoomService.newUserJoined().subscribe(()=>{
+            this.userCount++;
+        })
+        this.waitListService.joinedGame().subscribe((game:any)=>{
+            console.log(game);
+            this.router.navigate(['/games',game.room]);
+        })
+        this.user = jwt.getDecodedAccessToken();
     }
 
     ngOnInit(): void {
@@ -61,7 +83,9 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         const subscription = this.waitRoomService.getWaitingRoom(this.roomUUID).subscribe(
             ({waitRoom}) => {
                 this.chatRoomUUID =  waitRoom.chatUUID;
-                console.log(waitRoom);
+                this.ownerID = waitRoom.owner.id;
+                this.capacity = waitRoom.capacity;
+                this.userCount = waitRoom.userCount;
             },
             (err:any) => {
                 this.displayInfo(err.error.message, err.status);
@@ -82,4 +106,11 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         this.infoComponent.description = message;
     }
 
+    cancelCustomGame(){
+        this.router.navigate(['/']);
+    }
+
+    startGame(){
+        this.waitRoomService.startGame();
+    }
 }
