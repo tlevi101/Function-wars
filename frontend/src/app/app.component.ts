@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import jwt_decode from 'jwt-decode';
 import { DecodedTokenInterface } from './interfaces/token.interface';
 import {NavigatedService} from "./services/navigated.service";
+import {InfoComponent} from "./pop-up/info/info.component";
+import {SocketErrorService} from "./services/socket-error.service";
 
 @Component({
     selector: 'app-root',
@@ -15,7 +17,9 @@ export class AppComponent implements OnInit {
     public authorized = false;
     user: DecodedTokenInterface | undefined;
 
-    constructor(private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService) {
+    @ViewChild('infoComponent') infoComponent! :InfoComponent;
+
+    constructor(private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService:SocketErrorService) {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
             this.user = this.getDecodedAccessToken();
@@ -27,6 +31,13 @@ export class AppComponent implements OnInit {
                 }
             }
         )
+        this.socketErrorService.listenError().subscribe((error)=>{
+            this.infoComponent.description=error.message;
+                if(error.code===403 || error.code===404){
+                    this.infoComponent.buttonLink='/';
+                }
+            }
+        );
     }
 
     ngOnInit(): void {

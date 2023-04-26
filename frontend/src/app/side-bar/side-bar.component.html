@@ -9,7 +9,7 @@
         data-bs-target="#offcanvasRight"
         aria-controls="offcanvasRight">
         <span
-            *ngIf="hasUnreadMessages()"
+            *ngIf="hasUnreadMessages() || Invites.length > 0"
             class="position-absolute top-0 start-0 translate-middle p-2 bg-danger rounded-circle">
             <span class="visually-hidden">New alerts</span>
         </span>
@@ -45,6 +45,11 @@
             <h6 class="{{ myStatus('Friend requests') }}" id="offcanvasRightLabel">Friend requests</h6>
         </div>
         <div class="offcanvas-title" (click)="changeMenuPoint($event)">
+            <span
+                *ngIf="Invites.length > 0"
+                class="position-absolute top-0 start-0 translate-middle p-2 bg-danger rounded-circle">
+                <span class="visually-hidden">New alerts</span>
+            </span>
             <h6 class="{{ myStatus('Invites') }}" id="offcanvasRightLabel">Invites</h6>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -131,6 +136,15 @@
             <div class="d-flex justify-content-center">
                 <button type="button" class="btn btn-danger btn-sm" (click)="reject(friendRequest, i)">Reject</button>
                 <button type="button" class="btn btn-success btn-sm" (click)="accept(friendRequest, i)">Accept</button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="activeTitle === 'Invites'" class="offcanvas-body">
+        <div *ngFor="let invite of Invites; let i = index" class="container-request">
+            <h6>{{ invite.inviter.name }}</h6>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-danger btn-sm" (click)="rejectInvite(invite)">Reject</button>
+                <button type="button" class="btn btn-success btn-sm" (click)="acceptInvite(invite)">Accept</button>
             </div>
         </div>
     </div>

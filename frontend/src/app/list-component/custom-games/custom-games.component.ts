@@ -2,7 +2,6 @@ import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/c
 import {CustomGameListItemInterface, CustomGameService} from "../../services/custom-game.service";
 import {PaginationComponent} from "../pagination/pagination.component";
 import {InfoComponent} from "../../pop-up/info/info.component";
-import {Subscription} from "rxjs";
 import {Router} from "@angular/router";
 
 @Component({
@@ -15,7 +14,6 @@ export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
     customGames: CustomGameListItemInterface[] = [];
     page = 1;
     pageSize = 4;
-    private socketErrorSubscription: Subscription;
     @ViewChild('pagination') pagination!: PaginationComponent;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
@@ -26,10 +24,6 @@ export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
         this.customGameService.getCustomGames().subscribe(({customGames}) => {
             this.customGames = customGames;
         })
-        this.socketErrorSubscription = this.customGameService.listenError().subscribe(
-        ({message}) => {
-            this.infoComponent.description = message;
-        });
 
     }
 
@@ -40,7 +34,7 @@ export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
     }
 
     ngOnDestroy(): void {
-        this.socketErrorSubscription.unsubscribe();
+        // this.socketErrorSubscription.unsubscribe();
     }
 
     joinGame(roomUUID: string) {

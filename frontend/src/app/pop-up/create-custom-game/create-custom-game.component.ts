@@ -66,9 +66,8 @@ export class CreateCustomGameComponent implements AfterViewInit{
     onSubmit(){
         const fieldId = this.fieldSelect?.value;
         const isPrivate = this.isPrivate?.value;
-        // const friends = this.friends.controls.map((friend: AbstractControl)=>{return friend.value});
-        //TODO send invite to friends
-        this.waitRoomService.createCustomGame(fieldId, isPrivate);
+        const friends = this.friends.controls.map((friend: AbstractControl)=>{return parseInt(friend.value)});
+        this.waitRoomService.createCustomGame(fieldId, isPrivate, friends);
         const subscription = this.waitRoomService.waitRoomCreated().subscribe(
             ({roomUUID})=>{
                 this.router.navigate(['/wait-rooms', roomUUID]);

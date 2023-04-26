@@ -10,6 +10,7 @@ export class RuntimeMaps {
     public static waitList= new Map<number, socket> ();
     public static onlineUsers = new Map<number, { user: DecodedToken; socketID: string, currentURL:string }>();
     public static waitingRooms  = new Map<string, WaitingRoom>();
+    public static invites = new Set<{inviterID:number, invitedID:number}>
     constructor() {
     }
 }

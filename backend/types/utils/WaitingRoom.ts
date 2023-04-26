@@ -96,6 +96,10 @@ export class WaitingRoom{
         });
     }
 
+    public userIsNotInvited(playerID: number) {
+        return !Array.from(RuntimeMaps.invites.values()).some(invite => invite.inviterID === this.owner.id && invite.invitedID === playerID);
+    }
+
 
     public static publicRoomsFree(rooms: WaitingRoom[]) {
         return rooms.filter(r => r.isPublic && !r.isFull());

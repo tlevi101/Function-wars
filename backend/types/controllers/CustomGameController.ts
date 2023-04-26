@@ -4,6 +4,7 @@ import { GroupChat } from '../utils/GroupChat';
 import {RuntimeMaps} from "../RuntimeMaps";
 import {GroupChatController} from "./GroupChatController";
 import {GameController} from "./GameController";
+const {User } = require('../../models')
 export class CustomGameController {
     //*****************//
     //Route controllers//
@@ -44,18 +45,24 @@ export class CustomGameController {
      * @param socket: socket
      * @param fieldID: number
      * @param isPrivate: boolean
+     * @param friendIDs: number[]
      */
     public static async createCustomGame(
         socket: socket,
         fieldID: number,
         isPrivate:boolean,
+        friendIDs?:number[],
     ) {
+        console.debug(friendIDs);
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
         const room = await new Promise<WaitingRoom>((resolve)=>{
             resolve(new WaitingRoom(socket.decoded, fieldID, socket, isPrivate));
         })
         RuntimeMaps.waitingRooms.set(room.UUID, room);
         RuntimeMaps.groupChats.set(room.ChatUUID, new GroupChat(room.ChatUUID, room.playersToUserInterface(), room.Sockets));
+        if (friendIDs) {
+            CustomGameController.sendInvites(socket, friendIDs);
+        }
         socket.emit('waiting room created', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
     }
 
@@ -84,6 +91,9 @@ export class CustomGameController {
             console.debug('Custom game is full');
             return;
         }
+        if (room.isPrivate && room.userIsNotInvited(user.id)) {
+            socket.emit('error', {message: 'You are not invited!', code:404});
+        }
         socket.join(room.UUID);
         room.join(user, socket);
         GroupChatController.joinGroupChat(socket,room.ChatUUID);
@@ -101,12 +111,13 @@ export class CustomGameController {
         const room = await CustomGameController.getWaitingRoomByUser(socket.decoded);
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
-        if(!room || !groupChat) {
+        if(!room) {
+            console.error(`Room not found`)
             return;
         }
-        socket.to(room.UUID).emit('user left waiting room');
+        socket.to(room.UUID).emit('user left wait room');
         room.leave(user.id);
-        groupChat.leave(user.id, socket);
+        GroupChatController.leaveGroupChat(socket)
     }
 
 
@@ -162,5 +173,28 @@ export class CustomGameController {
             }
         }
         return null;
+    }
+
+
+    private static async sendInvites(socket:socket, friendIDs:number[]) {
+        const user = await User.findOne({where: {id: socket.decoded.id}});
+        const room = await this.getWaitingRoomByOwner(socket.decoded);
+        if(!room) {
+            console.error(`Wait room for user ${socket.decoded.name} not found`);
+            return;
+        }
+        if(!user) {
+            console.error(`User ${socket.decoded.name} not found`);
+            return;
+        }
+        friendIDs.forEach((friendID)=>{
+            if(user.isFriend(friendID)) {
+                const friendSocket = RuntimeMaps.onlineUsers.get(friendID)?.socketID;
+                if(friendSocket) {
+                    RuntimeMaps.invites.add({inviterID: user.id, invitedID: friendID});
+                    socket.to(friendSocket).emit('receive invite', {inviter: socket.decoded, customGameUUID: room.UUID});
+                }
+            }
+        })
     }
 }

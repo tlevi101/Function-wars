@@ -6,6 +6,10 @@ import { FriendsService } from '../services/friends.service';
 import { UsersService } from '../services/users.service';
 import { myAnimations } from './animations';
 import { InfoComponent } from '../pop-up/info/info.component';
+import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {CustomGameService} from "../services/custom-game.service";
+import {Router} from "@angular/router";
+import {JwtService} from "../services/jwt.service";
 
 interface Friend {
     id: number;
@@ -43,11 +47,17 @@ export class SideBarComponent {
     selectedFriend: SelectedFriend;
     activeTitle = 'Friends';
     activeFriend: Friend | undefined;
+    invites: Set<{inviter:DecodedTokenInterface, customGameUUID:string}> = new Set()
+    user: DecodedTokenInterface | undefined;
     constructor(
         private friendsService: FriendsService,
         private usersService: UsersService,
-        private chatService: ChatService
+        private chatService: ChatService,
+        private customGameService: CustomGameService,
+        private router:Router,
+        private jwt:JwtService
     ) {
+        this.user = jwt.getDecodedAccessToken();
         this.friendCurrentState = [];
         this.friends = [];
         this.friendRequests = [];
@@ -81,6 +91,9 @@ export class SideBarComponent {
                 const index = this.friends.findIndex(f => f.id === message.from);
                 this.friends[index].unreadMessages++;
             }
+        });
+        this.friendsService.receiveInvite().subscribe(({inviter,customGameUUID}) => {
+            this.invites.add({inviter,customGameUUID});
         });
     }
     myFriendsMouseIn(): void {
@@ -174,7 +187,7 @@ export class SideBarComponent {
         this.friendChat.friendId = friend.id;
         this.friendChat.friendName = friend.name;
         this.friendChat.loadChat(friend.id);
-        let index = this.friends.findIndex(f => f.id === friend.id);
+        const index = this.friends.findIndex(f => f.id === friend.id);
         this.friends[index].unreadMessages = 0;
     }
     handleChatClosed() {
@@ -183,10 +196,29 @@ export class SideBarComponent {
     hasUnreadMessages(): boolean {
         return this.friends.some(f => f.unreadMessages > 0);
     }
+    rejectInvite(invite:{inviter:DecodedTokenInterface, customGameUUID:string}) {
+        if(!this.user){
+            console.error('User is not defined');
+            return;
+        }
+        this.friendsService.inviteRejected({inviterID:invite.inviter.id,invitedID:this.user.id} );
+        this.invites.delete(invite);
+    }
+    acceptInvite(invite:{inviter:DecodedTokenInterface, customGameUUID:string}) {
+        this.customGameService.joinCustomGame(invite.customGameUUID);
+        this.invites.delete(invite);
+        this.customGameService.customGameJoined().subscribe((res: any) => {
+            this.router.navigate(['/wait-rooms', invite.customGameUUID]);
+        });
+    }
     get slideDirection(): string {
         return this.myFriendsHovered ? 'left' : 'right';
     }
     get friendSlideDirection(): string {
         return this.myFriendsHovered ? 'down' : 'up';
+    }
+
+    get Invites():{inviter:DecodedTokenInterface, customGameUUID:string}[] {
+        return Array.from(this.invites.values());
     }
 }

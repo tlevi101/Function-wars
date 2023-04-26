@@ -46,8 +46,8 @@ io.use(function (socket, next) {
         socket.on('route change', async ({url}) => {
             SocketConnectionService.userNavigated(socket, url);
         });
-        socket.on('create custom game', async ({ fieldID, isPrivate }) => {
-            await CustomGameController.createCustomGame(socket, fieldID, isPrivate);
+        socket.on('create custom game', async ({ fieldID, isPrivate, friendIDs }) => {
+            await CustomGameController.createCustomGame(socket, fieldID, isPrivate, friendIDs);
         })
 
         socket.on('join custom game', async ({ roomUUID }) => {
@@ -65,6 +65,10 @@ io.use(function (socket, next) {
 
         socket.on('join group chat', async ({ roomUUID }) => {
             await GroupChatController.joinGroupChat(socket, roomUUID);
+        });
+
+        socket.on('reject invite', async ({ invite }) => {
+            RuntimeMaps.invites.delete(invite);
         });
 
         socket.on('send chat message', async ({ message, friend_id }) => {

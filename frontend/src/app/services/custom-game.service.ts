@@ -34,12 +34,8 @@ export class CustomGameService {
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${this.token || ''}`);
     }
-
-    public listenError() {
-        return this.socket.fromEvent<{ message: string, code?:number }>('error');
-    }
-    public createCustomGame(fieldID: number, isPrivate: boolean) {
-        this.socket.emit('create custom game', { fieldID, isPrivate });
+    public createCustomGame(fieldID: number, isPrivate: boolean, friendIDs:number[]) {
+        this.socket.emit('create custom game', { fieldID, isPrivate, friendIDs });
     }
     public waitRoomCreated() {
         return this.socket.fromEvent<{ roomUUID: string; groupChatUUID: string }>('waiting room created');
