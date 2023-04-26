@@ -2,6 +2,7 @@ import {DecodedToken, MyRequest, MyResponse, socket} from './Interfaces';
 import { WaitingRoom } from '../utils/WaitingRoom';
 import { GroupChat } from '../utils/GroupChat';
 import {RuntimeMaps} from "../RuntimeMaps";
+import {GroupChatController} from "./GroupChatController";
 export class CustomGameController {
     //*****************//
     //Route controllers//
@@ -49,7 +50,9 @@ export class CustomGameController {
         isPrivate:boolean,
     ) {
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
-        const room = new WaitingRoom(socket.decoded, fieldID, socket, isPrivate);
+        const room = await new Promise<WaitingRoom>((resolve)=>{
+            resolve(new WaitingRoom(socket.decoded, fieldID, socket, isPrivate));
+        })
         RuntimeMaps.waitingRooms.set(room.UUID, room);
         RuntimeMaps.groupChats.set(room.ChatUUID, new GroupChat(room.ChatUUID, room.playersToUserInterface(), room.Sockets));
         socket.emit('waiting room created', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
@@ -65,14 +68,14 @@ export class CustomGameController {
         roomUUID: string,
     ) {
         const room = RuntimeMaps.waitingRooms.get(roomUUID);
-        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         const user = socket.decoded;
-        if(!room || !groupChat) {
+        if(!room) {
             socket.emit('error', {message: 'Custom game not found.',code:404});
             console.debug('Custom game not found.');
             return;
         }
         if(room.userIsInRoom(user.id)){
+            socket.emit('waiting room joined');
             return;
         }
         if (room.isFull()) {
@@ -81,9 +84,8 @@ export class CustomGameController {
             return;
         }
         socket.join(room.UUID);
-        socket.join(room.ChatUUID);
         room.join(user, socket);
-        groupChat.join({ id: user.id, name: user.name }, socket);
+        GroupChatController.joinGroupChat(socket,room.ChatUUID);
         socket.emit('waiting room joined');
     }
 
@@ -120,12 +122,8 @@ export class CustomGameController {
         if(!room) {
             return;
         }
-        const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
         room.destroy();
-        if(!groupChat){
-            return;
-        }
-        groupChat.destroy();
+        GroupChatController.deleteGroupChat(socket);
     }
 
     /**

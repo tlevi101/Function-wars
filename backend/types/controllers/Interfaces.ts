@@ -3,21 +3,6 @@ import { GroupChat } from '../utils/GroupChat';
 import { Request, Response } from 'express';
 import { WaitingRoom } from '../utils/WaitingRoom';
 
-export type AppType = any & {
-    locals: any & {
-        games: GamesMap;
-        groupChats: GroupChatsMap;
-        waitList: WaitListMap;
-        onlineUsers: OnlineUsersMap;
-        waitingRooms: WaitingRoomsMap;
-        io: any & {
-            to(socketID: string): Function;
-            emit(event: string, data?: Object): Function;
-            in(roomID: string): Function;
-        };
-    };
-};
-
 export type MyRequest = Request & {
     user: DecodedToken;
     games: GamesMap;

@@ -1,8 +1,6 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
-import {FieldService} from "../services/field.service";
-import {GroupChatService} from "../services/group-chat.service";
 import {InfoComponent} from "../pop-up/info/info.component";
 
 @Component({

@@ -41,8 +41,6 @@ export class CreateCustomGameComponent implements AfterViewInit{
             friends:new FormArray([]),
             isPrivate: new FormControl(false)
         });
-
-
     }
 
     ngAfterViewInit() {
@@ -69,7 +67,7 @@ export class CreateCustomGameComponent implements AfterViewInit{
         const fieldId = this.fieldSelect?.value;
         const isPrivate = this.isPrivate?.value;
         // const friends = this.friends.controls.map((friend: AbstractControl)=>{return friend.value});
-        //send invite to friends
+        //TODO send invite to friends
         this.waitRoomService.createCustomGame(fieldId, isPrivate);
         const subscription = this.waitRoomService.waitRoomCreated().subscribe(
             ({roomUUID})=>{

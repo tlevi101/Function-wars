@@ -133,6 +133,10 @@ export class GameController{
 
     }
 
+    /**
+     * Attempt to delete game, it's possible to try to delete non-existing game
+     * @param socket
+     */
     public static async deleteGame(socket:socket) {
         let game = await this.getGame(socket.decoded.id);
         if (!game) {
@@ -140,6 +144,7 @@ export class GameController{
         }
         const gameUUID = game.UUID;
         const chatUUID =  game.ChatUUID;
+        game.destroy();
         socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
         GroupChatController.deleteGameGroupChat(chatUUID);
         console.log(chalk.green(`Game ${gameUUID} deleted.`));

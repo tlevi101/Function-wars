@@ -55,6 +55,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
                 return user;
             });
         })
+        this.groupChat.newUserJoinedGroupChat().subscribe(()=>{
+            this.getOtherUsersStatus();
+        })
     }
 
     ngOnInit(): void {
@@ -94,6 +97,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
 
     getOtherUsersStatus() {
         this.groupChat.getOtherUsersStatus(this.roomUUID).subscribe(async ({ users }) => {
+            console.log(users);
             this.otherUsersStatus = users;
         });
     }

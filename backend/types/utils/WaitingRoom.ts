@@ -18,6 +18,7 @@ export class WaitingRoom{
         this.players.push(owner);
         this.owner = owner;
         this.roomUUID = `wait-room-${fieldID}-${this.players.map(p => p.id).join('-')}-${faker.random.alpha({count: 5} )}`;
+        socket.join(this.roomUUID);
         (async () => {
             console.log(fieldID);
             const field = await Field.findByPk(fieldID);
@@ -31,7 +32,9 @@ export class WaitingRoom{
             s.emit('owner left');
             s.leave(this.roomUUID);
         });
+        console.log(Array.from(RuntimeMaps.waitingRooms.keys()));
         RuntimeMaps.waitingRooms.delete(this.roomUUID);
+        console.log(Array.from(RuntimeMaps.waitingRooms.keys()));
     }
 
 

@@ -28,6 +28,9 @@ export class GroupChatService {
         this.socket.emit('join group chat', { roomUUID });
     }
 
+    public newUserJoinedGroupChat(){
+        return this.socket.fromEvent('new user joined group chat');
+    }
     public getOtherUsersStatus(roomUUID: string) {
         return this.http.get<{ users: OtherUsersStatusInterface[] }>(`${this.url}/${roomUUID}/users-status`, {
             headers: this.hr,

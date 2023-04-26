@@ -128,9 +128,17 @@ export class GroupChatController{
         if(groupChat){
             groupChat.leave(socket.decoded.id, socket);
             if(groupChat.Users.length === 0){
-                groupChat.destroy();
             }
         }
+    }
+
+    public static async deleteGroupChat(socket:socket){
+        const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
+        if(!groupChat){
+            console.error(groupChat);
+            return;
+        }
+        groupChat.destroy();
     }
 
     public static async deleteGameGroupChat(gameChatUUID: string){
@@ -143,9 +151,14 @@ export class GroupChatController{
     public static async joinGroupChat(socket: socket, roomUUID: string){
         console.log(`User (${socket.decoded.name}) joined group chat ${roomUUID}`);
         const groupChat = RuntimeMaps.groupChats.get(roomUUID);
-        if(groupChat){
-            groupChat.join(socket.decoded, socket);
+        if(!groupChat){
+            console.error('Chat not found')
+            console.log(RuntimeMaps.groupChats.keys());
+            return;
         }
+        groupChat.join(socket.decoded, socket);
+        console.log('user joined group chat');
+        socket.to(roomUUID).emit('new user joined group chat');
     }
 
     public static async sendMessage(socket: socket, message: string){

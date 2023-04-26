@@ -46,6 +46,10 @@ export interface GameInterface {
     uuid: string;
 }
 
+/**
+ * @property id number
+ * @property name number
+ */
 export interface UserInterface {
     id: number;
     name: string;

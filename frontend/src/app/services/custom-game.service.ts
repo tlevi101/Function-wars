@@ -47,6 +47,7 @@ export class CustomGameService {
     public joinCustomGame(roomUUID: string) {
         this.socket.emit('join custom game', { roomUUID });
     }
+
     public customGameJoined() {
         return this.socket.fromEvent('waiting room joined');
     }

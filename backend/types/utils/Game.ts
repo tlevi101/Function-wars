@@ -52,6 +52,8 @@ export class Game {
         this.sockets = sockets;
     }
 
+
+
     public changeCurrentPlayer(): void {
         const currentPlayerIndex = this.players.findIndex(player => player.ID === this.currentPlayer.ID);
         this.currentPlayer = this.players[(currentPlayerIndex + 1) % this.players.length];

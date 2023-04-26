@@ -12,6 +12,7 @@ export class GroupChat {
         this.roomUUID = roomUUID;
         this.users = users;
         this.sockets = sockets;
+        sockets.forEach(s => s.join(roomUUID));
     }
 
     get Messages(): MessageInterface[] {
@@ -45,9 +46,11 @@ export class GroupChat {
     }
 
     async getOtherUsersStatusForUser(userID: number) {
-        const otherUsers = this.users.filter(u => u.id !== userID);
+        const otherUsersID = new Set<UserInterface>();
+        await Promise.all(this.messages.filter(m => m.from.id !== userID).map(m => otherUsersID.add(m.from)));
+        await Promise.all(this.users.filter(u => u.id !== userID).map(u => otherUsersID.add(u)));
         const otherUsersStatus = await Promise.all(
-            otherUsers.map(async u => {
+            Array.from(otherUsersID.values()).map(async u => {
                 return {
                     id: u.id,
                     name: u.name,

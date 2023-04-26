@@ -19,19 +19,9 @@ export class SocketConnectionService{
         if(user){
             console.log(`User (${socket.decoded.name}) navigated to ${url}`);
             if(user.currentURL !== url && this.userLeftFromWaitRoomOrGame(user.currentURL)){
-                await GameController.leaveGame(socket);
-                await CustomGameController.leaveWaitingRoom(socket);
                 console.log('user left game or waiting room');
-                setTimeout(async ()=>{
-                    console.log('timeout');
-                    if(await this.userLeftTheGame(socket)){
-                        GameController.deleteGame(socket);
-                    }
-                    if(await this.ownerLeftWaitingRoom(socket)){
-                        CustomGameController.deleteWaitingRoom(socket);
-                    }
-
-                }, this.TIME_TO_RECONNECT)
+                GameController.deleteGame(socket);
+                CustomGameController.deleteWaitingRoom(socket);
             }
             user.currentURL = url;
             const gameUUID = this.getGameUUIDFromURL(url);
@@ -64,6 +54,7 @@ export class SocketConnectionService{
             }
             if(await this.ownerLeftWaitingRoom(socket)){
                 CustomGameController.deleteWaitingRoom(socket);
+                GroupChatController.deleteGroupChat(socket);
             }
 
         }, this.TIME_TO_RECONNECT)
