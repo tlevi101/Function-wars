@@ -10,7 +10,6 @@ import {
     ViewChildren,
 } from '@angular/core';
 
-import { Router } from '@angular/router';
 import {
     ConfirmWithInputComponent,
     ConfirmWithInputData,
@@ -42,10 +41,13 @@ export interface Action {
     confirmRequired: (data?: any) => boolean;
     confirmType?: ConfirmType;
     confirmData?: ConfirmWithInputData | ConfirmData;
+    visibleWhen?: (data?: any) => boolean;
 }
 
 export interface BaseData {
-    pagination: Pagination;
+    collectionSize: number;
+    pageSize: number;
+    page: number;
     headers: Header[];
     data: any[];
     singularActions: Action[];
@@ -60,7 +62,9 @@ export interface BaseData {
 export class BaseListComponent {
     selectedDataForAction: any = null;
     lastAction: Action | null = null;
-    @Input() pagination: Pagination;
+    @Input() collectionSize = 0;
+    @Input() pageSize = 7;
+    @Input() page = 1;
     @Input() headers: Header[] = [];
     @Input() data: any[] = [];
     @Input() singularActions: Action[] = [];
@@ -74,7 +78,6 @@ export class BaseListComponent {
         confirmInput?: string;
     }> = new EventEmitter();
     constructor() {
-        this.pagination = new Pagination(0);
     }
 
     actionClicked(action: Action, dataId: number | undefined = undefined): void {
@@ -161,7 +164,9 @@ export class BaseListComponent {
     }
 
     init(baseData: BaseData) {
-        this.pagination = baseData.pagination;
+        this.page = baseData.page;
+        this.pageSize = baseData.pageSize;
+        this.collectionSize = baseData.collectionSize;
         this.headers = baseData.headers;
         this.data = baseData.data;
         this.singularActions = baseData.singularActions;

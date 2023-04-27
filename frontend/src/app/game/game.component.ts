@@ -409,8 +409,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!this.functionDefControl?.touched) return '';
         return this.functionDefControl?.valid ? 'is-valid' : 'is-invalid';
     }
-    getFunctionDefError(): string {
-        // console.log(this.functionDefControl?.errors);
+    get functionDefError(): string {
+        console.log(this.functionDefControl?.errors);
         if (this.functionDefControl?.hasError('required')) return 'Function definition is required';
         if (this.functionDefControl?.hasError('invalidMathFunction')) {
             return this.functionDefControl?.getError('invalidMathFunction');

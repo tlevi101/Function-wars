@@ -1,6 +1,5 @@
 import { ConfirmWithInputData } from 'src/app/pop-up/confirm-with-input/confirm-with-input.component';
 import { Action, BaseData, ConfirmType, DataType } from '../base-list/base-list.component';
-import { Pagination } from '../pagination';
 
 const header = [
     { label: 'ID', key: 'id', type: DataType.STRING },
@@ -65,10 +64,12 @@ const pluralActions: Action[] = [
     },
 ];
 
-export let baseData: BaseData = {
+export const baseData: BaseData = {
     headers: header,
     singularActions: singularActions,
     pluralActions: pluralActions,
-    pagination: new Pagination(0),
+    collectionSize: 0,
+    page: 1,
+    pageSize: 7,
     data: [],
 };

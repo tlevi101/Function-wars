@@ -4,7 +4,6 @@ import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
 import { AdminService } from 'src/app/services/admin.service';
 import { BaseListComponent } from '../base-list/base-list.component';
 import jwt_decode from 'jwt-decode';
-import { Pagination } from '../pagination';
 import { baseData } from './base-list.data';
 
 @Component({
@@ -143,7 +142,7 @@ export class ReportsComponent implements OnInit {
             (res: any) => {
                 this.reports = res.reports;
                 this.reports = res.reports;
-                baseData.pagination = new Pagination(this.reports.length);
+                baseData.collectionSize = this.reports.length;
                 baseData.data = this.reports;
                 this.baseList.init(baseData);
             },

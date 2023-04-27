@@ -3,6 +3,7 @@ import {GroupChatController} from "./GroupChatController";
 import {RuntimeMaps} from "../RuntimeMaps";
 import {Game} from "../utils/Game";
 import {PlayerInterface, UserInterface} from "../utils/interfaces";
+import {WaitListController} from "./WaitListController";
 const { Field } = require('../../models');
 const chalk = require("chalk");
 
@@ -115,7 +116,18 @@ export class GameController{
 
     public static async createGame(sockets:socket[], fieldID?:number){
         const players :UserInterface[] = [];
-        const field = await Field.randomField(sockets.length);
+        let field = await Field.randomField(sockets.length);
+        if(fieldID){
+            field =  await Field.findByPk(fieldID);
+        }
+        if(!field && sockets.length===2){
+            sockets.forEach(s => {
+                s.emit('error', {message:'There is no playable field at the moment!'});
+                s.leave('wait-list')
+                WaitListController.leaveWaitList(s);
+            });
+            return;
+        }
         sockets.forEach(async socket => {
             const player : DecodedToken = socket.decoded;
             players.push(player);
@@ -144,9 +156,9 @@ export class GameController{
             return;
         }
         const gameUUID = game.UUID;
+        socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
         const chatUUID =  game.ChatUUID;
         game.destroy();
-        socket.to(gameUUID).emit('game ended', { message: `${socket.decoded.name} left the game.` });
         await GroupChatController.deleteGameGroupChat(chatUUID);
         console.log(chalk.green(`Game ${gameUUID} deleted.`));
     }

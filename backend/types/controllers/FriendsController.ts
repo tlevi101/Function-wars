@@ -5,17 +5,35 @@ const {User, Chat, Friendship} = require("../../models");
 
 export class FriendsController {
 
+    /**
+     * @method get
+     * @route '/friends'
+     * @param req
+     * @param res
+     */
     public static async getFriends(req: MyRequest, res: MyResponse) {
         const friends = await FriendsController.getUserFriends(req.user.id);
         return res.status(200).json({ friends: friends });
     }
 
+    /**
+     * @method get
+     * @route /friends/online
+     * @param req
+     * @param res
+     */
     public static async getOnlineFriends(req: MyRequest, res: MyResponse) {
         let friends = await FriendsController.getUserFriends(req.user.id);
         friends = friends.filter((friend:any) => !!req.onlineUsers.get(friend.id));
         return res.status(200).json({ friends: friends });
     }
 
+    /**
+     * @method get
+     * @route /friends/requests
+     * @param req
+     * @param res
+     */
     public static async getFriendRequests(req: MyRequest, res: MyResponse) {
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
@@ -29,6 +47,12 @@ export class FriendsController {
         return res.status(200).json({ requests: requests });
     }
 
+    /**
+     * @method get
+     * @route /friends/:id/chat
+     * @param req
+     * @param res
+     */
     public static async getFriendChat(req: MyRequest, res: MyResponse) {
         const { email } = req.user;
         const { id } = req.params;
@@ -60,6 +84,12 @@ export class FriendsController {
         return res.status(200).json({ chat: chat });
     }
 
+    /**
+     * @method put
+     * @route /friends/requests/:id/accept
+     * @param req
+     * @param res
+     */
     public static async acceptFriendRequest(req: MyRequest, res: MyResponse) {
         const { email } = req.user;
         const { id } = req.params;
@@ -86,6 +116,12 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friendship accepted.' });
     }
 
+    /**
+     * @method delete
+     * @route /friends/requests/:id/reject
+     * @param req
+     * @param res
+     */
     public static async rejectFriendRequest(req: MyRequest, res: MyResponse) {
         const { email } = req.user;
         const { id } = req.params;
@@ -110,6 +146,12 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friendship rejected.' });
     }
 
+    /**
+     * @method delete
+     * @route /friends/:id
+     * @param req
+     * @param res
+     */
     public static async deleteFriend(req: MyRequest, res: MyResponse) {
         const userJWT = req.user;
         const user = await User.findOne({ where: { email: userJWT.email } });
@@ -152,7 +194,12 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend deleted.' });
     }
 
-
+    /**
+     * @method post
+     * @route /friends/:id
+     * @param req
+     * @param res
+     */
     public static async sendFriendRequest(req: MyRequest, res: MyResponse) {
         const { name } = req.user;
         const { id } = req.params;
@@ -196,6 +243,14 @@ export class FriendsController {
                 return { name: friend.name, id: friend.id, unreadMessages: unreadMessages };
             })
         );
-        return friends;
+        return friends.sort((a:any, b:any) => {
+            if (a.unreadMessages > b.unreadMessages) {
+                return -1;
+            }
+            if (a.unreadMessages < b.unreadMessages) {
+                return 1;
+            }
+            return 0;
+        });
     }
 }

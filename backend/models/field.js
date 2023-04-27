@@ -1,5 +1,5 @@
 'use strict';
-const { Model } = require('sequelize');
+const { Model, Op } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Field extends Model {
         /**
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
             });
         }
         static async randomField(playerLimit = 2) {
-            let fields = await this.findAll({ where: { is_admin_field: true } });
+            let fields = await this.findAll({ where: {[Op.and]:{is_admin_field: true, deletedAt:{[Op.is]:null} } }});
             fields = await Promise.all(fields.filter(field => field.field.players.length === playerLimit));
             return fields[Math.floor(Math.random() * fields.length)];
         }

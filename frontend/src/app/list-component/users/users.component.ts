@@ -5,7 +5,6 @@ import { ConfirmWithInputData } from 'src/app/pop-up/confirm-with-input/confirm-
 import { AdminService } from 'src/app/services/admin.service';
 import { Action, BaseListComponent, ConfirmType, DataType, Header } from '../base-list/base-list.component';
 import jwt_decode from 'jwt-decode';
-import { Pagination } from '../pagination';
 import { baseData } from './base-list.data';
 
 @Component({
@@ -115,7 +114,7 @@ export class UsersComponent implements OnInit {
         this.adminService.getUsers().subscribe(
             (res: any) => {
                 this.users = res.users;
-                baseData.pagination = new Pagination(this.users.length);
+                baseData.collectionSize = this.users.length;
                 baseData.data = this.users;
                 this.baseList.init(baseData);
             },

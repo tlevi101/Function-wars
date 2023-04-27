@@ -1,7 +1,5 @@
-import { ConfirmWithInputData } from 'src/app/pop-up/confirm-with-input/confirm-with-input.component';
 import { ConfirmData } from 'src/app/pop-up/confirm/confirm.component';
 import { Action, BaseData, ConfirmType, DataType } from '../base-list/base-list.component';
-import { Pagination } from '../pagination';
 
 const headers = [
     { label: 'ID', key: 'id', type: DataType.STRING },
@@ -18,6 +16,7 @@ const confirmData: ConfirmData = {
 
 const deleteHTML = `<i class="fs-4 bi bi-trash3-fill text-danger"></i>`;
 const editHTML = `<i class="fs-4 bi bi-pencil-square text-primary"></i>`;
+const restoreHTML = `<i class="fs-4 text-primary bi bi-arrow-clockwise"></i>`
 
 const singularActions: Action[] = [
     {
@@ -34,6 +33,15 @@ const singularActions: Action[] = [
         confirmRequired: () => true,
         confirmData: confirmData,
     },
+    {
+        type: 'restore',
+        HTML: restoreHTML,
+        tooltip: 'Restore Field',
+        confirmRequired: () => false,
+        visibleWhen: (field:any) => {
+            return field.deletedAt!==null;
+        }
+    }
 ];
 
 const pluralActions: Action[] = [
@@ -47,9 +55,11 @@ const pluralActions: Action[] = [
     },
 ];
 
-export let adminBaseData: BaseData = {
+export const adminBaseData: BaseData = {
     headers: headers,
-    pagination: new Pagination(0),
+    collectionSize: 0,
+    pageSize: 7,
+    page: 1,
     data: [],
     singularActions: singularActions,
     pluralActions: pluralActions,

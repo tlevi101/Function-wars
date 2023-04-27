@@ -1,27 +1,46 @@
-<div class="center container d-flex m-4 game-container">
-	<div class="field me-2">
-		<canvas #field width="1000" height="700" >
+<div class="d-flex justify-content-center mt-5 ms-5">
+    <div class="container d-flex game-container">
+        <div class="field me-2">
+            <canvas #field width="1000" height="700"> </canvas>
+        </div>
+        <div class="d-flex flex-column controls p-2">
+            <form [formGroup]="functionForm" class="mb-auto">
+                <div class="d-flex gap-3 mb-3">
+                    <button
+                        *ngFor="let fn of validFunctions"
+                        type="button"
+                        class="btn btn-primary btn-sm {{ itsMyTurn ? '' : 'disabled' }}"
+                        (click)="insertFunction(fn)"
+                        [innerHTML]="fn"></button>
+                </div>
+                <div class="d-flex">
+                    <input
+                        #functionDef
+                        type="text"
+                        class="form-control w-50 me-auto {{ functionDefState }}"
+                        [attr.disabled]="!itsMyTurn ? '' : null"
+                        id="functionDef"
+                        placeholder="Function"
+                        formControlName="functionDef"
+                        (keydown)="overrideInput($event)" />
 
-		</canvas>
-	</div>
-	<div class="d-flex flex-column controls p-2">
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-sm {{
+                            functionForm.invalid || !itsMyTurn || !functionForm.touched ? 'disabled' : ''
+                        }}"
+                        (click)="submitFunction()">
+                        Submit function
+                    </button>
+                </div>
+                <div *ngIf="functionDefControl?.touched" class="invalid-feedback mb-3 display-1">
+                    {{ functionDefError }}
+                </div>
 
-		<form [formGroup]="functionForm" class="mb-auto">
-            <div class="d-flex gap-3 mb-3">
-                <button *ngFor="let fn of validFunctions" type="button" class="btn btn-primary btn-sm {{itsMyTurn? '':'disabled'}}" (click)="insertFunction(fn)" [innerHTML]="fn"></button>
-            </div>
-			<div class="d-flex">
-				<input #functionDef type="text" class="form-control w-50 me-auto {{functionDefState}}" [attr.disabled]="!itsMyTurn ? '' : null" id="functionDef" placeholder="Function" formControlName="functionDef" (keydown)="overrideInput($event)">
-				<button type="submit" class="btn btn-primary btn-sm {{functionForm.invalid || !itsMyTurn || !functionForm.touched ? 'disabled' : ''}}" (click)="submitFunction()">Submit function</button>
-			</div>
-			 <div *ngIf="functionDefControl?.touched" class="invalid-feedback mb-3">
-                {{getFunctionDefError()}}
-			</div>
-		</form>
-        <app-group-chat [roomUUID]="'chat-'+gameUUID"></app-group-chat>
-
-	</div>
+            </form>
+            <app-group-chat [roomUUID]="'chat-' + gameUUID"></app-group-chat>
+        </div>
+    </div>
 </div>
 
 <app-info #infoComponent></app-info>
-

@@ -41,12 +41,16 @@ export class FieldService {
     }
 
     getFieldByGame(gameUUID: string) {
-        let url = this.url.replace('fields', 'games');
+        const url = this.url.replace('fields', 'games');
         return this.http.get(`${url}/${gameUUID}/field`, { headers: this.hr });
     }
 
     getPlayersByGame(gameUUID: string) {
-        let url = this.url.replace('fields', 'games');
+        const url = this.url.replace('fields', 'games');
         return this.http.get(`${url}/${gameUUID}/players`, { headers: this.hr });
     }
+
+	restoreField(fieldId: number) {
+		return this.http.put(`${this.url}/${fieldId}/restore`, {}, { headers: this.hr });
+	}
 }

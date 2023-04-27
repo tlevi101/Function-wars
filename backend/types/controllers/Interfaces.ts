@@ -2,7 +2,14 @@ import { Game } from '../utils/Game';
 import { GroupChat } from '../utils/GroupChat';
 import { Request, Response } from 'express';
 import { WaitingRoom } from '../utils/WaitingRoom';
-
+/**
+ * @property user : DecodedToken
+ * @property games : GamesMap
+ * @property groupChats : GroupChatsMap
+ * @property waitList : WaitListMap
+ * @property onlineUsers : OnlineUsersMap
+ * @property waitingRooms : WaitingRoomsMap
+ */
 export type MyRequest = Request & {
     user: DecodedToken;
     games: GamesMap;
@@ -11,7 +18,9 @@ export type MyRequest = Request & {
     onlineUsers: OnlineUsersMap;
     waitingRooms: WaitingRoomsMap;
 };
-
+/**
+ * @property io : any
+ */
 export type MyResponse = Response & {
     io: any & {
         to(socketID: string): Function;
@@ -19,6 +28,18 @@ export type MyResponse = Response & {
         in(roomID: string): Function;
     };
 };
+/**
+ * @property id : number
+ * @property name : string
+ * @property email : string
+ * @property banned : boolean
+ * @property banned_reason : string
+ * @property is_admin : boolean
+ * @property role : string
+ * @property JWT_created_at : Date
+ * @property chat_restriction : boolean
+ * @property iat : number
+ */
 export interface DecodedToken {
     id: number;
     name: string;
@@ -31,6 +52,10 @@ export interface DecodedToken {
     chat_restriction: boolean;
     iat: number;
 }
+/**
+ * @property decoded : DecodedToken
+ * @property id : string
+ */
 export type socket = any & {
     decoded: DecodedToken;
     id: string;

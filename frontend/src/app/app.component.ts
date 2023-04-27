@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import jwt_decode from 'jwt-decode';
-import { DecodedTokenInterface } from './interfaces/token.interface';
+import {DecodedTokenInterface} from './interfaces/token.interface';
 import {NavigatedService} from "./services/navigated.service";
 import {InfoComponent} from "./pop-up/info/info.component";
 import {SocketErrorService} from "./services/socket-error.service";
@@ -17,24 +17,24 @@ export class AppComponent implements OnInit {
     public authorized = false;
     user: DecodedTokenInterface | undefined;
 
-    @ViewChild('infoComponent') infoComponent! :InfoComponent;
+    @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
-    constructor(private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService:SocketErrorService) {
+    constructor(private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService) {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
             this.user = this.getDecodedAccessToken();
         }
         this.router.events.subscribe(
-            (event) =>{
-                if(event instanceof NavigationEnd){
+            (event) => {
+                if (event instanceof NavigationEnd) {
                     this.navigatedService.routeChange(event.url);
                 }
             }
         )
-        this.socketErrorService.listenError().subscribe((error)=>{
-            this.infoComponent.description=error.message;
-                if(error.code===403 || error.code===404){
-                    this.infoComponent.buttonLink='/';
+        this.socketErrorService.listenError().subscribe((error) => {
+                this.infoComponent.description = error.message;
+                if (error.code === 403 || error.code === 404) {
+                    this.infoComponent.buttonLink = '/';
                 }
             }
         );
@@ -65,6 +65,7 @@ export class AppComponent implements OnInit {
     get activateRoute(): string {
         return this.router.url;
     }
+
     getDecodedAccessToken(): DecodedTokenInterface | undefined {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
         try {

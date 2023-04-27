@@ -152,27 +152,21 @@ export class CustomGameController {
         await GameController.createGame(room.Sockets, room.FieldID);
     }
 
-    /**
-     *
-     * @param user : DecodedToken
-     * @private
-     */
-    public static async getWaitingRoomByUser(user: DecodedToken) {
-        for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
-            if (value.Players.some(p => p.id === user.id)) {
-                return value;
+    private static async findWaitingRoom(where: (waitRoom: WaitingRoom) => boolean): Promise<WaitingRoom | null> {
+        for await (const [key, waitRoom] of RuntimeMaps.waitingRooms.entries()) {
+            if (where(waitRoom)) {
+                return waitRoom;
             }
         }
         return null;
     }
 
-    public static async getWaitingRoomByOwner(user:DecodedToken){
-        for await (const [key, value] of RuntimeMaps.waitingRooms.entries()) {
-            if (value.isOwner(user.id)) {
-                return value;
-            }
-        }
-        return null;
+    public static async getWaitingRoomByUser(user: DecodedToken) {
+        return await CustomGameController.findWaitingRoom(room => room.userIsInRoom(user.id));
+    }
+
+    public static async getWaitingRoomByOwner(user: DecodedToken) {
+        return await CustomGameController.findWaitingRoom(room => room.isOwner(user.id));
     }
 
 
