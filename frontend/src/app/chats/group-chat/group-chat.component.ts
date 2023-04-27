@@ -26,7 +26,7 @@ export interface MessageInterface {
 })
 export class GroupChatComponent implements OnInit, AfterViewInit {
 
-    @Input() chatMessagesMaxHeight = 500;
+    @Input() chatMessagesMaxHeight = 300;
     @Input() roomUUID = '';
     messages: MessageInterface[] = [];
     user: DecodedTokenInterface | undefined;

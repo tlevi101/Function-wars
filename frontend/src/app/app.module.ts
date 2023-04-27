@@ -33,6 +33,7 @@ import { ScaleAbleFieldComponent } from './scale-able-field/scale-able-field.com
 import { WaitRoomComponent } from './wait-room/wait-room.component';
 import { CustomGamesComponent } from './list-component/custom-games/custom-games.component';
 import { PaginationComponent } from './list-component/pagination/pagination.component';
+import { AdminsComponent } from './list-component/admins/admins.component';
 
 const config: SocketIoConfig = {
     url: 'http://localhost:3000',
@@ -70,6 +71,7 @@ const config: SocketIoConfig = {
         WaitRoomComponent,
         CustomGamesComponent,
         PaginationComponent,
+        AdminsComponent,
     ],
     imports: [
         BrowserModule,

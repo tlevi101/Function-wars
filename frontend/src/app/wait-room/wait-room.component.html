@@ -6,7 +6,7 @@
                 <app-group-chat
                     *ngIf="chatRoomUUID !== ''"
                     [roomUUID]="chatRoomUUID"
-                    [chatMessagesMaxHeight]="700 * 0.7 - 30"
+                    [chatMessagesMaxHeight]="700 * 0.7 - 100"
                     class="mt-auto"></app-group-chat>
                 <div  class="d-flex gap-3 mt-2">
                     <button *ngIf="ownerID === user?.id" type="button" class="btn btn-primary" (click)="cancelCustomGame()">Cancel custom game</button>

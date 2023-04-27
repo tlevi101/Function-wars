@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { retry } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -17,6 +18,10 @@ export class AdminService {
     getUsers() {
         return this.http.get(`${this.url}/users`, { headers: this.hr });
     }
+
+	getAdmins() {
+		return this.http.get(`${this.url}/admins`, { headers: this.hr });
+	}
 
     banUser(userId: number, reason: string | undefined = undefined) {
         return this.http.put(
@@ -57,4 +62,12 @@ export class AdminService {
     getReports() {
         return this.http.get(`${this.url}/reports`, { headers: this.hr });
     }
+
+	makeAdmin(userId: number) {
+		return this.http.put(`${this.url}/users/${userId}/make-admin`, {}, { headers: this.hr });
+	}
+
+	removeAdmin(userId: number) {
+		return this.http.put(`${this.url}/users/${userId}/remove-admin`, {}, { headers: this.hr });
+	}
 }

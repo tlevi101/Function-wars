@@ -9,6 +9,8 @@
 					<a class="nav-link {{route === '/admin/users'?  'active' : ''}}" aria-current="page" [routerLink]="['/admin/users']">Users</a>
 					<a class="nav-link {{route === '/admin/reports' ?  'active' : ''}}" [routerLink]="['/admin/reports']">Reports</a>
 					<a class="nav-link {{route === '/admin/fields' ?  'active' : ''}}" [routerLink]="['/admin/fields']">Fields</a>
+					<a class="nav-link {{route === '/admin/admins' ?  'active' : ''}}" [routerLink]="['/admin/admins']">Admins</a>
+			
 
 			</div>
 			<div *ngIf="!user?.is_admin" class="navbar-nav d-flex">

@@ -36,7 +36,7 @@
 				<td *ngFor="let header of headers" [innerHTML]="getDataField(singularData, header)"></td>
 				<td>
 					<div class="d-flex gap-1 justify-content-center">
-						<div *ngFor="let action of  singularActions" class="mt-2 {{!action.visibleWhen || action.visibleWhen(singularData)?'':'d-none'}}" [innerHtml]="action.HTML" placement="top" ngbTooltip="{{action.tooltip}}"
+						<div *ngFor="let action of  singularActions" class="mt-2 {{!action.visibleWhen || action.visibleWhen(singularData, user)?'':'d-none'}}" [innerHtml]="action.HTML" placement="top" ngbTooltip="{{action.tooltip}}"
 							(click)="actionClicked(action, singularData.id)"></div>
 					</div>
 				</td>

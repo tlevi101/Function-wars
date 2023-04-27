@@ -17,6 +17,8 @@ import {
 
 import { ConfirmComponent, ConfirmData } from 'src/app/pop-up/confirm/confirm.component';
 import { Pagination } from '../pagination';
+import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
+import { JwtService } from 'src/app/services/jwt.service';
 
 export interface Header {
     label: string;
@@ -41,7 +43,7 @@ export interface Action {
     confirmRequired: (data?: any) => boolean;
     confirmType?: ConfirmType;
     confirmData?: ConfirmWithInputData | ConfirmData;
-    visibleWhen?: (data?: any) => boolean;
+    visibleWhen?: (data?: any, user?:DecodedTokenInterface) => boolean;
 }
 
 export interface BaseData {
@@ -62,6 +64,7 @@ export interface BaseData {
 export class BaseListComponent {
     selectedDataForAction: any = null;
     lastAction: Action | null = null;
+	user: DecodedTokenInterface | undefined;
     @Input() collectionSize = 0;
     @Input() pageSize = 7;
     @Input() page = 1;
@@ -77,7 +80,9 @@ export class BaseListComponent {
         data: any[];
         confirmInput?: string;
     }> = new EventEmitter();
-    constructor() {
+    constructor(private jwt:JwtService) {
+		this.user =  jwt.getDecodedAccessToken();
+		console.log(this.user)
     }
 
     actionClicked(action: Action, dataId: number | undefined = undefined): void {

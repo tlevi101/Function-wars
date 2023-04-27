@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
 import { AdminService } from 'src/app/services/admin.service';
 import { BaseListComponent } from '../base-list/base-list.component';
@@ -14,19 +13,12 @@ import { baseData } from './base-list.data';
 export class ReportsComponent implements OnInit {
     reports: any[] = [];
     @ViewChild('baseList') baseList!: BaseListComponent;
-    constructor(private adminService: AdminService, private router: Router) {
+    constructor(private adminService: AdminService) {
         this.sendGetReportsRequest();
     }
 
     ngOnInit(): void {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-        const decodedToken: DecodedTokenInterface = jwt_decode(token || '');
-        if (!token) {
-            this.router.navigate(['/login']);
-        }
-        if (!decodedToken.is_admin) {
-            this.router.navigate(['/']);
-        }
     }
 
     handleActionClickedEvent($event: any) {

@@ -16,6 +16,9 @@
     <div class="d-flex justify-content-center">
         <app-pagination *ngIf="customGames.length>0" [pageSize]="pageSize" [collectionSize]="customGames.length" (pageChanged)="page = $event"></app-pagination>
     </div>
+	<div *ngIf="customGames.length===0" class="alert alert-info text-center" role="alert">
+		No custom game is available
+	</div>
 </div>
 
 <app-info #infoComponent></app-info>

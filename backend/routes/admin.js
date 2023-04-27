@@ -1,48 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const { User, Report } = require('../models');
 const auth = require('../middlewares/auth');
+const { AdminController } = require('../types/controllers/AdminController');
+const { ReportController } = require('../types/controllers/ReportController');
 
-router.get('/users', auth, async (req, res) => {
-    if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin.' });
-    res.status(200).json({ users: await User.findAll() });
-});
+router.get('/admins', auth, AdminController.getAdmins);
 
-router.get('/reports', auth, async (req, res) => {
-    if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin.' });
-    const reports = await Report.findAll({
-        attributes: { exclude: ['reported_by', 'reported'] },
-        include: [
-            {
-                model: User,
-                as: 'reportedBy',
-                attributes: ['id', 'name', 'email'],
-            },
-            {
-                model: User,
-                as: 'reportedUser',
-                attributes: ['id', 'name', 'email', 'chat_restriction', 'banned', 'banned_reason'],
-            },
-        ],
-        order: [
-            ['handled', 'ASC'],
-            ['deletedAt', 'ASC'],
-            ['createdAt', 'ASC'],
-        ],
-    });
-    res.status(200).json({ reports: reports });
-});
+router.get('/users', auth, AdminController.getUsers);
 
-router.delete('/reports/:id', auth, async (req, res) => {
-    if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin.' });
-    const report = await Report.findByPk(req.params.id);
-    if (!report) return res.status(404).json({ message: 'Report not found.' });
-    if (!report.deletedAt) await report.update({ handled: true, deletedAt: new Date() });
-    else await report.destroy();
-    res.status(200).json({ message: 'Report deleted.' });
-});
-router.use('/users', require('./subRoutes/user-updates'));
+router.get('/reports', auth, ReportController.getReports);
 
-router.use('/reports', require('./subRoutes/user-updates'));
+router.delete('/reports/:id', auth, ReportController.deleteReport);
+
+router.put('/users/:id/ban', auth, AdminController.banUser);
+
+router.put('/users/:id/unban', auth, AdminController.unbanUser);
+
+router.put('/users/:userID/make-admin', auth, AdminController.makeAdmin);
+
+router.put('/users/:userID/remove-admin', auth, AdminController.removeAdmin);
+
+router.put('/users/:id/add-remove-chat-restriction', auth, AdminController.addOrRemoveChatRestriction);
 
 module.exports = router;
