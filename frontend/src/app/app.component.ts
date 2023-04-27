@@ -5,6 +5,8 @@ import {DecodedTokenInterface} from './interfaces/token.interface';
 import {NavigatedService} from "./services/navigated.service";
 import {InfoComponent} from "./pop-up/info/info.component";
 import {SocketErrorService} from "./services/socket-error.service";
+import { AuthService } from './services/auth.service';
+import { JwtService } from './services/jwt.service';
 
 @Component({
     selector: 'app-root',
@@ -19,10 +21,11 @@ export class AppComponent implements OnInit {
 
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
-    constructor(private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService) {
+    constructor(private jwt:JwtService, private authService:AuthService,private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService) {
+		this.authService.updateToken();
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
-            this.user = this.getDecodedAccessToken();
+            this.user = this.jwt.getDecodedAccessToken();
         }
         this.router.events.subscribe(
             (event) => {
@@ -40,16 +43,15 @@ export class AppComponent implements OnInit {
         );
     }
 
-    ngOnInit(): void {
-        this.activatedRoute.url.subscribe(url => {
-            console.log(url);
-        });
+    async ngOnInit(): Promise<void> {
+		
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) this.authorized = true;
         else {
             this.authorized = false;
             if (!window.location.href.includes('reset-password')) this.router.navigate(['/login']);
         }
+
     }
 
     get isAuthorized(): boolean | null {
@@ -58,7 +60,7 @@ export class AppComponent implements OnInit {
     }
 
     get isAdmin(): boolean | null {
-        if (this.getDecodedAccessToken()?.is_admin) return true;
+        if (this.jwt.getDecodedAccessToken()?.is_admin) return true;
         return false;
     }
 
@@ -66,12 +68,4 @@ export class AppComponent implements OnInit {
         return this.router.url;
     }
 
-    getDecodedAccessToken(): DecodedTokenInterface | undefined {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
-        try {
-            return jwt_decode(token);
-        } catch (Error) {
-            return;
-        }
-    }
 }

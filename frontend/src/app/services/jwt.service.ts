@@ -22,4 +22,18 @@ export class JwtService {
             return;
         }
     }
+
+	public updateToken(token?: string) {
+		if(!token){
+			localStorage.removeItem('token');
+			sessionStorage.removeItem('token');
+			return;
+		}
+		if(localStorage.getItem('token')) {
+			localStorage.setItem('token', token);
+		} else {
+			sessionStorage.setItem('token', token);
+		}
+	}
+
 }
