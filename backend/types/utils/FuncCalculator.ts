@@ -227,12 +227,12 @@ class FuncCalculator {
         this.fn = this.fn.replaceAll('e', 'Math.E');
     }
     replaceAbsWithMathAbs(): void {
-        const regex = /\|.*x.*\|/gi;
+        const regex = /\|([^|]*x[^|]*)\|/gi;
         this.fn = this.fn.replaceAll(regex, 'Math.abs($&)');
         this.fn = this.fn.replaceAll('|', '');
     }
     replaceSqrtOperator(): void {
-        const regex = /(√x)|(√\(.*x.*\))/gi;
+        const regex = /(√x)|(√\([^(]*x[^)]*\))/gi;
         this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
         this.fn = this.fn.replaceAll('√', '');
     }
