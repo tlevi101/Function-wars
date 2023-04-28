@@ -36,4 +36,8 @@ export class JwtService {
 		}
 	}
 
+	public removeToken(){
+		localStorage.removeItem('token');
+		sessionStorage.removeItem('token');
+	}
 }

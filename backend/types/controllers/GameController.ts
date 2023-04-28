@@ -163,4 +163,13 @@ export class GameController{
         console.log(chalk.green(`Game ${gameUUID} deleted.`));
     }
 
+
+	public static async userBanned(userID:number){
+		const game = await GameController.getGame(userID);
+		if(!game){
+			return;
+		}
+		game.userBanned(userID);
+	}
+
 }

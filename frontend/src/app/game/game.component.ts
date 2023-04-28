@@ -88,6 +88,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             this.infoComponent.buttonText = 'Quit';
             this.infoComponent.buttonLink = '/';
         });
+
+		this.gameService.listenUserBanned().subscribe(({message}) => {
+			this.infoComponent.description = message;
+			this.infoComponent.buttonText = 'Quit';
+			this.infoComponent.buttonLink = '/';
+		})
     }
 
     ngAfterViewInit() {

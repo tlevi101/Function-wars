@@ -1,3 +1,5 @@
+import { RuntimeMaps } from "../RuntimeMaps";
+import { GameController } from "./GameController";
 import { MyRequest, MyResponse } from "./Interfaces";
 import { ReportController } from "./ReportController";
 const { User } = require('../../models');
@@ -60,6 +62,11 @@ export class AdminController{
 		}
 		await user.update({ banned: true, banned_reason: banned_reason });
 		await ReportController.markUserReportsAsHandled(user.id);
+		const socketID = RuntimeMaps.onlineUsers.get(user.id)?.socketID;
+		if(socketID){
+			res.io.to(socketID).emit('banned', { message: 'You have been banned.' });
+			GameController.userBanned(user.id);
+		}
 		return res.status(200).send({ message: 'User banned.' });	
 	}
 

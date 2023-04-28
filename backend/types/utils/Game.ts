@@ -198,6 +198,15 @@ export class Game {
         );
         return this.gameOver;
     }
+
+	public userBanned(playerID: number): void {
+		this.sockets.forEach(socket => {
+			if(socket.decoded.id === playerID) return;
+			socket.emit('user banned', {message:`${this.getPlayer(playerID)?.Name} banned, game is over!`})
+		});
+		this.destroy();
+	}
+
     public destroy(){
         this.sockets.forEach(socket => socket.leave(this.uuid));
         RuntimeMaps.games.delete(this.uuid);
@@ -242,6 +251,10 @@ export class Game {
         }
         return player.Online;
     }
+
+	private getPlayer(playerID: number): Player | undefined {
+		return this.players.find(player => player.ID === playerID);
+	}
 
     get CurrentPlayer(): Player {
         return this.currentPlayer;

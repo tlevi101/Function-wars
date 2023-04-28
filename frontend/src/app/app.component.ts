@@ -7,6 +7,7 @@ import {InfoComponent} from "./pop-up/info/info.component";
 import {SocketErrorService} from "./services/socket-error.service";
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
+import { UsersService } from './services/users.service';
 
 @Component({
     selector: 'app-root',
@@ -21,7 +22,7 @@ export class AppComponent implements OnInit {
 
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
-    constructor(private jwt:JwtService, private authService:AuthService,private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService) {
+    constructor(private jwt:JwtService, private authService:AuthService,private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService, private usersService: UsersService) {
 		this.authService.updateToken();
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) {
@@ -41,6 +42,13 @@ export class AppComponent implements OnInit {
                 }
             }
         );
+		
+		this.usersService.listenBanned().subscribe(({message}) => {
+			this.jwt.removeToken();
+			this.infoComponent.description = message;
+			this.infoComponent.buttonLink = '/';
+		});
+	
     }
 
     async ngOnInit(): Promise<void> {

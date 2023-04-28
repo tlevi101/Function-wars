@@ -249,7 +249,9 @@ module.exports = (sequelize, DataTypes) => {
                     user.password = bcrypt.hashSync(user.password, salt);
                 },
                 beforeUpdate: (user, options) => {
+					const hashedRegex = /^\$2[ayb]\$/
                     options.validate = false;
+					if(hashedRegex.test(user.password)) return;
                     let salt = bcrypt.genSaltSync(10);
                     user.password = bcrypt.hashSync(user.password, salt);
                 },

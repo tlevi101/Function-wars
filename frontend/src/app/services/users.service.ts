@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -8,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UsersService {
     private hr;
     private url;
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private socket:Socket) {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);
@@ -26,4 +27,8 @@ export class UsersService {
     reportUser(id: number, description: string): Observable<{ message: string }> {
         return this.http.post<{ message: string }>(`${this.url}/${id}/report`, { description }, { headers: this.hr });
     }
+
+	listenBanned(){
+		return this.socket.fromEvent<{message: string}>('banned');
+	}
 }
