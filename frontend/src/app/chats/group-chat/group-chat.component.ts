@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
-import { DecodedTokenInterface } from '../../interfaces/token.interface';
+import { DecodedToken } from '../../interfaces/token.interface';
 import { GroupChatService } from '../../services/group-chat.service';
 import { Router } from '@angular/router';
 import { InfoComponent } from '../../pop-up/info/info.component';
@@ -14,7 +14,7 @@ import {
 
 export interface MessageInterface {
     from: {
-        id: number;
+        id: number | string;
         name: string;
     };
     message: string;
@@ -25,11 +25,11 @@ export interface MessageInterface {
     styleUrls: ['./group-chat.component.scss'],
 })
 export class GroupChatComponent implements OnInit, AfterViewInit {
-
+	
     @Input() chatMessagesMaxHeight = 300;
     @Input() roomUUID = '';
     messages: MessageInterface[] = [];
-    user: DecodedTokenInterface | undefined;
+    user: DecodedToken | undefined;
     otherUsersStatus: OtherUsersStatusInterface[] = [];
 
     @ViewChild('chatContainer') chatContainer!: ElementRef;
@@ -79,7 +79,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
             console.log('User not logged in');
             return;
         }
-        if (this.user.chat_restriction) {
+        if (this.user.type==='user' && this.user.chat_restriction) {
             return;
         }
         this.messages.push({ from: { id: this.user!.id, name: this.user!.name }, message: message });
@@ -101,7 +101,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
             this.otherUsersStatus = users;
         });
     }
-    getUser(otherUserID: number) {
+    getUser(otherUserID: number | string) {
         return this.otherUsersStatus.find(user => user.id === otherUserID);
     }
 
@@ -186,7 +186,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
         );
     }
 
-    muteUser(otherUserID: number) {
+    muteUser(otherUserID: number | string) {
         this.groupChat.muteUser(this.roomUUID, otherUserID).subscribe(
             ({ message }) => {
                 this.infoComponent.description = message;
@@ -203,7 +203,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
         );
     }
 
-    unmuteUser(otherUserID: number) {
+    unmuteUser(otherUserID: number | string) {
         this.groupChat.unmuteUser(this.roomUUID, otherUserID).subscribe(
             ({ message }) => {
                 this.infoComponent.description = message;
@@ -221,7 +221,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     get chatRestricted() {
-        return this.user?.chat_restriction;
+        return this.user?.type==='user' && this.user?.chat_restriction;
     }
 
     scrollToBottom(): void {
@@ -233,4 +233,11 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
             console.log(err);
         }
     }
+
+	getType(type: any) {
+		return typeof type;
+	}
+	isNumber(value: any): value is number {
+		return typeof value === 'number';
+	  }
 }

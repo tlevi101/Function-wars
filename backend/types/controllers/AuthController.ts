@@ -22,7 +22,7 @@ export class AuthController {
 		if (name.length > 20 || name.length < 3)
 			return res.status(400).json({ message: 'Name is must be between 3 and 20 characters long' });
 		const token = jsonwebtoken.sign(
-			{ name, guest: true, JWT_createdAt: new Date(), id: uuidv4() },
+			{type:'guest', name, guest: true, JWT_createdAt: new Date(), id: uuidv4() },
 			process.env.JWT_SECRET,
 			{
 				algorithm: process.env.JWT_ALGO,

@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import jwt_decode from 'jwt-decode';
-import {DecodedTokenInterface} from './interfaces/token.interface';
+import {DecodedToken} from './interfaces/token.interface';
 import {NavigatedService} from "./services/navigated.service";
 import {InfoComponent} from "./pop-up/info/info.component";
 import {SocketErrorService} from "./services/socket-error.service";
@@ -18,16 +18,12 @@ export class AppComponent implements OnInit {
     title = 'Function Wars';
     showNewGame = true;
     public authorized = false;
-    user: DecodedTokenInterface | undefined;
+    user: DecodedToken | undefined;
 
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
     constructor(private jwt:JwtService, private authService:AuthService,private router: Router, private activatedRoute: ActivatedRoute, private navigatedService: NavigatedService, private socketErrorService: SocketErrorService, private usersService: UsersService) {
-		this.authService.updateToken();
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        if (token) {
-            this.user = this.jwt.getDecodedAccessToken();
-        }
+		this.user = this.jwt.getDecodedAccessToken();
         this.router.events.subscribe(
             (event) => {
                 if (event instanceof NavigationEnd) {
@@ -42,17 +38,19 @@ export class AppComponent implements OnInit {
                 }
             }
         );
-		
+
 		this.usersService.listenBanned().subscribe(({message}) => {
 			this.jwt.removeToken();
 			this.infoComponent.description = message;
 			this.infoComponent.buttonLink = '/';
 		});
-	
+
     }
 
     async ngOnInit(): Promise<void> {
-		
+		if(this.user && this.user?.type==='user'){
+			await this.authService.updateToken();
+		}
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (token) this.authorized = true;
         else {
@@ -68,7 +66,9 @@ export class AppComponent implements OnInit {
     }
 
     get isAdmin(): boolean | null {
-        if (this.jwt.getDecodedAccessToken()?.is_admin) return true;
+		const decodedToken = this.jwt.getDecodedAccessToken();
+		if(decodedToken?.type==='guest') return false;
+        if (decodedToken?.is_admin) return true;
         return false;
     }
 

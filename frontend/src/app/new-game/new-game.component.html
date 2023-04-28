@@ -5,7 +5,7 @@
     <div class="row mb-3 w-75 mx-auto">
         <a [routerLink]="'/custom-games'" class="mw-100 p-0"><button type="button" class="btn btn-primary w-100" >Join Custom Game</button></a>
     </div>
-    <div class="row w-75 mx-auto" ngbTooltip="{{ canCreateGame ? '' : 'You must create your first field!' }}">
+    <div *ngIf="!isGuest" class="row w-75 mx-auto" ngbTooltip="{{ canCreateGame ? '' : 'You must create your first field!' }}">
         <button
             type="button"
             class="btn btn-primary {{ canCreateGame ? '' : 'disabled' }}"

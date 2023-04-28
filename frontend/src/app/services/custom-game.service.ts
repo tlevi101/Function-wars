@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { JwtService } from './jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Socket } from 'ngx-socket-io';
-import { DecodedTokenInterface } from '../interfaces/token.interface';
+import { DecodedToken } from '../interfaces/token.interface';
 
 export interface WaitRoomResponseInterface {
     roomUUID: string;
     chatUUID: string;
-    owner: DecodedTokenInterface;
-    players: DecodedTokenInterface[];
+    owner: DecodedToken;
+    players: DecodedToken[];
     fieldID: number;
     userCount: number;
     capacity: number;
 }
 export interface CustomGameListItemInterface {
-    owner: DecodedTokenInterface;
+    owner: DecodedToken;
     roomUUID: string;
     userCount: number;
     capacity: number;

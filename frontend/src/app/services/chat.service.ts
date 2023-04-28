@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
-import { DecodedTokenInterface } from '../interfaces/token.interface';
+import { DecodedToken } from '../interfaces/token.interface';
 import jwt_decode from 'jwt-decode';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class ChatService {
     private token: string;
-    private decodedToken: DecodedTokenInterface | undefined;
+    private decodedToken: DecodedToken | undefined;
     private hr: HttpHeaders;
     private url: string;
     constructor(private socket: Socket, private http: HttpClient) {
@@ -35,7 +35,7 @@ export class ChatService {
     public getChatMessages(friend_id: number) {
         return this.http.get(`${this.url}/${friend_id}/chat`, { headers: this.hr });
     }
-    public getDecodedAccessToken(): DecodedTokenInterface | undefined {
+    public getDecodedAccessToken(): DecodedToken | undefined {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
         try {
             return jwt_decode(token);

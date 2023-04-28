@@ -6,7 +6,7 @@ import { FriendsService } from '../services/friends.service';
 import { UsersService } from '../services/users.service';
 import { myAnimations } from './animations';
 import { InfoComponent } from '../pop-up/info/info.component';
-import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {DecodedToken} from "../interfaces/token.interface";
 import {CustomGameService} from "../services/custom-game.service";
 import {Router} from "@angular/router";
 import {JwtService} from "../services/jwt.service";
@@ -47,8 +47,8 @@ export class SideBarComponent {
     selectedFriend: SelectedFriend;
     activeTitle = 'Friends';
     activeFriend: Friend | undefined;
-    invites: Set<{inviter:DecodedTokenInterface, customGameUUID:string}> = new Set()
-    user: DecodedTokenInterface | undefined;
+    invites: Set<{inviter:DecodedToken, customGameUUID:string}> = new Set()
+    user: DecodedToken | undefined;
     constructor(
         private friendsService: FriendsService,
         private usersService: UsersService,
@@ -196,15 +196,19 @@ export class SideBarComponent {
     hasUnreadMessages(): boolean {
         return this.friends.some(f => f.unreadMessages > 0);
     }
-    rejectInvite(invite:{inviter:DecodedTokenInterface, customGameUUID:string}) {
+    rejectInvite(invite:{inviter:DecodedToken, customGameUUID:string}) {
         if(!this.user){
             console.error('User is not defined');
             return;
         }
+		if(typeof invite.inviter.id === 'string' || typeof this.user.id === 'string'){
+			console.error('User id is not a number');
+			return;
+		}
         this.friendsService.inviteRejected({inviterID:invite.inviter.id,invitedID:this.user.id} );
         this.invites.delete(invite);
     }
-    acceptInvite(invite:{inviter:DecodedTokenInterface, customGameUUID:string}) {
+    acceptInvite(invite:{inviter:DecodedToken, customGameUUID:string}) {
         this.customGameService.joinCustomGame(invite.customGameUUID);
         this.invites.delete(invite);
         this.customGameService.customGameJoined().subscribe((res: any) => {
@@ -218,7 +222,7 @@ export class SideBarComponent {
         return this.myFriendsHovered ? 'down' : 'up';
     }
 
-    get Invites():{inviter:DecodedTokenInterface, customGameUUID:string}[] {
+    get Invites():{inviter:DecodedToken, customGameUUID:string}[] {
         return Array.from(this.invites.values());
     }
 }

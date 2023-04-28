@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
 import {InfoComponent} from "../pop-up/info/info.component";
 import {JwtService} from "../services/jwt.service";
-import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {DecodedToken} from "../interfaces/token.interface";
 import {GameService} from "../services/game.service";
 import {WaitListService} from "../services/wait-list.service";
 
@@ -17,7 +17,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
     roomUUID = '';
     chatRoomUUID = '';
     ownerID:number|undefined;
-    user : DecodedTokenInterface | undefined;
+    user : DecodedToken | undefined;
     capacity = 2;
     userCount = 0;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
@@ -80,7 +80,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         const subscription = this.waitRoomService.getWaitingRoom(this.roomUUID).subscribe(
             ({waitRoom}) => {
                 this.chatRoomUUID =  waitRoom.chatUUID;
-                this.ownerID = waitRoom.owner.id;
+                this.ownerID = Number(waitRoom.owner.id); //Only registered users can create a custom game
                 this.capacity = waitRoom.capacity;
                 this.userCount = waitRoom.userCount;
             },

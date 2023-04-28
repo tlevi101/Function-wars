@@ -79,7 +79,8 @@ export class FieldListComponent implements OnInit {
 		this.fieldService.getFields().subscribe(
 			(response: any) => {
 				this.fields = response.fields;
-				if (this.jwtService.getDecodedAccessToken()?.is_admin) {
+				const decodedToken = this.jwtService.getDecodedAccessToken();
+				if (decodedToken?.type === 'user' && decodedToken.is_admin) {
 					adminBaseData.collectionSize = this.fields.length;
 					adminBaseData.data = this.fields;
 					this.baseList.init(adminBaseData);

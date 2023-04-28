@@ -8,7 +8,7 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
+import { DecodedToken } from 'src/app/interfaces/token.interface';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
@@ -24,7 +24,7 @@ export class FriendChatComponent implements AfterContentChecked, AfterContentIni
     @ViewChild('sendInput') sendInput!: ElementRef;
     @Output('chatClosed') chatClosed: EventEmitter<boolean> = new EventEmitter();
     messages: any[] = [];
-    user: DecodedTokenInterface | undefined;
+    user: DecodedToken | undefined;
     constructor(private chatService: ChatService) {
         this.user = chatService.getDecodedAccessToken();
     }

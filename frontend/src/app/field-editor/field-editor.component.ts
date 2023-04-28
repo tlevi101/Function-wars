@@ -37,6 +37,9 @@ export class FieldEditorComponent implements OnInit {
         if (!this.jwt.isTokenValid()) {
             this.router.navigate(['/login']);
         }
+		if(this.jwt.isGuestToken()) {
+            this.router.navigate(['/']);
+		}
         if (this.router.url !== '/field/new') {
             this.activeRoute.paramMap.subscribe(async params => {
                 const id = params.get('id');

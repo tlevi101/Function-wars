@@ -5,7 +5,7 @@
         <div class="d-flex flex-wrap">
             <h5 class="mt-sm-1 me-2">{{ message.from.name }}</h5>
             <div *ngIf="message.from.id !== user?.id" class="d-flex gap-2 mt-1">
-                <i *ngIf="!getUser(message.from.id)?.isFriend" class="fs-5 bi bi-person-fill-add" ngbTooltip="Send friend request!" (click)="addFriend(message.from.id)"></i>
+                <i *ngIf=" isNumber(message.from.id) && !getUser(message.from.id)?.isFriend" class="fs-5 bi bi-person-fill-add" ngbTooltip="Send friend request!" (click)="addFriend(message.from.id)"></i>
                 <i *ngIf="getUser(message.from.id)?.isFriend" class="fs-5 bi bi-person-check-fill" ngbTooltip="You are already friends!"></i>
                 <div *ngIf="!getUser(message.from.id)?.muted" class="slashedChat position-relative" ngbTooltip="Mute" (click)="muteUser(message.from.id)">
                     <i class="fs-6 bi bi-chat position-absolute"></i>
@@ -14,9 +14,9 @@
                     </div>
                 </div>
                 <i *ngIf="getUser(message.from.id)?.muted" class="fs-5 bi bi-chat" ngbTooltip="Unmute" (click)="unmuteUser(message.from.id)"></i>
-                <i class="fs-5 bi bi-megaphone-fill" ngbTooltip="Report" (click)="reportUser(message.from.id)"></i>
-				<i *ngIf="!getUser(message.from.id)?.blocked" (click)="blockUser(message.from.id)" class="me-2 text-danger fs-5 bi bi-person-fill-lock" ngbTooltip="Block user"></i>
-				<i *ngIf="getUser(message.from.id)?.blocked" (click)="unblockUser(message.from.id)" class="me-2 text-success fs-5 bi bi-person-fill-lock" ngbTooltip="Unblock user"></i>
+                <i *ngIf="isNumber(message.from.id)"class="fs-5 bi bi-megaphone-fill" ngbTooltip="Report" (click)="reportUser(message.from.id)"></i>
+				<i *ngIf="isNumber(message.from.id) && !getUser(message.from.id)?.blocked" (click)="blockUser(message.from.id)" class="me-2 text-danger fs-5 bi bi-person-fill-lock" ngbTooltip="Block user"></i>
+				<i *ngIf="isNumber(message.from.id) && getUser(message.from.id)?.blocked" (click)="unblockUser(message.from.id)" class="me-2 text-success fs-5 bi bi-person-fill-lock" ngbTooltip="Unblock user"></i>
                 <!-- <span *ngIf="!getUser(message.from.id)?.blocked" class="fs-6" (click)="blockUser(message.from.id)">Block</span> -->
                 <!-- <span *ngIf="getUser(message.from.id)?.blocked" class="fs-6" (click)="unblockUser(message.from.id)">Unblock</span> -->
             </div>

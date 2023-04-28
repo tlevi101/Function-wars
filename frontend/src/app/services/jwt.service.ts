@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import jwt_decode from 'jwt-decode';
-import { DecodedTokenInterface } from '../interfaces/token.interface';
+import { DecodedToken } from '../interfaces/token.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class JwtService {
     public isTokenValid(): boolean {
         return this.getDecodedAccessToken() !== undefined;
     }
-    public getDecodedAccessToken(): DecodedTokenInterface | undefined {
+    public getDecodedAccessToken(): DecodedToken | undefined {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token') || '';
         try {
             return jwt_decode(token);
@@ -39,5 +39,10 @@ export class JwtService {
 	public removeToken(){
 		localStorage.removeItem('token');
 		sessionStorage.removeItem('token');
+	}
+
+	public isGuestToken(): boolean {
+		const decodedToken = this.getDecodedAccessToken();
+		return decodedToken?.type === 'guest';
 	}
 }

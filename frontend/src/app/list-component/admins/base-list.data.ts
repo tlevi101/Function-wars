@@ -1,6 +1,6 @@
-import { ConfirmWithInputData } from 'src/app/pop-up/confirm-with-input/confirm-with-input.component'; 
+import { ConfirmWithInputData } from 'src/app/pop-up/confirm-with-input/confirm-with-input.component';
 import { Action, BaseData, ConfirmType, DataType } from '../base-list/base-list.component';
-import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
+import { DecodedToken } from 'src/app/interfaces/token.interface';
 
 const header = [
     { label: 'ID', key: 'id', type: DataType.STRING },
@@ -32,7 +32,7 @@ const singularActions: Action[] = [
 		tooltip: 'Remove admin permission',
 		confirmRequired: () => true,
 		confirmType: ConfirmType.DEFAULT,
-		visibleWhen(data, user?:DecodedTokenInterface) {
+		visibleWhen(data, user?:DecodedToken) {
 			return data.role !== 'super_admin' && data.id !== user?.id;
 		},
 		confirmData: {

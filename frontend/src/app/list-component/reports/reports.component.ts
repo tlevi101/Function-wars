@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
+import { DecodedToken } from 'src/app/interfaces/token.interface';
 import { AdminService } from 'src/app/services/admin.service';
 import { BaseListComponent } from '../base-list/base-list.component';
 import jwt_decode from 'jwt-decode';
@@ -145,7 +145,7 @@ export class ReportsComponent implements OnInit {
         );
     }
 
-    getDecodedAccessToken(token: string): DecodedTokenInterface | null {
+    getDecodedAccessToken(token: string): DecodedToken | null {
         try {
             return jwt_decode(token);
         } catch (Error) {

@@ -4,7 +4,7 @@ export interface Point {
 }
 
 export interface PlayerInterface {
-    id: number;
+    id: number | string;
     name: string;
     location: { x: number; y: number };
     dimension: { width: number; height: number };

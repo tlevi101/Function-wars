@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DecodedTokenInterface } from 'src/app/interfaces/token.interface';
+import { DecodedToken } from 'src/app/interfaces/token.interface';
 import { AdminService } from 'src/app/services/admin.service';
 import { Action, BaseListComponent, ConfirmType, DataType, Header } from '../base-list/base-list.component';
-import jwt_decode from 'jwt-decode';
 import { baseData } from './base-list.data';
+import { JwtService } from 'src/app/services/jwt.service';
 
 @Component({
     selector: 'app-users',
@@ -13,23 +13,23 @@ import { baseData } from './base-list.data';
 })
 export class UsersComponent implements OnInit, AfterViewInit {
     users: any[] = [];
+	user: DecodedToken | undefined;
     @ViewChild('baseList') baseList!: BaseListComponent;
-    constructor(private adminService: AdminService, private router: Router) {
+    constructor(private adminService: AdminService, private router: Router, private jwt:JwtService) {
+		this.user = jwt.getDecodedAccessToken();
     }
 
     ngOnInit(): void {
-        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-        const decodedToken: DecodedTokenInterface = jwt_decode(token || '');
-        if (!token) {
+        if (!this.user) {
             this.router.navigate(['/login']);
         }
-        if (!decodedToken.is_admin) {
+        if ((this.user?.type === 'user' && !this.user?.is_admin) || this.user?.type === 'guest') {
             this.router.navigate(['/']);
         }
     }
 
 	ngAfterViewInit(): void {
-        this.sendGetUsersRequest();	
+        this.sendGetUsersRequest();
 	}
 
     handleActionClicked($event: any) {
@@ -140,12 +140,5 @@ export class UsersComponent implements OnInit, AfterViewInit {
                 console.log(err);
             }
         );
-    }
-    getDecodedAccessToken(token: string): DecodedTokenInterface | null {
-        try {
-            return jwt_decode(token);
-        } catch (Error) {
-            return null;
-        }
     }
 }

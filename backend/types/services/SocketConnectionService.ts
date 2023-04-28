@@ -48,7 +48,6 @@ export class SocketConnectionService{
         RuntimeMaps.onlineUsers.delete(socket.decoded.id);
         WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);
-        GroupChatController.leaveGroupChat(socket);
         GameController.leaveGame(socket);
         setTimeout(async ()=>{
             if(await this.userLeftTheGame(socket)){

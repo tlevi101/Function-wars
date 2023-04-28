@@ -45,11 +45,11 @@ export class GroupChatService {
         return this.socket.fromEvent('receive group message');
     }
 
-    public muteUser(roomUUID: string, user_id: number) {
+    public muteUser(roomUUID: string, user_id: number | string) {
         return this.http.post<{ message: string }>(`${this.url}/${roomUUID}/mute/${user_id}`, {}, { headers: this.hr });
     }
 
-    public unmuteUser(roomUUID: string, user_id: number) {
+    public unmuteUser(roomUUID: string, user_id: number | string) {
         return this.http.post<{ message: string }>(
             `${this.url}/${roomUUID}/unmute/${user_id}`,
             {},

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
-import {DecodedTokenInterface} from "../interfaces/token.interface";
+import {DecodedToken} from "../interfaces/token.interface";
 import {Socket} from "ngx-socket-io";
 
 @Injectable({
@@ -50,7 +50,7 @@ export class FriendsService {
         return this.http.post<{ message: string }>(`${this.url}/${friendId}`, {}, { headers: this.hr });
     }
 
-    receiveInvite(): Observable<{inviter:DecodedTokenInterface, customGameUUID:string}> {
+    receiveInvite(): Observable<{inviter:DecodedToken, customGameUUID:string}> {
         return this.socket.fromEvent('receive invite');
     }
 
