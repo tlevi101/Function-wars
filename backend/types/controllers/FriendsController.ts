@@ -12,6 +12,7 @@ export class FriendsController {
      * @param res
      */
     public static async getFriends(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const friends = await FriendsController.getUserFriends(req.user.id);
         return res.status(200).json({ friends: friends });
     }
@@ -23,6 +24,7 @@ export class FriendsController {
      * @param res
      */
     public static async getOnlineFriends(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         let friends = await FriendsController.getUserFriends(req.user.id);
         friends = friends.filter((friend:any) => !!req.onlineUsers.get(friend.id));
         return res.status(200).json({ friends: friends });
@@ -35,6 +37,7 @@ export class FriendsController {
      * @param res
      */
     public static async getFriendRequests(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -54,6 +57,7 @@ export class FriendsController {
      * @param res
      */
     public static async getFriendChat(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
@@ -91,6 +95,7 @@ export class FriendsController {
      * @param res
      */
     public static async acceptFriendRequest(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const { id } = req.params;
         console.log(email);
@@ -123,6 +128,7 @@ export class FriendsController {
      * @param res
      */
     public static async rejectFriendRequest(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
@@ -153,6 +159,7 @@ export class FriendsController {
      * @param res
      */
     public static async deleteFriend(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const userJWT = req.user;
         const user = await User.findOne({ where: { email: userJWT.email } });
         if (!user) {

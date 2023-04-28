@@ -9,7 +9,7 @@ export interface Dimension {
 }
 
 export interface PlayerInterface {
-    id: number;
+    id: number | string;
     name: string;
     location: PointInterface;
     dimension: { width: number; height: number };
@@ -51,7 +51,7 @@ export interface GameInterface {
  * @property name number
  */
 export interface UserInterface {
-    id: number;
+    id: number | string;
     name: string;
 }
 export interface MutesInterface {

@@ -4,12 +4,12 @@ import { Dimension } from './Shape';
 import { PlayerInterface } from './interfaces';
 
 class Player {
-    private id: number;
+    private id: number | string;
     private name: string;
     private object: Ellipse;
     private avoidArea: Circle;
     private online: boolean = true;
-    constructor(location: Point, id: number, name: string) {
+    constructor(location: Point, id: number| string, name: string) {
         this.object = new Ellipse(location, { width: 80, height: 80 });
         this.avoidArea = new Circle(location, 130);
         this.id = id;
@@ -47,7 +47,7 @@ class Player {
     get AvoidArea(): Circle {
         return this.avoidArea;
     }
-    get ID(): number {
+    get ID(): number | string {
         return this.id;
     }
     get Name(): string {

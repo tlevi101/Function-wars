@@ -45,7 +45,7 @@ export class GroupChat {
         RuntimeMaps.groupChats.delete(this.roomUUID);
     }
 
-    async getOtherUsersStatusForUser(userID: number) {
+    async getOtherUsersStatusForUser(userID: number | string) {
         const otherUsersID = new Set<UserInterface>();
         await Promise.all(this.messages.filter(m => m.from.id !== userID).map(m => otherUsersID.add(m.from)));
         await Promise.all(this.users.filter(u => u.id !== userID).map(u => otherUsersID.add(u)));
@@ -64,7 +64,7 @@ export class GroupChat {
         return otherUsersStatus;
     }
 
-    private updatePlayerSocket(userID: number, socket: any) {
+    private updatePlayerSocket(userID: number | string, socket: any) {
         this.sockets = this.sockets.map(s => {
             if (s.decoded.id === userID) {
                 s = socket;
@@ -73,7 +73,7 @@ export class GroupChat {
         });
     }
 
-    public reconnect(userID: number, socket: any) {
+    public reconnect(userID: number | string, socket: any) {
         this.updatePlayerSocket(userID, socket);
         socket.join(this.roomUUID);
     }
@@ -88,17 +88,17 @@ export class GroupChat {
         this.users.push(user);
     }
 
-    public leave(user: UserInterface | number, socket: any) {
+    public leave(user: UserInterface | number | string, socket: any) {
         this.sockets = this.sockets.filter(s => s.id !== socket.id);
         socket.leave(this.roomUUID);
-        if (typeof user === 'number') {
+        if (typeof user === 'number' || typeof user ==='string') {
             this.users = this.users.filter(u => u.id !== user);
             return;
         }
         this.users = this.users.filter(u => u.id !== user.id);
     }
 
-    public muteUser(mutedByID: number, mutedUserID: number) {
+    public muteUser(mutedByID: number | string, mutedUserID: number | string) {
         const mutedBy = this.users.find(u => u.id == mutedByID);
         const mutedUser = this.users.find(u => u.id == mutedUserID);
         if (!mutedBy || !mutedUser) {
@@ -106,34 +106,36 @@ export class GroupChat {
         }
         this.mutes.push({ mutedBy: mutedBy, mutedUser: mutedUser });
     }
-    public unmuteUser(mutedBy: number, mutedUser: number) {
+    public unmuteUser(mutedBy: number | string, mutedUser: number | string) {
         this.mutes = this.mutes.filter(m => m.mutedBy.id !== mutedBy && m.mutedUser.id !== mutedUser);
     }
-    private isMuted(mutedByID: number, mutedUserID: number): boolean {
+    private isMuted(mutedByID: number | string, mutedUserID: number | string): boolean {
         return this.mutes.some(m => m.mutedBy.id === mutedByID && m.mutedUser.id === mutedUserID);
     }
-    private async userBlockedOther(userID: number, otherUserID: number): Promise<boolean> {
+    private async userBlockedOther(userID: number | string, otherUserID: number | string): Promise<boolean | undefined> {
+		if(typeof userID ==='string' || typeof otherUserID ==='string') return undefined
         return (await User.findByPk(userID)).isBlocked(otherUserID);
     }
     public async userCanSendMessage(userID: number): Promise<boolean> {
         return !(await User.findByPk(userID)).chat_restriction;
     }
 
-    public async userWantToReceiveMessagesFrom(userID: number, otherUserID: number): Promise<boolean> {
+    public async userWantToReceiveMessagesFrom(userID: number | string, otherUserID: number | string): Promise<boolean> {
         return !this.isMuted(userID, otherUserID) && !(await this.userBlockedOther(userID, otherUserID));
     }
-    public getMessagesForUser(userID: number): MessageInterface[] {
+    public getMessagesForUser(userID: number | string): MessageInterface[] {
         return this.messages.filter(
-            async m => !this.isMuted(userID, m.from.id) && !(await this.userBlockedOther(userID, m.from.id))
+            async m => await this.userWantToReceiveMessagesFrom(userID, m.from.id)
         );
     }
 
-    private async usersAreFriends(user1ID: number, user2ID: number): Promise<boolean> {
+    private async usersAreFriends(user1ID: number | string, user2ID: number | string): Promise<boolean | undefined> {
+		if(typeof user1ID ==='string' || typeof user2ID ==='string') return undefined;
         const user1 = await User.findByPk(user1ID);
         return await user1.isFriend(user2ID);
     }
 
-    public userIsInChat(userID: number): boolean {
-        return this.users.some(u => u.id == userID);
+    public userIsInChat(userID: number | string): boolean {
+        return this.users.some(u => u.id === userID);
     }
 }

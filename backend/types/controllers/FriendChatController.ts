@@ -13,6 +13,9 @@ export class FriendChatController {
 
 
     public static async sendMessage(socket: socket,message: string, friendID: number) {
+		if(socket.decoded.type === 'guest'){
+			socket.emit('error', 'Guests cannot send messages.');
+		}
         const user = await User.findByPk(socket.decoded.id);
         let chat = await user.getChat(friendID);
         if (!chat) {
@@ -39,6 +42,9 @@ export class FriendChatController {
     }
 
     public static async setSeen(socket: socket, friendID: number) {
+		if(socket.decoded.type === 'guest'){
+			socket.emit('error', 'Guests cannot send messages.');
+		}
         const user = await User.findByPk(socket.decoded.id);
         const chat = await user.getChat(friendID);
         if (!chat) {

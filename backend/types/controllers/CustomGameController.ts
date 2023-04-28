@@ -166,7 +166,8 @@ export class CustomGameController {
     }
 
     public static async getWaitingRoomByOwner(user: DecodedToken) {
-        return await CustomGameController.findWaitingRoom(room => room.isOwner(user.id));
+	if(user.type==='guest') return;
+		return await CustomGameController.findWaitingRoom(room => room.isOwner(user.id));
     }
 
 

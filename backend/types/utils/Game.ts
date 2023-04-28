@@ -1,5 +1,5 @@
 import FuncCalculator = require('./FuncCalculator');
-import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface } from './interfaces';
+import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface, UserInterface } from './interfaces';
 import Player = require('./Player');
 import { Ellipse, Rectangle, Point } from './Shape';
 import {socket} from "../controllers/Interfaces";
@@ -22,7 +22,6 @@ export class Game {
         sockets: any[],
         currentPlayer?: PlayerInterface
     ) {
-        //TODO sockets are not part of frontend, there is nothing to do with this on backend
         this.players = players.map(
             player => new Player(new Point(player.location.x, player.location.y), player.id, player.name)
         );
@@ -167,10 +166,9 @@ export class Game {
 
     public static async makeGameFromField(
         field: FieldInterface,
-        players: { id: number; name: string }[],
+        players: UserInterface[],
         sockets: any[]
     ): Promise<Game> {
-        //TODO sockets are not part of frontend, there is nothing to do with this on backend
         const playerInterfaces: PlayerInterface[] = await Promise.all(
             players.map((player, index) => {
                 const playerInterface: PlayerInterface = {
@@ -270,7 +268,6 @@ export class Game {
         return this.field;
     }
     get Sockets(): any[] {
-        //TODO sockets are not part of frontend, there is nothing to do with this on backend
         return this.sockets;
     }
     get UUID(): string {

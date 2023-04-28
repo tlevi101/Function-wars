@@ -38,7 +38,7 @@ export class WaitingRoom{
     }
 
 
-    public leave(playerID:number) {
+    public leave(playerID:number | string) {
         this.players = this.players.filter(p => p.id !== playerID);
         this.sockets = this.sockets.filter(s => {
             if(s.decoded.id !== playerID){
@@ -62,7 +62,7 @@ export class WaitingRoom{
             } as UserInterface;
         });
     }
-    public userIsInRoom(playerID: number) {
+    public userIsInRoom(playerID: number | string) {
         return this.players.some(p => p.id === playerID);
     }
     public isFull() {

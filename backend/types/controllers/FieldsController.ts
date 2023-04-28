@@ -10,6 +10,7 @@ export class FieldsController {
      * @param res
      */
     public static async getFields(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -44,6 +45,7 @@ export class FieldsController {
      * @param res
      */
     public static async getField(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -67,11 +69,6 @@ export class FieldsController {
      * @param res
      */
     public static async showFieldForAnyone(req: MyRequest, res: MyResponse) {
-        const { email } = req.user;
-        const user = await User.findOne({ where: { email: email } });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
         const { id } = req.params;
         const field = await Field.findOne({ where: { id: id } });
         if (!field) {
@@ -87,6 +84,7 @@ export class FieldsController {
      * @param res
      */
     public static async createField(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -112,6 +110,7 @@ export class FieldsController {
      * @param res
      */
     public static async updateField(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -140,6 +139,7 @@ export class FieldsController {
      * @param res
      */
     public static async deleteField(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
@@ -169,6 +169,7 @@ export class FieldsController {
      * @private
      */
     public static async restoreField(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {

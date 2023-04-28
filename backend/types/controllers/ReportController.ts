@@ -13,6 +13,7 @@ export class ReportController{
 	 * @returns 
 	 */
 	public static async getReports(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
 		if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin.' });
 		const reports = await Report.findAll({
 			attributes: { exclude: ['reported_by', 'reported'] },
@@ -47,6 +48,7 @@ export class ReportController{
 	 * @returns 
 	 */
 	public static async deleteReport(req: MyRequest, res: MyResponse) {
+		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
 		if (!req.user.is_admin)
 		 	return res.status(403).json({ message: 'You are not an admin.' });
 		const report = await Report.findByPk(req.params.id);

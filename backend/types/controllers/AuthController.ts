@@ -1,4 +1,4 @@
-import { MyRequest, MyResponse } from "./Interfaces";
+import { MyRequest, MyResponse, DecodedUser, GuestUser } from "./Interfaces";
 const { v4: uuidv4 } = require('uuid');
 const jsonwebtoken = require('jsonwebtoken');
 const { User, PasswordReset } = require('../../models');
@@ -22,7 +22,7 @@ export class AuthController {
 		if (name.length > 20 || name.length < 3)
 			return res.status(400).json({ message: 'Name is must be between 3 and 20 characters long' });
 		const token = jsonwebtoken.sign(
-			{ name, guest: true, JWT_createdAt: new Date(), uuid: uuidv4() },
+			{ name, guest: true, JWT_createdAt: new Date(), id: uuidv4() },
 			process.env.JWT_SECRET,
 			{
 				algorithm: process.env.JWT_ALGO,
@@ -168,6 +168,9 @@ export class AuthController {
 	 */
 	public static async updateToken(req: MyRequest, res: MyResponse) {
 		const decoded = req.user;
+		if(decoded.type==='guest'){
+			return res.status(403).send({ message: 'Guest cannot make this request!'});
+		}
 		const user = await User.findByPk(decoded.id);
 		if (!user) {
 			return res.status(404).send({ message: 'User not found' });
