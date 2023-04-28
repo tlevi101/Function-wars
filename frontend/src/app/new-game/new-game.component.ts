@@ -54,6 +54,7 @@ export class NewGameComponent implements OnInit {
 
     cancelWaiting() {
         this.showWaiting = false;
+        this.waitListService.leaveWaitList();
     }
 
 	get isGuest(): boolean {
