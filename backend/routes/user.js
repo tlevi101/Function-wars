@@ -3,7 +3,7 @@ const router = express.Router();
 const { User, Friendship, Report, Chat } = require('../models');
 const auth = require('../middlewares/auth');
 const { Op } = require('sequelize');
-const {FriendsController} = require("../types/controllers/FriendsController");
+const { FriendsController } = require('../types/controllers/FriendsController');
 
 router.get('/friends', auth, FriendsController.getFriends);
 

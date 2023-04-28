@@ -1,10 +1,10 @@
-import {DecodedToken, socket} from "../controllers/Interfaces";
-import {UserInterface} from "./interfaces";
-import {RuntimeMaps} from "../RuntimeMaps";
+import { DecodedToken, socket } from '../controllers/Interfaces';
+import { UserInterface } from './interfaces';
+import { RuntimeMaps } from '../RuntimeMaps';
 const { faker } = require('@faker-js/faker');
-const {Field} = require("../../models");
+const { Field } = require('../../models');
 
-export class WaitingRoom{
+export class WaitingRoom {
     private fieldID: number;
     private players: DecodedToken[] = [];
     private owner: DecodedToken;
@@ -12,17 +12,19 @@ export class WaitingRoom{
     private roomUUID: string = '';
     private capacity: number = 4;
     private privateRoom: boolean = false;
-    constructor(owner:DecodedToken,fieldID: number, socket: socket, privateRoom: boolean = false) {
+    constructor(owner: DecodedToken, fieldID: number, socket: socket, privateRoom: boolean = false) {
         this.fieldID = fieldID;
         this.sockets.push(socket);
         this.players.push(owner);
         this.owner = owner;
-        this.roomUUID = `wait-room-${fieldID}-${this.players.map(p => p.id).join('-')}-${faker.random.alpha({count: 5} )}`;
+        this.roomUUID = `wait-room-${fieldID}-${this.players.map(p => p.id).join('-')}-${faker.random.alpha({
+            count: 5,
+        })}`;
         socket.join(this.roomUUID);
         (async () => {
             console.log(fieldID);
             const field = await Field.findByPk(fieldID);
-            this.capacity = field.field.players.length
+            this.capacity = field.field.players.length;
         })();
         this.privateRoom = privateRoom;
     }
@@ -37,19 +39,18 @@ export class WaitingRoom{
         console.log(Array.from(RuntimeMaps.waitingRooms.keys()));
     }
 
-
-    public leave(playerID:number | string) {
+    public leave(playerID: number | string) {
         this.players = this.players.filter(p => p.id !== playerID);
         this.sockets = this.sockets.filter(s => {
-            if(s.decoded.id !== playerID){
+            if (s.decoded.id !== playerID) {
                 return true;
             }
             s.leave(this.roomUUID);
             return false;
         });
     }
-    public join(player:DecodedToken, socket: socket) {
-        if(this.players.some(p => p.id === player.id)) return;
+    public join(player: DecodedToken, socket: socket) {
+        if (this.players.some(p => p.id === player.id)) return;
         this.players.push(player);
         this.sockets.push(socket);
     }
@@ -58,7 +59,7 @@ export class WaitingRoom{
         return this.players.map(p => {
             return {
                 id: p.id,
-                name: p.name
+                name: p.name,
             } as UserInterface;
         });
     }
@@ -72,7 +73,7 @@ export class WaitingRoom{
     public isOwner(playerID: number) {
         return this.owner.id === playerID;
     }
-    toFrontend(){
+    toFrontend() {
         return {
             roomUUID: this.roomUUID,
             chatUUID: this.ChatUUID,
@@ -82,7 +83,6 @@ export class WaitingRoom{
             userCount: this.players.length,
             capacity: this.capacity,
         };
-
     }
     public static toFrontendAll(room: WaitingRoom[]) {
         return room.map(r => {
@@ -97,15 +97,16 @@ export class WaitingRoom{
     }
 
     public userIsNotInvited(playerID: number) {
-        return !Array.from(RuntimeMaps.invites.values()).some(invite => invite.inviterID === this.owner.id && invite.invitedID === playerID);
+        return !Array.from(RuntimeMaps.invites.values()).some(
+            invite => invite.inviterID === this.owner.id && invite.invitedID === playerID
+        );
     }
-
 
     public static publicRoomsFree(rooms: WaitingRoom[]) {
         return rooms.filter(r => r.isPublic && !r.isFull());
     }
 
-    get ownerIsOnline(){
+    get ownerIsOnline() {
         return this.players.some(p => p.id === this.owner.id);
     }
     get isPrivate(): boolean {

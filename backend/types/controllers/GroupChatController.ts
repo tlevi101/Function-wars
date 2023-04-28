@@ -1,11 +1,10 @@
-import {UserInterface} from "../utils/interfaces";
-import {MyRequest, MyResponse, socket} from "./Interfaces";
+import { UserInterface } from '../utils/interfaces';
+import { MyRequest, MyResponse, socket } from './Interfaces';
 const chalk = require('chalk');
-import {RuntimeMaps} from "../RuntimeMaps";
-import {GroupChat} from "../utils/GroupChat";
+import { RuntimeMaps } from '../RuntimeMaps';
+import { GroupChat } from '../utils/GroupChat';
 
-
-export class GroupChatController{
+export class GroupChatController {
     //*****************//
     //Route controllers//
     //*****************//
@@ -16,8 +15,8 @@ export class GroupChatController{
      * @param req
      * @param res
      */
-    public static async muteUser(req: MyRequest, res: MyResponse){
-        const {roomUUID, userID} = req.params;
+    public static async muteUser(req: MyRequest, res: MyResponse) {
+        const { roomUUID, userID } = req.params;
         const { user } = req;
         const groupChat = RuntimeMaps.groupChats.get(roomUUID);
         if (!groupChat) {
@@ -26,7 +25,7 @@ export class GroupChatController{
         if (!groupChat.userIsInChat(user.id)) {
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
-        if(Number.isNaN(parseInt(userID))){
+        if (Number.isNaN(parseInt(userID))) {
             return res.status(400).json({ message: 'Invalid user ID.' });
         }
         if (!groupChat.userIsInChat(parseInt(userID))) {
@@ -34,8 +33,7 @@ export class GroupChatController{
         }
         try {
             groupChat.muteUser(user.id, parseInt(userID));
-
-        }catch (e:any) {
+        } catch (e: any) {
             return res.status(400).json({ message: e.message });
         }
         return res.status(200).json({ message: 'User muted.' });
@@ -47,7 +45,7 @@ export class GroupChatController{
      * @param req
      * @param res
      */
-    public static async unmuteUser(req: MyRequest, res: MyResponse){
+    public static async unmuteUser(req: MyRequest, res: MyResponse) {
         const { roomUUID, userID } = req.params;
         const { user } = req;
         const groupChat = RuntimeMaps.groupChats.get(roomUUID);
@@ -62,7 +60,7 @@ export class GroupChatController{
         }
         try {
             groupChat.unmuteUser(user.id, parseInt(userID));
-        } catch (e:any) {
+        } catch (e: any) {
             return res.status(400).json({ message: e.message });
         }
         return res.status(200).json({ message: 'User unmuted.' });
@@ -72,7 +70,7 @@ export class GroupChatController{
      * @method GET
      * @route /group-chats/:roomUUID/messages
      */
-    public static async getMessages(req: MyRequest, res: MyResponse){
+    public static async getMessages(req: MyRequest, res: MyResponse) {
         const { roomUUID } = req.params;
         const { user } = req;
         const groupChat = req.groupChats.get(roomUUID);
@@ -90,7 +88,7 @@ export class GroupChatController{
      * @method GET
      * @route /group-chats/:roomUUID/users-status
      */
-    public static async getUsersStatus(req: MyRequest, res: MyResponse){
+    public static async getUsersStatus(req: MyRequest, res: MyResponse) {
         const { roomUUID } = req.params;
         const { user } = req;
         const groupChat = RuntimeMaps.groupChats.get(roomUUID);
@@ -104,7 +102,6 @@ export class GroupChatController{
         return res.status(200).json({ users: await groupChat.getOtherUsersStatusForUser(user.id) });
     }
 
-
     //******************//
     //Socket controllers//
     //******************//
@@ -115,7 +112,7 @@ export class GroupChatController{
      * @param users
      * @param roomUUID
      */
-    public static async createGroupChat(sockets: socket[], users: UserInterface[], roomUUID: string){
+    public static async createGroupChat(sockets: socket[], users: UserInterface[], roomUUID: string) {
         console.log(chalk.green('group chat created, uuid: chat-' + roomUUID));
         RuntimeMaps.groupChats.set('chat-' + roomUUID, new GroupChat('chat-' + roomUUID, users, sockets));
         sockets.forEach(s => {
@@ -123,44 +120,44 @@ export class GroupChatController{
         });
     }
 
-    public static async leaveGroupChat(socket: socket){
+    public static async leaveGroupChat(socket: socket) {
         const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
-        if(groupChat){
+        if (groupChat) {
             groupChat.leave(socket.decoded.id, socket);
-            if(groupChat.Users.length === 0){
+            if (groupChat.Users.length === 0) {
             }
         }
     }
 
-    public static async deleteGroupChat(socket:socket){
+    public static async deleteGroupChat(socket: socket) {
         const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
-        if(!groupChat){
+        if (!groupChat) {
             console.error('groupChat not found');
             return;
         }
         groupChat.destroy();
     }
-    public static async deleteGroupChatByUUID(uuid:string){
+    public static async deleteGroupChatByUUID(uuid: string) {
         const groupChat = RuntimeMaps.groupChats.get(uuid);
-        if(!groupChat){
+        if (!groupChat) {
             console.error('groupChat not found');
             return;
         }
         groupChat.destroy();
     }
 
-    public static async deleteGameGroupChat(gameChatUUID: string){
+    public static async deleteGameGroupChat(gameChatUUID: string) {
         const groupChat = RuntimeMaps.groupChats.get(gameChatUUID);
-        if(groupChat){
+        if (groupChat) {
             groupChat.destroy();
         }
     }
 
-    public static async joinGroupChat(socket: socket, roomUUID: string){
+    public static async joinGroupChat(socket: socket, roomUUID: string) {
         console.log(`User (${socket.decoded.name}) joined group chat ${roomUUID}`);
         const groupChat = RuntimeMaps.groupChats.get(roomUUID);
-        if(!groupChat){
-            console.error('Chat not found')
+        if (!groupChat) {
+            console.error('Chat not found');
             console.log(RuntimeMaps.groupChats.keys());
             return;
         }
@@ -169,20 +166,20 @@ export class GroupChatController{
         socket.to(roomUUID).emit('new user joined group chat');
     }
 
-    public static async sendMessage(socket: socket, message: string){
+    public static async sendMessage(socket: socket, message: string) {
         const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
         if (!groupChat) {
             console.debug('chat not found');
             return;
         }
-        if(!await groupChat.userCanSendMessage(socket.decoded.id)){
+        if (!(await groupChat.userCanSendMessage(socket.decoded.id))) {
             console.debug('user cannot send message');
             return;
         }
-        groupChat.sendMessage({from:{id: socket.decoded.id, name: socket.decoded.name}, message: message});
+        groupChat.sendMessage({ from: { id: socket.decoded.id, name: socket.decoded.name }, message: message });
     }
 
-    public static async getGroupChatByUser(userID:number) {
+    public static async getGroupChatByUser(userID: number) {
         for await (const groupChat of RuntimeMaps.groupChats.values()) {
             if (groupChat.Users.find(user => user.id === userID)) {
                 return groupChat;
@@ -190,6 +187,4 @@ export class GroupChatController{
         }
         return null;
     }
-
-
 }

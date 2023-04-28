@@ -1,5 +1,5 @@
 import { MessageInterface, MutesInterface, UserInterface } from './interfaces';
-import {RuntimeMaps} from "../RuntimeMaps";
+import { RuntimeMaps } from '../RuntimeMaps';
 const { User } = require('../../models');
 
 export class GroupChat {
@@ -30,10 +30,11 @@ export class GroupChat {
     public sendMessage(message: MessageInterface) {
         this.messages.push(message);
         this.sockets.forEach(async s => {
-            if(s.decoded.id !== message.from.id && await this.userWantToReceiveMessagesFrom(s.decoded.id, message.from.id) ){
-                s.emit('receive group message',
-                    message
-                );
+            if (
+                s.decoded.id !== message.from.id &&
+                (await this.userWantToReceiveMessagesFrom(s.decoded.id, message.from.id))
+            ) {
+                s.emit('receive group message', message);
             }
         });
     }
@@ -79,7 +80,7 @@ export class GroupChat {
     }
 
     public join(user: UserInterface, socket: any) {
-        if(this.users.find(u => u.id === user.id)){
+        if (this.users.find(u => u.id === user.id)) {
             this.updatePlayerSocket(user.id, socket);
             return;
         }
@@ -91,7 +92,7 @@ export class GroupChat {
     public leave(user: UserInterface | number | string, socket: any) {
         this.sockets = this.sockets.filter(s => s.id !== socket.id);
         socket.leave(this.roomUUID);
-        if (typeof user === 'number' || typeof user ==='string') {
+        if (typeof user === 'number' || typeof user === 'string') {
             this.users = this.users.filter(u => u.id !== user);
             return;
         }
@@ -112,25 +113,29 @@ export class GroupChat {
     private isMuted(mutedByID: number | string, mutedUserID: number | string): boolean {
         return this.mutes.some(m => m.mutedBy.id === mutedByID && m.mutedUser.id === mutedUserID);
     }
-    private async userBlockedOther(userID: number | string, otherUserID: number | string): Promise<boolean | undefined> {
-		if(typeof userID ==='string' || typeof otherUserID ==='string') return undefined
+    private async userBlockedOther(
+        userID: number | string,
+        otherUserID: number | string
+    ): Promise<boolean | undefined> {
+        if (typeof userID === 'string' || typeof otherUserID === 'string') return undefined;
         return (await User.findByPk(userID)).isBlocked(otherUserID);
     }
     public async userCanSendMessage(userID: number): Promise<boolean> {
         return !(await User.findByPk(userID)).chat_restriction;
     }
 
-    public async userWantToReceiveMessagesFrom(userID: number | string, otherUserID: number | string): Promise<boolean> {
+    public async userWantToReceiveMessagesFrom(
+        userID: number | string,
+        otherUserID: number | string
+    ): Promise<boolean> {
         return !this.isMuted(userID, otherUserID) && !(await this.userBlockedOther(userID, otherUserID));
     }
     public getMessagesForUser(userID: number | string): MessageInterface[] {
-        return this.messages.filter(
-            async m => await this.userWantToReceiveMessagesFrom(userID, m.from.id)
-        );
+        return this.messages.filter(async m => await this.userWantToReceiveMessagesFrom(userID, m.from.id));
     }
 
     private async usersAreFriends(user1ID: number | string, user2ID: number | string): Promise<boolean | undefined> {
-		if(typeof user1ID ==='string' || typeof user2ID ==='string') return undefined;
+        if (typeof user1ID === 'string' || typeof user2ID === 'string') return undefined;
         const user1 = await User.findByPk(user1ID);
         return await user1.isFriend(user2ID);
     }

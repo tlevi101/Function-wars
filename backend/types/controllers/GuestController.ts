@@ -1,4 +1,1 @@
-export class GuestController{
-
-	
-}
+export class GuestController {}

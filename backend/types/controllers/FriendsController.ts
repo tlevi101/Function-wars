@@ -1,10 +1,8 @@
-import {MyRequest, MyResponse} from "./Interfaces";
-import {Op} from "sequelize";
-const {User, Chat, Friendship} = require("../../models");
-
+import { MyRequest, MyResponse } from './Interfaces';
+import { Op } from 'sequelize';
+const { User, Chat, Friendship } = require('../../models');
 
 export class FriendsController {
-
     /**
      * @method get
      * @route '/friends'
@@ -12,7 +10,7 @@ export class FriendsController {
      * @param res
      */
     public static async getFriends(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const friends = await FriendsController.getUserFriends(req.user.id);
         return res.status(200).json({ friends: friends });
     }
@@ -24,9 +22,9 @@ export class FriendsController {
      * @param res
      */
     public static async getOnlineFriends(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         let friends = await FriendsController.getUserFriends(req.user.id);
-        friends = friends.filter((friend:any) => !!req.onlineUsers.get(friend.id));
+        friends = friends.filter((friend: any) => !!req.onlineUsers.get(friend.id));
         return res.status(200).json({ friends: friends });
     }
 
@@ -37,14 +35,14 @@ export class FriendsController {
      * @param res
      */
     public static async getFriendRequests(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
         let requests = await user.getFriendRequests();
-        requests = requests.map((request:any) => {
+        requests = requests.map((request: any) => {
             return { id: request.id, from: { id: request.from.id, name: request.from.name } };
         });
         return res.status(200).json({ requests: requests });
@@ -57,7 +55,7 @@ export class FriendsController {
      * @param res
      */
     public static async getFriendChat(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
@@ -82,7 +80,7 @@ export class FriendsController {
         }
         let chat = await user.getChat(friend.id);
         if (!chat) {
-            let messages:any[] = [];
+            let messages: any[] = [];
             chat = await Chat.create({ friendship_id: friendship.id, messages: messages });
         }
         return res.status(200).json({ chat: chat });
@@ -95,7 +93,7 @@ export class FriendsController {
      * @param res
      */
     public static async acceptFriendRequest(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
         const { id } = req.params;
         console.log(email);
@@ -128,7 +126,7 @@ export class FriendsController {
      * @param res
      */
     public static async rejectFriendRequest(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
@@ -159,7 +157,7 @@ export class FriendsController {
      * @param res
      */
     public static async deleteFriend(req: MyRequest, res: MyResponse) {
-		if(req.user.type==='guest') return res.status(403).json({message:'Guest cannot make this request!'});
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const userJWT = req.user;
         const user = await User.findOne({ where: { email: userJWT.email } });
         if (!user) {
@@ -233,24 +231,22 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friendship request sent.' });
     }
 
-
-
-    private static async getUserFriends(userID:number){
+    private static async getUserFriends(userID: number) {
         const user = await User.findByPk(userID);
         let friends = await user.getFriends();
         friends = await Promise.all(
-            friends.map(async (friend:any) => {
+            friends.map(async (friend: any) => {
                 const chat = await friend.getChat(user.id);
                 let unreadMessages = 0;
                 if (chat) {
                     unreadMessages = chat.messages.filter(
-                        (message:any) => message.seen === false && message.from != user.id
+                        (message: any) => message.seen === false && message.from != user.id
                     ).length;
                 }
                 return { name: friend.name, id: friend.id, unreadMessages: unreadMessages };
             })
         );
-        return friends.sort((a:any, b:any) => {
+        return friends.sort((a: any, b: any) => {
             if (a.unreadMessages > b.unreadMessages) {
                 return -1;
             }

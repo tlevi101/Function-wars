@@ -1,9 +1,16 @@
 import FuncCalculator = require('./FuncCalculator');
-import { FieldInterface, GameInterface, ObjectInterface, PlayerInterface, PointInterface, UserInterface } from './interfaces';
+import {
+    FieldInterface,
+    GameInterface,
+    ObjectInterface,
+    PlayerInterface,
+    PointInterface,
+    UserInterface,
+} from './interfaces';
 import Player = require('./Player');
 import { Ellipse, Rectangle, Point } from './Shape';
-import {socket} from "../controllers/Interfaces";
-import {RuntimeMaps} from "../RuntimeMaps";
+import { socket } from '../controllers/Interfaces';
+import { RuntimeMaps } from '../RuntimeMaps';
 const MyLogger = require('../../logs/logger.js');
 
 export class Game {
@@ -50,8 +57,6 @@ export class Game {
                 : this.players[0];
         this.sockets = sockets;
     }
-
-
 
     public changeCurrentPlayer(): void {
         const currentPlayerIndex = this.players.findIndex(player => player.ID === this.currentPlayer.ID);
@@ -197,15 +202,15 @@ export class Game {
         return this.gameOver;
     }
 
-	public userBanned(playerID: number): void {
-		this.sockets.forEach(socket => {
-			if(socket.decoded.id === playerID) return;
-			socket.emit('user banned', {message:`${this.getPlayer(playerID)?.Name} banned, game is over!`})
-		});
-		this.destroy();
-	}
+    public userBanned(playerID: number): void {
+        this.sockets.forEach(socket => {
+            if (socket.decoded.id === playerID) return;
+            socket.emit('user banned', { message: `${this.getPlayer(playerID)?.Name} banned, game is over!` });
+        });
+        this.destroy();
+    }
 
-    public destroy(){
+    public destroy() {
         this.sockets.forEach(socket => socket.leave(this.uuid));
         RuntimeMaps.games.delete(this.uuid);
     }
@@ -222,7 +227,7 @@ export class Game {
         });
     }
 
-    public playerReconnect(playerID: number, socket:socket): void {
+    public playerReconnect(playerID: number, socket: socket): void {
         this.players = this.players.map(player => {
             if (player.ID === playerID) {
                 player.reconnect();
@@ -250,9 +255,9 @@ export class Game {
         return player.Online;
     }
 
-	private getPlayer(playerID: number): Player | undefined {
-		return this.players.find(player => player.ID === playerID);
-	}
+    private getPlayer(playerID: number): Player | undefined {
+        return this.players.find(player => player.ID === playerID);
+    }
 
     get CurrentPlayer(): Player {
         return this.currentPlayer;
@@ -275,7 +280,7 @@ export class Game {
     }
 
     get ChatUUID(): string {
-        return 'chat-'+this.uuid;
+        return 'chat-' + this.uuid;
     }
 
     get GameOver(): boolean {

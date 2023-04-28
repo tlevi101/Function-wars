@@ -16,14 +16,14 @@ const setHandledTrue = async user_id => {
     }
 };
 
-router.put('/:id/ban', auth, );
+router.put('/:id/ban', auth);
 
-router.put('/:id/unban', auth );
+router.put('/:id/unban', auth);
 
-router.put('/make-admin/userID', auth, );
+router.put('/make-admin/userID', auth);
 
-router.put('/remove-admin/userID', auth, );
+router.put('/remove-admin/userID', auth);
 
-router.put('/:id/add-remove-chat-restriction', auth, );
+router.put('/:id/add-remove-chat-restriction', auth);
 
 module.exports = router;

@@ -3,11 +3,11 @@ const { Op } = require('sequelize');
 const express = require('express');
 const auth = require('../middlewares/auth');
 const chalk = require('chalk');
-const {RuntimeMaps} = require("../types/RuntimeMaps");
-import GroupChat  from "../types/utils/GroupChat";
+const { RuntimeMaps } = require('../types/RuntimeMaps');
+import GroupChat from '../types/utils/GroupChat';
 const groupChatRouter = express.Router();
 
-const leaveGroupChat = async (socket) => {
+const leaveGroupChat = async socket => {
     let groupChat = null;
     let groupChatUUID = null;
     for await (const _groupChat of RuntimeMaps.groupChats) {
@@ -26,7 +26,7 @@ const leaveGroupChat = async (socket) => {
     socket.leave(groupChatUUID);
 };
 
-const deleteGameGroupChat = async (groupChatUUID) => {
+const deleteGameGroupChat = async groupChatUUID => {
     const groupChat = RuntimeMaps.groupChats.get(groupChatUUID);
     if (!groupChat) {
         return;
@@ -35,7 +35,7 @@ const deleteGameGroupChat = async (groupChatUUID) => {
     RuntimeMaps.groupChats.delete(groupChatUUID);
 };
 
-const deleteGameGroupChatByUserID = async (userID) => {
+const deleteGameGroupChatByUserID = async userID => {
     const groupChat = await getCroupChat(userID, RuntimeMaps.groupChats);
     if (!groupChat) {
         return;
@@ -53,7 +53,7 @@ const joinGroupChat = async (socket, groupChatUUID) => {
     socket.join(groupChatUUID);
 };
 
-const reconnectToGroupChat = async (socket) => {
+const reconnectToGroupChat = async socket => {
     const groupChat = await getCroupChat(socket.decoded.id, RuntimeMaps.groupChats);
     if (!groupChat) {
         console.debug('chat not found');
@@ -63,7 +63,7 @@ const reconnectToGroupChat = async (socket) => {
     groupChat.reconnect(socket.decoded.id, socket);
 };
 
-const getCroupChat = async (userID) => {
+const getCroupChat = async userID => {
     for await (const groupChat of RuntimeMaps.groupChats.values()) {
         if (groupChat.Users.find(user => user.id === userID)) {
             return groupChat;
@@ -75,7 +75,6 @@ const sendGroupMessage = async (socket, message) => {
     const groupChat = await findUserInGroupChats(socket.decoded.id);
     if (!groupChat) {
         return;
-
     }
     if (!(await groupChat.userCanSendMessage(socket.decoded.id))) {
         return;
@@ -170,7 +169,7 @@ groupChatRouter.get('/:roomUUID/users-status', auth, async (req, res) => {
     return res.status(200).json({ users: await groupChat.getOtherUsersStatusForUser(user.id) });
 });
 
-const findUserInGroupChats = async (userID) => {
+const findUserInGroupChats = async userID => {
     for await (const [key, groupChat] of RuntimeMaps.groupChats) {
         if (groupChat.users.find(user => user.id === userID)) {
             return groupChat;

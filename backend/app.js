@@ -12,12 +12,12 @@ const http = require('http').createServer();
 const jwt = require('jsonwebtoken');
 const MyLogger = require('./logs/logger');
 const chalk = require('chalk');
-const {CustomGameController} = require("./types/controllers/CustomGameController");
-const {RuntimeMaps} = require("./types/RuntimeMaps");
-const {GroupChatController} = require("./types/controllers/GroupChatController");
-const {SocketConnectionService} = require("./types/services/SocketConnectionService");
-const {FriendChatController} = require("./types/controllers/FriendChatController");
-const {WaitListController} = require("./types/controllers/WaitListController");
+const { CustomGameController } = require('./types/controllers/CustomGameController');
+const { RuntimeMaps } = require('./types/RuntimeMaps');
+const { GroupChatController } = require('./types/controllers/GroupChatController');
+const { SocketConnectionService } = require('./types/services/SocketConnectionService');
+const { FriendChatController } = require('./types/controllers/FriendChatController');
+const { WaitListController } = require('./types/controllers/WaitListController');
 //Socket
 
 const io = require('socket.io')(http, {
@@ -43,17 +43,17 @@ io.use(function (socket, next) {
     .on('connection', async socket => {
         SocketConnectionService.userConnected(socket);
 
-        socket.on('route change', async ({url}) => {
+        socket.on('route change', async ({ url }) => {
             SocketConnectionService.userNavigated(socket, url);
         });
         socket.on('create custom game', async ({ fieldID, isPrivate, friendIDs }) => {
             await CustomGameController.createCustomGame(socket, fieldID, isPrivate, friendIDs);
-        })
+        });
 
         socket.on('join custom game', async ({ roomUUID }) => {
             console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
             await CustomGameController.joinWaitingRoom(socket, roomUUID);
-            await GroupChatController.joinGroupChat(socket, 'chat-'+roomUUID);
+            await GroupChatController.joinGroupChat(socket, 'chat-' + roomUUID);
         });
 
         socket.on('start custom game', async () => {
@@ -112,7 +112,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-
 // parse requests of content-type - application/json
 app.use(express.json());
 app.use(cors());
@@ -125,7 +124,6 @@ app.use('/group-chats', require('./routes/groupChats'));
 app.use('/admin/', require('./routes/admin'));
 app.use('/', require('./routes/user'));
 app.use('/games', require('./routes/games'));
-
 
 app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });

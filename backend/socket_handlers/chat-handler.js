@@ -1,6 +1,6 @@
 const { Friendship, User, Chat } = require('../models');
 const { Op } = require('sequelize');
-const {RuntimeMaps} = require("../types/RuntimeMaps");
+const { RuntimeMaps } = require('../types/RuntimeMaps');
 
 const sendChatMessage = async (socket, message, friend_id) => {
     const user = await User.findByPk(RuntimeMaps.onlineUsers.get(socket.decoded.id).user.id);
@@ -43,4 +43,3 @@ const setSeen = async (socket, friend_id) => {
     });
     await Chat.update({ messages: chat.messages }, { where: { id: chat.id } });
 };
-

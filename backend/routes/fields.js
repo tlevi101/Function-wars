@@ -4,7 +4,7 @@ const { User, Field } = require('../models');
 const auth = require('../middlewares/auth');
 const Joi = require('joi');
 const { Op } = require('sequelize');
-const {FieldsController} = require("../types/controllers/FieldsController");
+const { FieldsController } = require('../types/controllers/FieldsController');
 
 router.get('/fields', auth, FieldsController.getFields);
 

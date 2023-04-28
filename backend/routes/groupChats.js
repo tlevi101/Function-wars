@@ -3,7 +3,7 @@ const router = express.Router();
 const { User, Field } = require('../models');
 const auth = require('../middlewares/auth');
 const { Op } = require('sequelize');
-const {GroupChatController} = require("../types/controllers/GroupChatController");
+const { GroupChatController } = require('../types/controllers/GroupChatController');
 
 router.post('/:roomUUID/mute/:userID', auth, GroupChatController.muteUser);
 

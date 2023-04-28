@@ -3,7 +3,6 @@ import { GroupChat } from '../utils/GroupChat';
 import { Request, Response } from 'express';
 import { WaitingRoom } from '../utils/WaitingRoom';
 
-
 /**
  * @property user : DecodedToken
  * @property games : GamesMap
@@ -31,7 +30,7 @@ export type MyResponse = Response & {
     };
 };
 
-export type DecodedToken = DecodedUser | GuestUser; 
+export type DecodedToken = DecodedUser | GuestUser;
 /**
  * @property id : number
  * @property name : string
@@ -44,8 +43,8 @@ export type DecodedToken = DecodedUser | GuestUser;
  * @property chat_restriction : boolean
  * @property iat : number
  */
-export interface DecodedUser{
-	type:'registeredUser'
+export interface DecodedUser {
+    type: 'registeredUser';
     id: number;
     name: string;
     email: string;
@@ -65,10 +64,10 @@ export interface DecodedUser{
  * @property iat : number
  */
 export interface GuestUser {
-	type:'guest'
-	readonly guest: true;
-	name: string;
-	id: string;
+    type: 'guest';
+    readonly guest: true;
+    name: string;
+    id: string;
     JWT_created_at: Date;
     iat: number;
 }
