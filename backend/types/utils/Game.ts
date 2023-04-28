@@ -45,7 +45,10 @@ export class Game {
                 });
             }
         });
-        this.uuid = `game-${field.id}-${players.map(player => player.id).join('')}`;
+        this.uuid = `game-${field.id}-${players.map(player => {
+				return typeof player.id==='string' ? player.id.substring(0,3) : player.id
+			}).join('')
+		}`;
         this.field = field;
         this.currentPlayer =
             currentPlayer !== undefined
@@ -214,11 +217,11 @@ export class Game {
         this.sockets.forEach(socket => socket.leave(this.uuid));
         RuntimeMaps.games.delete(this.uuid);
     }
-    public playerCanReconnect(playerID: number): boolean {
+    public playerCanReconnect(playerID: number | string): boolean {
         const player = this.players.find(player => player.ID === playerID);
         return player !== undefined;
     }
-    public playerLeft(playerID: number): void {
+    public playerLeft(playerID: number | string): void {
         this.players = this.players.map(player => {
             if (player.ID === playerID) {
                 player.disconnect();
@@ -227,7 +230,7 @@ export class Game {
         });
     }
 
-    public playerReconnect(playerID: number, socket: socket): void {
+    public playerReconnect(playerID: number | string, socket: socket): void {
         this.players = this.players.map(player => {
             if (player.ID === playerID) {
                 player.reconnect();
@@ -238,7 +241,7 @@ export class Game {
         socket.join(this.uuid);
     }
 
-    public updatePlayerSocket(playerID: number, socket: any): void {
+    public updatePlayerSocket(playerID: number | string, socket: any): void {
         this.sockets = this.sockets.map(s => {
             if (s.decoded.id === playerID) {
                 s = socket;
@@ -247,7 +250,7 @@ export class Game {
         });
     }
 
-    public playerIsOnline(playerID: number): never | boolean {
+    public playerIsOnline(playerID: number | string): never | boolean {
         const player = this.players.find(player => player.ID === playerID);
         if (!player) {
             throw new Error('Player not found');

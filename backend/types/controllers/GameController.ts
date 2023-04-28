@@ -4,6 +4,7 @@ import { RuntimeMaps } from '../RuntimeMaps';
 import { Game } from '../utils/Game';
 import { PlayerInterface, UserInterface } from '../utils/interfaces';
 import { WaitListController } from './WaitListController';
+import Player = require('../utils/Player');
 const { Field } = require('../../models');
 const chalk = require('chalk');
 
@@ -43,7 +44,7 @@ export class GameController {
             res.io
                 .to(gameUUID)
                 .emit('game over', { points, message: `Game over, Winner is ${game.CurrentPlayer.Name}` });
-            game.Sockets.forEach(socket => {
+            game.Sockets.forEach((socket:socket) => {
                 socket.leave(gameUUID);
                 GroupChatController.deleteGameGroupChat('chat-' + gameUUID);
             });
@@ -70,7 +71,7 @@ export class GameController {
             return res.status(404).json({ message: 'Game not found.' });
         }
         let players = game.Players;
-        if (!players.find(player => player.ID === req.user.id)) {
+        if (!players.find((player:Player) => player.ID === req.user.id)) {
             return res.status(403).json({ message: 'You are not in this game.' });
         }
         return res.status(200).json(game.toFrontend());
@@ -105,7 +106,7 @@ export class GameController {
         console.log(chalk.green(`Player ${socket.decoded.name} socket updated in ${game.UUID}`));
     }
 
-    public static async getGame(playerID: number) {
+    public static async getGame(playerID: number | string) {
         for await (const [key, game] of RuntimeMaps.games) {
             if (game.Players.find(player => player.ID === playerID)) {
                 return game;

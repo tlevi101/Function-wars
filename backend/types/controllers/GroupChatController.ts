@@ -25,14 +25,11 @@ export class GroupChatController {
         if (!groupChat.userIsInChat(user.id)) {
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
-        if (Number.isNaN(parseInt(userID))) {
-            return res.status(400).json({ message: 'Invalid user ID.' });
-        }
-        if (!groupChat.userIsInChat(parseInt(userID))) {
+        if (!groupChat.userIsInChat(userID)) {
             return res.status(404).json({ message: 'User not found.' });
         }
         try {
-            groupChat.muteUser(user.id, parseInt(userID));
+            groupChat.muteUser(user.id, userID);
         } catch (e: any) {
             return res.status(400).json({ message: e.message });
         }
@@ -55,11 +52,11 @@ export class GroupChatController {
         if (!groupChat.userIsInChat(user.id)) {
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
-        if (!groupChat.userIsInChat(parseInt(userID))) {
+        if (!groupChat.userIsInChat(userID)) {
             return res.status(404).json({ message: 'User not found.' });
         }
         try {
-            groupChat.unmuteUser(user.id, parseInt(userID));
+            groupChat.unmuteUser(user.id, userID);
         } catch (e: any) {
             return res.status(400).json({ message: e.message });
         }
@@ -179,7 +176,7 @@ export class GroupChatController {
         groupChat.sendMessage({ from: { id: socket.decoded.id, name: socket.decoded.name }, message: message });
     }
 
-    public static async getGroupChatByUser(userID: number) {
+    public static async getGroupChatByUser(userID: number | string) {
         for await (const groupChat of RuntimeMaps.groupChats.values()) {
             if (groupChat.Users.find(user => user.id === userID)) {
                 return groupChat;

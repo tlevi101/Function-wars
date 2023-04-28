@@ -75,14 +75,14 @@ export interface GuestUser {
  * @property decoded : DecodedToken
  * @property id : string
  */
-export type socket = any & {
+export type socket = {
     decoded: DecodedToken;
     id: string;
-    emit(event: string, data?: Object): Function;
-    on(): Function;
-    join(roomID: string): Function;
-    leave(roomID: string): Function;
-    to(socketID: number): Function;
+    emit(event: string, data?: Object): socket;
+    on(): socket;
+    join(roomID: string): socket;
+    leave(roomID: string): socket;
+    to(socketID: string): socket;
 };
 
 type userID = number;

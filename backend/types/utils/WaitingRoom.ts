@@ -96,7 +96,7 @@ export class WaitingRoom {
         });
     }
 
-    public userIsNotInvited(playerID: number) {
+    public userIsNotInvited(playerID: number | string) {
         return !Array.from(RuntimeMaps.invites.values()).some(
             invite => invite.inviterID === this.owner.id && invite.invitedID === playerID
         );

@@ -120,8 +120,8 @@ export class GroupChat {
         if (typeof userID === 'string' || typeof otherUserID === 'string') return undefined;
         return (await User.findByPk(userID)).isBlocked(otherUserID);
     }
-    public async userCanSendMessage(userID: number): Promise<boolean> {
-        return !(await User.findByPk(userID)).chat_restriction;
+    public async userCanSendMessage(userID: number | string): Promise<boolean> {
+        return typeof userID === 'string' || !(await User.findByPk(userID)).chat_restriction;
     }
 
     public async userWantToReceiveMessagesFrom(
