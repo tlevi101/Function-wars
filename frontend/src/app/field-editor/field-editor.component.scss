@@ -5,6 +5,9 @@
 	padding: 10px;
 	border-radius: 10px;
 }
+.overflow-x-scroll{
+    overflow-x: scroll;
+}
 canvas{
 	background-color: rgb(0, 0, 212);
 	width: 1000px;
@@ -47,14 +50,4 @@ canvas{
 	width: 150px;
 	height: 100px;
 	opacity: 0.5;
-}
-.center {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-  }
-
-.asd{
-	color: rgba(255, 0, 0, 0.363);
 }
