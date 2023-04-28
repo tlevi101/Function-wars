@@ -65,7 +65,6 @@ export class AuthController {
 	 * @returns 
 	 */
 	public static async login(req: MyRequest, res: MyResponse) {
-		console.log(req.body);
 		const { email, password } = req.body;
 		if (!email) {
 			return res.status(400).send({ message: 'Email required' });

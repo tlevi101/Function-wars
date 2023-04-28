@@ -7,6 +7,7 @@ import {
 	ResetPasswordBodyInterface,
 } from '../interfaces/backend-body.interfaces';
 import { JwtService } from './jwt.service';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
 	providedIn: 'root',
@@ -14,7 +15,7 @@ import { JwtService } from './jwt.service';
 export class AuthService {
 	private hr = new HttpHeaders().set('Content-Type', 'application/json');
 	private url = 'http://localhost:4000';
-	constructor(private http: HttpClient, private jwt: JwtService) {
+	constructor(private http: HttpClient, private jwt: JwtService, private socket:Socket) {
 		this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${jwt.getToken()}`);
@@ -56,4 +57,9 @@ export class AuthService {
 				this.jwt.updateToken();
 			});
 	}
+
+	connectSocket() {
+		this.socket.connect();
+	}
+
 }

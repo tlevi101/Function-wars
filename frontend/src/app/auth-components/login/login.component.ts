@@ -38,6 +38,7 @@ export class LoginComponent implements OnInit {
                 if (this.rememberMe?.value) localStorage.setItem('token', res.jwt);
                 else sessionStorage.setItem('token', res.jwt);
                 this.router.navigate(['/']);
+				this.authService.connectSocket();
             },
             err => {
                 if (err.status === 400 || err.status === 404) this.loginForm.setErrors({ invalidCredentials: true });
