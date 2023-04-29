@@ -90,9 +90,6 @@ export class Shape {
      * @param point
      */
     public damageMe(point: Point, distance: number): DamageCircle {
-        if (!this.pointInside(point)) {
-            throw new Error('I cannot be damaged, point is not inside!');
-        }
         const damage = new DamageCircle(point, distance);
         this.damages.push(damage);
         return damage;
@@ -100,18 +97,33 @@ export class Shape {
     public toJSON(): ObjectInterface {
         throw new Error('Method not implemented.');
     }
-    public async pointInside(point: Point): Promise<boolean> {
+
+
+    public async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
 
-    protected async pointIsInsideOfADamage(point: Point): Promise<boolean> {
-        for await (const damage of this.damages) {
-            if (damage.pointIsInside(point)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
+
+	public static async pointInsideOfAnyDamage(point: Point, damages: DamageCircle[]): Promise<boolean> {
+		for await (const damage of damages) {
+			if (damage.pointIsInside(point)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static async getDamagesFromObjects(objects: (Ellipse | Rectangle)[]): Promise<DamageCircle[]> {
+		const damages: DamageCircle[] = [];
+		for await (const object of objects) {
+			damages.push(...object.Damages);
+		}
+		return damages;
+	}
+
+
+
     get Dimension(): Dimension {
         return this.dimension;
     }
@@ -161,10 +173,11 @@ export class Ellipse extends Shape {
         super(location, { width: Math.round(dimension.width / 2), height: Math.round(dimension.height / 2) });
         this.changeAvoidAreaRadius();
     }
-    public override async pointInside(point: Point): Promise<boolean> {
-        if (this.damages.length > 0 && (await this.pointIsInsideOfADamage(point))) {
-            return false;
-        }
+
+    public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
+		if(await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))){
+			return false;
+		}
         const x = point.x - this.Location.x;
         const y = point.y - this.Location.y;
         const a = this.Dimension.width;
@@ -292,10 +305,10 @@ export class Rectangle extends Shape {
      * @param point
      * @return boolean
      */
-    public override async pointInside(point: Point): Promise<boolean> {
-        if (this.damages.length > 0 && (await this.pointIsInsideOfADamage(point))) {
-            return false;
-        }
+    public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
+		if(await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))){
+			return false;
+		}
         const crossProducts: number[] = [];
         for (let i = 0; i < this.angles.length - 1; i++) {
             const sideVector = await Vector.initFromPoints(this.angles[i], this.angles[i + 1]);
@@ -334,6 +347,10 @@ export class Circle {
         return { location: this.location.toJSON(), radius: this.radius };
     }
 
+	public pointIsInside(point: Point): boolean {
+        return point.distance(this.location) < this.radius;
+    }
+
     get Location(): Point {
         return this.location;
     }
@@ -350,13 +367,9 @@ export class Circle {
 
 export class DamageCircle extends Circle {
     private baseRadius = 20;
-    private baseRadiusMultiplier = 0.8;
+    private damageMultiplier = 0.1;
     constructor(location: Point, pathLength: number) {
         super(location, 10);
-        this.radius = this.baseRadius + pathLength * this.baseRadiusMultiplier;
-    }
-
-    public pointIsInside(point: Point): boolean {
-        return point.distance(this.location) < this.radius;
+        this.radius = this.baseRadius + pathLength * this.damageMultiplier;
     }
 }

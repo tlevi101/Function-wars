@@ -24,7 +24,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     lastFunctionPoints: { leftSide: Point[]; rightSide: Point[] } | undefined;
     lastFunctionLength = 0;
     myLocation: Point | undefined;
-    submittedThisRound = false;
     lastDamages: { leftSide?: { location: Point; radius: number }; rightSide?: { location: Point; radius: number } } =
         {};
 
@@ -102,10 +101,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     submitFunction() {
-        if (this.functionForm.invalid || !this.itsMyTurn || this.submittedThisRound) {
+        if (this.functionForm.invalid || !this.itsMyTurn) {
             return;
         }
-        this.submittedThisRound = true;
         this.gameService.submitFunction(this.gameUUID, this.functionDef).subscribe(
             (response: any) => {
                 // this.initGameDataFromResponse(response.game);
@@ -149,7 +147,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('sendGetGameData');
         const subscription = this.gameService.getGameData(gameUUID).subscribe(
             async (response: any) => {
-                this.submittedThisRound = false;
                 const game = response as GameInterface;
                 this.newObjects = game.objects;
                 if (this.players.length > 0) await this.animate();
@@ -202,12 +199,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             const timer = setInterval(() => {
                 tickCount++;
                 this.draw(tickCount * this.ratio * unitPerTick);
-                const rightLastPoint = this.lastFunctionPoints!.rightSide[this.lastFunctionPoints!.rightSide.length - 1];
-                const rightFirstPoint = this.lastFunctionPoints!.rightSide[0];
-                const leftLastPoint = this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1];
-                const leftFirstPoint = this.lastFunctionPoints!.leftSide[0];
-                if (tickCount * this.ratio * unitPerTick + rightFirstPoint.x  >= rightLastPoint.x &&
-                    leftFirstPoint.x-tickCount * this.ratio * unitPerTick <= leftLastPoint.x) {
+                const rightLastPoint = this.lastFunctionPoints?.rightSide[this.lastFunctionPoints?.rightSide.length - 1];
+                const rightFirstPoint = this.lastFunctionPoints?.rightSide[0];
+                const leftLastPoint = this.lastFunctionPoints?.leftSide[this.lastFunctionPoints?.leftSide.length - 1];
+                const leftFirstPoint = this.lastFunctionPoints?.leftSide[0];
+                if (( !rightLastPoint || !rightFirstPoint || tickCount * this.ratio * unitPerTick + rightFirstPoint.x  >= rightLastPoint.x) &&
+					( !leftLastPoint || !leftFirstPoint || leftFirstPoint.x-tickCount * this.ratio * unitPerTick <= leftLastPoint.x)) {
                     setTimeout(() => {
                         this.lastDamages = {};
                     }, 100);
@@ -366,21 +363,17 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     drawDamages(xLimit: number = this.field.nativeElement.width) {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = '#D6DEEB';
             if (
-                this.lastFunctionPoints &&
+                this.lastFunctionPoints && this.lastFunctionPoints.rightSide.length > 0 &&
                 xLimit + this.lastFunctionPoints.rightSide[0].x >=
                     this.lastFunctionPoints.rightSide[this.lastFunctionPoints.rightSide.length - 1].x &&
                 this.lastDamages.rightSide
             ) {
                 this.drawNewDamage(this.lastDamages.rightSide);
             }
-            if (this.lastFunctionPoints) {
-                console.log(this.lastFunctionPoints!.leftSide[0].x - xLimit);
-                console.log(this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1].x);
-            }
             if (
-                this.lastFunctionPoints &&
+                this.lastFunctionPoints && this.lastFunctionPoints.leftSide.length > 0 &&
                 this.lastFunctionPoints.leftSide[0].x - xLimit <=
                     this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length - 1].x &&
                 this.lastDamages.leftSide
@@ -389,7 +382,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             for (const object of this.objects) {
                 for (const damage of object.damages) {
-                    ctx.fillStyle = 'white';
+                    ctx.fillStyle = '#D6DEEB';
                     ctx.beginPath();
                     ctx.arc(damage.location.x, damage.location.y, damage.radius, 0, 2 * Math.PI);
                     ctx.fill();

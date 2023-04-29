@@ -6,11 +6,11 @@ import { PlayerInterface } from './interfaces';
 class Player {
     private id: number | string;
     private name: string;
-    private object: Ellipse;
+    private object: Circle;
     private avoidArea: Circle;
     private online: boolean = true;
     constructor(location: Point, id: number | string, name: string) {
-        this.object = new Ellipse(location, { width: 80, height: 80 });
+        this.object = new Circle(location, 40);
         this.avoidArea = new Circle(location, 130);
         this.id = id;
         this.name = name;
@@ -23,15 +23,15 @@ class Player {
             id: this.id,
             name: this.name,
             location: this.object.Location,
-            dimension: this.object.Dimension,
+            dimension: this.Dimension,
             avoidArea: this.avoidArea.toJSON(),
         };
     }
 
     async pointInside(point: Point): Promise<boolean> {
-        return await this.object.pointInside(point);
+        return await this.object.pointIsInside(point);
     }
-    get Shape(): Ellipse {
+    get Shape(): Circle {
         return this.object;
     }
     get Location(): Point {
@@ -41,8 +41,13 @@ class Player {
         this.object.Location = value;
         this.avoidArea.Location = value;
     }
+	/**
+
+	 * @returns {Dimension} Dimension of the player, 
+	*/
     get Dimension(): Dimension {
-        return this.object.Dimension;
+		//FIXME width and height is not being multiplied bcs frontend will do this anyway
+        return { width: this.object.Radius, height: this.object.Radius};
     }
     get AvoidArea(): Circle {
         return this.avoidArea;
