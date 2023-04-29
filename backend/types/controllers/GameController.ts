@@ -40,6 +40,7 @@ export class GameController {
             return res.status(400).json({ message: 'Invalid function.' });
         }
         const { points, damages } = await game.calculateFunctionPoints();
+		const length = await Game.getFunctionLength(points);
         if (game.GameOver) {
             res.io
                 .to(gameUUID)
@@ -51,7 +52,7 @@ export class GameController {
             req.games.delete(gameUUID);
             return res.status(200).json({ message: 'Game over.' });
         } else {
-            res.io.to(gameUUID).emit('receive function', { points, damages });
+            res.io.to(gameUUID).emit('receive function', { points, damages, length });
         }
         game.changeCurrentPlayer();
         req.games.set(gameUUID, game);

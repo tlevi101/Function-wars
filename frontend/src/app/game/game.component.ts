@@ -22,6 +22,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     currentPlayer: PlayerInterface | undefined;
     gameUUID = '';
     lastFunctionPoints: { leftSide: Point[]; rightSide: Point[] } | undefined;
+    lastFunctionLength = 0;
     myLocation: Point | undefined;
     submittedThisRound = false;
     lastDamages: { leftSide?: { location: Point; radius: number }; rightSide?: { location: Point; radius: number } } =
@@ -47,7 +48,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 asyncValidators: [this.validationService.mathFunctionValidator('functionDef')],
             }
         );
-        console.log(this.gameService.Socket);
     }
 
     ngOnDestroy(): void {
@@ -72,6 +72,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log(response);
             this.lastFunctionPoints = response.points;
             this.lastDamages = response.damages;
+            this.lastFunctionLength = response.length;
             this.sendGetGameData(this.gameUUID);
             // await this.animate();
         });
@@ -190,21 +191,30 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
     async animate(newObjects?: ObjectInterface[]) {
         let tickCount = 0;
-        const ticksPerSecond = 100;
-        const tickRate = 1000 / ticksPerSecond;
         const unitPerTick = 0.3;
+        const unitPerSec = 5
+        const speed = unitPerSec * unitPerTick;
+        const ticksPerSecond = 1000 / (speed * this.ratio);
+        // const tickRate = 1000 / ticksPerSecond;
+        console.log('lastFunctionLength: ', this.lastFunctionLength)
+        console.log('ticksPerSecond: ', ticksPerSecond);
         await new Promise<void>(resolve => {
             const timer = setInterval(() => {
                 tickCount++;
                 this.draw(tickCount * this.ratio * unitPerTick);
-                if (tickCount * this.ratio * unitPerTick >= this.field.nativeElement.width) {
+                const rightLastPoint = this.lastFunctionPoints!.rightSide[this.lastFunctionPoints!.rightSide.length - 1];
+                const rightFirstPoint = this.lastFunctionPoints!.rightSide[0];
+                const leftLastPoint = this.lastFunctionPoints!.leftSide[this.lastFunctionPoints!.leftSide.length - 1];
+                const leftFirstPoint = this.lastFunctionPoints!.leftSide[0];
+                if (tickCount * this.ratio * unitPerTick + rightFirstPoint.x  >= rightLastPoint.x &&
+                    leftFirstPoint.x-tickCount * this.ratio * unitPerTick <= leftLastPoint.x) {
                     setTimeout(() => {
                         this.lastDamages = {};
                     }, 100);
                     resolve();
                     clearInterval(timer);
                 }
-            }, tickRate);
+            }, ticksPerSecond);
         });
     }
 
