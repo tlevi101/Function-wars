@@ -35,9 +35,9 @@ export class GameController {
         const location = currentPlayer.Location;
         try {
             await game.submitFunction(fn);
-        } catch (e) {
+        } catch (e:any) {
             console.log(e);
-            return res.status(400).json({ message: 'Invalid function.' });
+            return res.status(400).json({ message: e.message});
         }
         const { points, damages } = await game.calculateFunctionPoints();
 		const length = await Game.getFunctionLength(points);

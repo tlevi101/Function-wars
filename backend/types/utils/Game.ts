@@ -13,6 +13,13 @@ import { socket } from '../controllers/Interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
 const MyLogger = require('../../logs/logger.js');
 
+/**
+ * @property [playerID : string] : string
+ */
+export interface SubmittedFunction{
+	[playerID: string | number]: string;
+}
+
 export class Game {
     private players: Player[];
     private objects: (Rectangle | Ellipse)[];
@@ -22,6 +29,7 @@ export class Game {
     private uuid: string;
     private sockets: any[];
     private gameOver = false;
+	private submittedFunctions: SubmittedFunction[] = [];
     constructor(
         players: PlayerInterface[],
         objects: ObjectInterface[],
@@ -66,7 +74,11 @@ export class Game {
         this.currentPlayer = this.players[(currentPlayerIndex + 1) % this.players.length];
     }
 
-    public async submitFunction(func: string): Promise<void> {
+    public async submitFunction(func: string): Promise<void | never> {
+		if(this.submittedFunctions.some(submittedFunction => submittedFunction[this.CurrentPlayer.ID] === func)){
+			throw new Error('Function already submitted')
+		}
+		this.submittedFunctions.push({[this.currentPlayer.ID]:func});
         const funcCalculator = new FuncCalculator(func, this.currentPlayer.Location.x, this.currentPlayer.Location.y);
         if (!(await funcCalculator.isValidFunction())) {
             throw new Error('Invalid function');
