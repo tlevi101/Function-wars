@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
-import jwt_decode from 'jwt-decode';
 import {DecodedToken} from './interfaces/token.interface';
 import {NavigatedService} from "./services/navigated.service";
 import {InfoComponent} from "./pop-up/info/info.component";
@@ -75,5 +74,9 @@ export class AppComponent implements OnInit {
     get activateRoute(): string {
         return this.router.url;
     }
+
+	get isGuest(): boolean {
+		return this.jwt.getDecodedAccessToken()?.type === 'guest';
+	}
 
 }

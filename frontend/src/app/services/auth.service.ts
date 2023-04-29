@@ -62,4 +62,8 @@ export class AuthService {
 		this.socket.connect();
 	}
 
+	disconnectSocket() {
+		this.socket.disconnect();
+	}
+
 }

@@ -44,7 +44,7 @@
         <div class="offcanvas-title" (click)="changeMenuPoint($event)">
             <h6 class="{{ myStatus('Friend requests') }}" id="offcanvasRightLabel">Friend requests</h6>
         </div>
-        <div class="offcanvas-title" (click)="changeMenuPoint($event)">
+        <div class="position-relative offcanvas-title" (click)="changeMenuPoint($event)">
             <span
                 *ngIf="Invites.length > 0"
                 class="position-absolute top-0 start-0 translate-middle p-2 bg-danger rounded-circle">

@@ -87,9 +87,17 @@ export class CustomGameController {
      * @param isPrivate: boolean
      * @param friendIDs: number[]
      */
-    public static async createCustomGame(socket: socket, fieldID: number, isPrivate: boolean, friendIDs?: number[]) {
+    public static async createCustomGame(socket: socket, fieldID: any, isPrivate: boolean, friendIDs?: number[]) {
         console.debug(friendIDs);
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
+		console.debug(`Field ID: ${fieldID}, type: ${typeof fieldID}`);
+		try{
+			fieldID = parseInt(fieldID);
+		}
+		catch(err){
+			socket.emit('error', { message: 'Field is required', code: 400 });
+			return;
+		}
         const room = await new Promise<WaitingRoom>(resolve => {
             resolve(new WaitingRoom(socket.decoded, fieldID, socket, isPrivate));
         });

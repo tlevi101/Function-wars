@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DecodedToken } from '../interfaces/token.interface';
 import { JwtService } from '../services/jwt.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
     selector: 'app-nav-bar',
@@ -11,7 +12,7 @@ import { JwtService } from '../services/jwt.service';
 export class NavBarComponent implements OnInit {
     public name: string | undefined = 'User';
     public user: DecodedToken | undefined;
-    constructor(private router: Router, private jwt:JwtService) {
+    constructor(private router: Router, private jwt:JwtService, private authService: AuthService) {
         this.user = jwt.getDecodedAccessToken();
     }
 
@@ -31,8 +32,10 @@ export class NavBarComponent implements OnInit {
 		return this.user?.type === 'guest';
 	}
     logout() {
+		this.authService.disconnectSocket();
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
         this.router.navigate(['/login']);
     }
+
 }
