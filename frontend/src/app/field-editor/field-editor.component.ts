@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Dimension, Ellipse, Shape, Point, Rectangle } from './Shape';
 import { Player } from './Player';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -12,8 +12,9 @@ import { ActivatedRoute, Router } from '@angular/router';
     templateUrl: './field-editor.component.html',
     styleUrls: ['./field-editor.component.scss'],
 })
-export class FieldEditorComponent implements OnInit {
+export class FieldEditorComponent implements OnInit, AfterViewInit {
     fieldParticles = new Map<number, Shape | Player>();
+	ratio = 35;
     mouseOnHold = false;
     fieldSubmitForm: FormGroup;
 
@@ -45,13 +46,17 @@ export class FieldEditorComponent implements OnInit {
                 const id = params.get('id');
                 if (id !== null) {
                     await this.sendGetFieldRequest(parseInt(id));
-                    this.drawObjects();
+                    this.draw();
                 } else {
                     //TODO 404
                 }
             });
         }
     }
+
+	ngAfterViewInit(): void {
+		this.draw();
+	}
 
     async sendGetFieldRequest(id: number) {
         await this.fieldService
@@ -118,7 +123,7 @@ export class FieldEditorComponent implements OnInit {
             return;
         }
         particle.width = parseInt(this.widthRange.nativeElement.value);
-        this.drawObjects();
+        this.draw();
     }
 
     heightChange() {
@@ -126,14 +131,14 @@ export class FieldEditorComponent implements OnInit {
         const particle = this.fieldParticles.get(size);
         if (!particle || particle instanceof Player) return;
         particle.height = parseInt(this.heightRange.nativeElement.value);
-        this.drawObjects();
+        this.draw();
     }
 
     addPlayer() {
         const loc: Point = new Point(450, 300);
         const size = this.fieldParticles.size;
         this.fieldParticles.set(size + 1, new Player(loc));
-        this.drawObjects();
+        this.draw();
     }
 
     addCircle() {
@@ -142,7 +147,7 @@ export class FieldEditorComponent implements OnInit {
         const size = this.fieldParticles.size;
         this.fieldParticles.set(size + 1, new Ellipse(loc, dim));
         this.modifyObjectControls();
-        this.drawObjects();
+        this.draw();
     }
 
     addRectangle() {
@@ -151,13 +156,13 @@ export class FieldEditorComponent implements OnInit {
         const size = this.fieldParticles.size;
         this.fieldParticles.set(size + 1, new Rectangle(loc, dim));
         this.modifyObjectControls();
-        this.drawObjects();
+        this.draw();
     }
 
     removeSelected() {
         const size = this.fieldParticles.size;
         this.fieldParticles.delete(size);
-        this.drawObjects();
+        this.draw();
     }
 
     async mouseMoved(event: any) {
@@ -166,7 +171,7 @@ export class FieldEditorComponent implements OnInit {
         if (!this.fieldParticles.get(size)) return;
         this.fieldParticles.get(size)!.Location = new Point(event.offsetX, event.offsetY);
         await this.validateField();
-        this.drawObjects();
+        this.draw();
     }
 
     async mouseDown(event: any) {
@@ -239,6 +244,36 @@ export class FieldEditorComponent implements OnInit {
             i++;
         }
     }
+
+	drawLines() {
+        const ctx = this.field.nativeElement.getContext('2d');
+        if (ctx) {
+            const canvasWidth = this.field.nativeElement.width;
+			ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+            const canvasHeight = this.field.nativeElement.height;
+            for (let i = 0; i < canvasWidth / this.ratio; i++) {
+                ctx.beginPath();
+				ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+				ctx.moveTo(i * this.ratio, 0);
+                ctx.lineTo(i * this.ratio, canvasHeight);
+                ctx.stroke();
+                ctx.closePath();
+            }
+            for (let i = 0; i < canvasHeight / this.ratio; i++) {
+                ctx.beginPath();
+				ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+				ctx.moveTo(0, i * this.ratio);
+                ctx.lineTo(canvasWidth, i * this.ratio);
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+    }
+
+	draw(){
+		this.drawObjects();
+		this.drawLines();
+	}
 
     get playerCount() {
         const iter = this.fieldParticles.values();

@@ -76,4 +76,12 @@ export class CustomGameService {
     public startGame(){
         this.socket.emit('start custom game');
     }
+
+	public kickPlayer(playerID:number | string, roomUUID:string){
+		return this.http.post(`${this.url}/wait-rooms/${roomUUID}/${playerID}/kick`,{},{headers:this.hr});
+	}
+
+	public listenKicked(){
+		return this.socket.fromEvent('kicked from wait room');
+	}
 }

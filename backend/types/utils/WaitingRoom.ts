@@ -1,6 +1,7 @@
 import { DecodedToken, socket } from '../controllers/Interfaces';
 import { UserInterface } from './interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
+import { table } from 'console';
 const { faker } = require('@faker-js/faker');
 const { Field } = require('../../models');
 
@@ -64,7 +65,7 @@ export class WaitingRoom {
         });
     }
     public userIsInRoom(playerID: number | string) {
-        return this.players.some(p => p.id === playerID);
+        return this.players.some(p => p.id == playerID);
     }
     public isFull() {
         return this.players.length >= this.capacity;
@@ -95,6 +96,18 @@ export class WaitingRoom {
             };
         });
     }
+
+	public kickPlayer(playerID: number | string) {
+		this.players = this.players.filter(p => p.id != playerID);
+		this.sockets = this.sockets.filter(s => {
+			if (s.decoded.id != playerID) {
+				return true;
+			}
+			s.emit('kicked from wait room');
+			s.leave(this.roomUUID);
+			return false;
+		});
+	}
 
     public userIsNotInvited(playerID: number | string) {
         return !Array.from(RuntimeMaps.invites.values()).some(

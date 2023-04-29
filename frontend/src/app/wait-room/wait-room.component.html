@@ -3,10 +3,18 @@
         <div class="d-flex gap-2 ">
             <app-scale-able-field [scale]="0.7"></app-scale-able-field>
             <div class="d-flex flex-column chat p-4">
+				<div *ngIf="isOwner" class="users d-flex">
+					<div class="player-card" *ngFor="let player of otherPlayers">
+						<span class="fs-6">{{player.name}}</span>
+						<div class="d-flex justify-content-center">
+							<i class="fs-3 text-danger bi bi-person-dash" ngbTooltip="Kick player" (click)="kickPlayer(player.id)"></i>
+						</div>
+					</div>
+				</div>
                 <app-group-chat
                     *ngIf="chatRoomUUID !== ''"
                     [roomUUID]="chatRoomUUID"
-                    [chatMessagesMaxHeight]="700 * 0.7 - 100"
+                    [chatMessagesMaxHeight]="700 * 0.7 - (isOwner ? 200 : 75)"
                     class="mt-auto"></app-group-chat>
                 <div  class="d-flex gap-3 mt-2">
                     <button *ngIf="ownerID === user?.id" type="button" class="btn btn-primary" (click)="cancelCustomGame()">Cancel custom game</button>

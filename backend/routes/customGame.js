@@ -8,5 +8,7 @@ const { CustomGameController } = require('../types/controllers/CustomGameControl
 router.get('/custom-games', auth, CustomGameController.getCustomGames);
 
 router.get('/wait-rooms/:roomUUID', auth, CustomGameController.getWaitingRoom);
-//TODO kick user from waiting room
+
+router.post('/wait-rooms/:roomUUID/:userID/kick', auth, CustomGameController.kickPlayer);
+
 module.exports = router;

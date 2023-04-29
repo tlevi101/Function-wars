@@ -3,24 +3,26 @@
 
 $body-bg: #011627;
 $body-color: #D6DEEB;
-$primary: #82AAFF;
+$primary: #7FDBCA;
+
 
 // input
-$input-bg: #00569b;
+$input-bg: #D6DEEB;
+$input-color:$body-bg;
 $input-border-color:#1D3B53;
 $input-disabled-bg: #011627;
 $input-disabled-border-color: #011627;
 $input-disabled-color: #00447e;
-$form-check-input-checked-color:          $body-color;
+$form-check-input-checked-color:          $body-bg;
 $form-check-input-checked-bg-color:       $primary;
-$input-placeholder-color: #9a9a9a;
+$input-placeholder-color: #6c6c6c;
 // $input-group-addon-bg:   #7FDBCA;
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px $input-bg inset !important;
-	-webkit-text-fill-color: $body-color !important;
+	-webkit-text-fill-color: $body-bg !important;
 }
 $offcanvas-bg-color: #00294b;
 $offcanvas-horizontal-width: 300px;
@@ -47,9 +49,6 @@ $pagination-disabled-color:			$body-color;
 $pagination-disabled-bg:			#7e57c228;
 $pagination-disabled-border-color:  #000000;
 
-$form-check-input-bg: white;
-$form-check-input-checked-bg-color: #0051ff;
-
 $modal-content-bg:                  #00294b;
 $modal-content-border-width:        0px;
 
@@ -71,6 +70,14 @@ $modal-content-border-width:        0px;
 .container-center form {
 	min-width: 30%;
 }
+option:hover{
+	color: black;
+	background-color: $primary;
+}
+option:focus{
+	color: black;
+	background-color: $primary;
+}
 // Then add additional custom code here
 ::-webkit-scrollbar {
 	width: 10px;
@@ -84,12 +91,12 @@ $modal-content-border-width:        0px;
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
-	background: $primary;
+	background: #80A4C2;
 	border-radius: 10px;
 	margin-right: 2px;
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-	background: $primary;
+	background: #80A4C2;
   }

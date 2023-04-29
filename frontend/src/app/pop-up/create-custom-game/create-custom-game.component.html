@@ -4,7 +4,7 @@
         <div class="col">
             <h3 class="text-center">Create custom game.</h3>
             <form [formGroup]="customGameCreation">
-                <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" formControlName="fieldSelect">
+                <select class="form-select form-select mb-3" aria-label=".form-select example" formControlName="fieldSelect">
                     <option selected>Choose a field!</option>
                     <option *ngFor="let field of myFields" value="{{field.id}}">{{field.name}}</option>
                 </select>
