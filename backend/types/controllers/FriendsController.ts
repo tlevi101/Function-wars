@@ -3,6 +3,10 @@ import { Op } from 'sequelize';
 const { User, Chat, Friendship } = require('../../models');
 
 export class FriendsController {
+
+
+
+
     /**
      * @method get
      * @route '/friends'
@@ -14,6 +18,9 @@ export class FriendsController {
         const friends = await FriendsController.getUserFriends(req.user.id);
         return res.status(200).json({ friends: friends });
     }
+
+
+
 
     /**
      * @method get
@@ -27,6 +34,9 @@ export class FriendsController {
         friends = friends.filter((friend: any) => !!req.onlineUsers.get(friend.id));
         return res.status(200).json({ friends: friends });
     }
+
+
+
 
     /**
      * @method get
@@ -48,7 +58,10 @@ export class FriendsController {
         return res.status(200).json({ requests: requests });
     }
 
-    /**
+
+
+
+	/**
      * @method get
      * @route /friends/:id/chat
      * @param req
@@ -86,6 +99,9 @@ export class FriendsController {
         return res.status(200).json({ chat: chat });
     }
 
+
+
+
     /**
      * @method put
      * @route /friends/requests/:id/accept
@@ -116,8 +132,11 @@ export class FriendsController {
             });
         }
         await friendship.update({ pending: false });
-        return res.status(200).json({ message: 'Friendship accepted.' });
+        return res.status(200).json({ message: 'Friend request accepted.' });
     }
+
+
+
 
     /**
      * @method delete
@@ -147,8 +166,11 @@ export class FriendsController {
             });
         }
         await friendship.destroy();
-        return res.status(200).json({ message: 'Friendship rejected.' });
+        return res.status(200).json({ message: 'Friend request rejected.' });
     }
+
+
+
 
     /**
      * @method delete
@@ -199,6 +221,10 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend deleted.' });
     }
 
+
+
+
+
     /**
      * @method post
      * @route /friends/:id
@@ -228,10 +254,14 @@ export class FriendsController {
             friend_id: id,
             pending: true,
         });
-        return res.status(200).json({ message: 'Friendship request sent.' });
+        return res.status(200).json({ message: 'Friend request sent.' });
     }
 
-    private static async getUserFriends(userID: number) {
+   
+	
+	
+	
+	private static async getUserFriends(userID: number) {
         const user = await User.findByPk(userID);
         let friends = await user.getFriends();
         friends = await Promise.all(

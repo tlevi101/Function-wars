@@ -31,12 +31,10 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.DATE,
                 },
-            })
-            .then(() => {
-                queryInterface.addIndex('PasswordResets', ['user_id'], {
-                    unique: true,
-                });
             });
+			await queryInterface.addIndex('PasswordResets', ['user_id'], {
+				unique: true,
+			  });
     },
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('PasswordResets');

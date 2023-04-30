@@ -1,7 +1,7 @@
 'use strict';
 const { faker } = require('@faker-js/faker');
 const chalk = require('chalk');
-const models = require('../models');
+const models = require('../../models');
 const { User, Friendship, Report } = models;
 const { Op } = require('sequelize');
 

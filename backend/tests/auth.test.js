@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../types/controllers/app');
+const{ app } = require('../app');
 const { User } = require('../models');
 
 describe('POST /', () => {
@@ -118,7 +118,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Password must be between 8 and 20 characters'
                         ),
                     })
@@ -138,7 +138,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Password must be between 8 and 20 characters'
                         ),
                     })
@@ -155,7 +155,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: 'notNull Violation: User.name cannot be null,\nnotNull Violation: User.email cannot be null',
+                        message: 'notNull Violation: User.name cannot be null,\nnotNull Violation: User.email cannot be null',
                     })
                 );
             });
@@ -174,7 +174,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Username must be between 3 and 20 characters'
                         ),
                     })
@@ -195,7 +195,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Username must be between 3 and 20 characters'
                         ),
                     })
@@ -217,7 +217,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining('Validation error: Invalid email address'),
+                        message: expect.stringContaining('Validation error: Invalid email address'),
                     })
                 );
             });
@@ -258,7 +258,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: 'users_name must be unique',
+                        message: 'users_name must be unique',
                     })
                 );
             });
@@ -278,7 +278,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: 'users_email must be unique',
+                        message: 'users_email must be unique',
                     })
                 );
             });
@@ -335,11 +335,13 @@ describe('POST /', () => {
             });
     });
 
-    // TODO: create a banned test user with seeder
+	/**
+	 * @email user6... (@name: banned user) is banned
+	 */
     it('POST /login user banned', () => {
         return request(app)
             .post('/login')
-            .send({ email: 'banned@test.com' })
+            .send({ email: 'user6@functionWars.com' })
             .expect('Content-Type', /json/)
             .expect(403)
             .then(res => {
@@ -434,17 +436,16 @@ describe('POST /', () => {
             });
     });
 
-    //TODO: create a banned test user with seeder
     it('POST /forgot-password user banned', () => {
         return request(app)
             .post('/forgot-password')
-            .send({ email: 'banned@test.com' })
+            .send({ email: 'user6@functionWars.com' })
             .expect('Content-Type', /json/)
             .expect(403)
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        message: 'User is banned',
+                        message: 'User banned',
                         banned_reason: expect.any(String),
                     })
                 );
@@ -467,9 +468,9 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid uuid is missing', () => {
+    it('PUT /reset-password/:uuid uuid is missing', () => {
         return request(app)
-            .put('/password-reset/')
+            .put('/reset-password/')
             .send()
             .expect('Content-Type', /json/)
             .expect(404)
@@ -482,14 +483,14 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid uuid is incorrect', async () => {
+    it('PUT /reset-password/:uuid uuid is incorrect', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid + '1')
+            .put(`/reset-password/${uuid}1`)
             .send()
             .expect('Content-Type', /json/)
             .expect(404)
@@ -502,24 +503,34 @@ describe('POST /', () => {
             });
     });
 
-    // TODO: create test0 user with seeder and a pasword reset for test0 user
-    it('PUT /password-reset/:uuid link expired', async () => {
+    it('PUT /reset-password/:uuid link expired', async () => {
+		const user =  await User.findOne({where:{
+			email: 'user8@functionWars.com'
+		}});
+        const passwordReset = await user.getPasswordReset();
+		const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/')
-            .send({ password: '1234567', passwordAgain: '1234567' })
+            .put(`/reset-password/${uuid}`)
+            .send({ password: '12345678', passwordAgain: '12345678' })
             .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {});
+            .expect(400)
+            .then(res => {
+				expect(res.body).toEqual(
+					expect.objectContaining({
+						message: 'Link expired',
+					})
+				)
+			});
     });
 
-    it('PUT /password-reset/:uuid password missing', async () => {
+    it('PUT /reset-password/:uuid password missing', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send()
             .expect('Content-Type', /json/)
             .expect(400)
@@ -532,14 +543,14 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid passwordAgain is missing', async () => {
+    it('PUT /reset-password/:uuid passwordAgain is missing', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send({ password: '123456' })
             .expect('Content-Type', /json/)
             .expect(400)
@@ -552,14 +563,14 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid password and passwordAgain are not the same', async () => {
+    it('PUT /reset-password/:uuid password and passwordAgain are not the same', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send({ password: '123456', passwordAgain: '1234567' })
             .expect('Content-Type', /json/)
             .expect(400)
@@ -572,21 +583,21 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid password too short', async () => {
+    it('PUT /reset-password/:uuid password too short', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send({ password: '1234567', passwordAgain: '1234567' })
             .expect('Content-Type', /json/)
             .expect(400)
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Password must be between 8 and 20 characters'
                         ),
                     })
@@ -594,14 +605,14 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid password too short', async () => {
+    it('PUT /reset-password/:uuid password too short', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send({
                 password: '123456781234567812345678',
                 passwordAgain: '123456781234567812345678',
@@ -611,7 +622,7 @@ describe('POST /', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        error: expect.stringContaining(
+                        message: expect.stringContaining(
                             'Validation error: Password must be between 8 and 20 characters'
                         ),
                     })
@@ -619,14 +630,14 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /password-reset/:uuid everything went well', async () => {
+    it('PUT /reset-password/:uuid everything went well', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
         const passwordReset = await user.getPasswordReset();
         const uuid = passwordReset.getUuid();
         return request(app)
-            .put('/password-reset/' + uuid)
+            .put('/reset-password/' + uuid)
             .send({ password: '12345678', passwordAgain: '12345678' })
             .expect('Content-Type', /json/)
             .expect(200)

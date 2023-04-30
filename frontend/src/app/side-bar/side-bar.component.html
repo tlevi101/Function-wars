@@ -1,35 +1,35 @@
-<div class="btnParent">
-    <button
-        [@slideLeftRight]="slideDirection"
-        (mouseenter)="myFriendsMouseIn()"
-        (mouseleave)="myFriendsMouseLeave()"
-        class="btn btn-primary btn-sm position-relative"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasRight"
-        aria-controls="offcanvasRight">
-        <span
-            *ngIf="hasUnreadMessages() || Invites.length > 0"
-            class="position-absolute top-0 start-0 translate-middle p-2 bg-danger rounded-circle">
-            <span class="visually-hidden">New alerts</span>
-        </span>
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-chevron-double-left"
-            viewBox="0 0 16 16">
-            <path
-                fill-rule="evenodd"
-                d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-            <path
-                fill-rule="evenodd"
-                d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
-        </svg>
-        My friends
-    </button>
-</div>
+	<div class="btnParent">
+		<button
+			[@slideLeftRight]="slideDirection"
+			(mouseenter)="myFriendsMouseIn()"
+			(mouseleave)="myFriendsMouseLeave()"
+			class="btn btn-primary btn-sm position-relative"
+			type="button"
+			data-bs-toggle="offcanvas"
+			data-bs-target="#offcanvasRight"
+			aria-controls="offcanvasRight">
+			<span
+				*ngIf="hasUnreadMessages() || Invites.length > 0"
+				class="position-absolute top-0 start-0 translate-middle p-2 bg-danger rounded-circle">
+				<span class="visually-hidden">New alerts</span>
+			</span>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				fill="currentColor"
+				class="bi bi-chevron-double-left"
+				viewBox="0 0 16 16">
+				<path
+					fill-rule="evenodd"
+					d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+				<path
+					fill-rule="evenodd"
+					d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+			</svg>
+			My friends
+		</button>
+	</div>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
     <div class="position-relative offcanvas-header d-flex">

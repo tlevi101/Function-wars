@@ -47,17 +47,13 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.DATE,
                 },
-            })
-            .then(() => {
-                queryInterface.addIndex('Users', ['email'], {
-                    unique: true,
-                });
-            })
-            .then(() => {
-                queryInterface.addIndex('Users', ['name'], {
-                    unique: true,
-                });
             });
+            await queryInterface.addIndex('Users', ['email'], {
+                    unique: true,
+			});
+			await queryInterface.addIndex('Users', ['name'], {
+                    unique: true,
+			});
     },
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable('Users');

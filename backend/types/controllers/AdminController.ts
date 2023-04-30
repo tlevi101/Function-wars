@@ -6,6 +6,9 @@ const { User } = require('../../models');
 const { Op } = require('sequelize');
 
 export class AdminController {
+
+
+
     /**
      * @method get
      * @route /admins
@@ -20,6 +23,8 @@ export class AdminController {
         return res.status(200).json({ admins: await User.findAll({ where: { is_admin: true } }) });
     }
 
+
+
     /**
      * @method get
      * @route /users
@@ -33,6 +38,9 @@ export class AdminController {
         }
         return res.status(200).json({ users: await User.findAll({ where: { is_admin: false } }) });
     }
+
+
+
 
     /**
      * @method put
@@ -63,6 +71,9 @@ export class AdminController {
         return res.status(200).send({ message: 'User banned.' });
     }
 
+
+
+
     /**
      * @method put
      * @route /users/:id/unban
@@ -85,6 +96,9 @@ export class AdminController {
         return res.status(200).send({ message: 'User unbanned.' });
     }
 
+
+
+
     /**
      * @method put
      * @route /users/:userID/make-admin
@@ -105,6 +119,9 @@ export class AdminController {
         await users.update({ is_admin: true, role: 'admin' });
         return res.status(200).send({ message: 'User is now admin.' });
     }
+
+
+
 
     /**
      * @method put
@@ -127,6 +144,9 @@ export class AdminController {
         return res.status(200).send({ message: "User isn't an admin anymore." });
     }
 
+
+
+	
     /**
      * @method put
      * @route /users/:id/add-remove-chat-restriction

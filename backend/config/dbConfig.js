@@ -14,6 +14,7 @@ const dbConfig = {
         database: process.env.DB_DATABASE + '_test',
         password: process.env.DB_PASSWORD,
         dialect: 'mysql',
+        logging: process.env.DB_LOGGING === 'true',
     },
 };
 

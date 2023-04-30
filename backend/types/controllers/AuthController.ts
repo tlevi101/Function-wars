@@ -6,6 +6,9 @@ const { Sequelize } = require('sequelize');
 const forgotPasswordMailer = require('../../mail/forgotPasswordMail');
 
 export class AuthController {
+
+
+
     /**
      * @method post
      * @route /register-guest
@@ -29,6 +32,9 @@ export class AuthController {
         );
         res.status(201).json({ message: 'Guest accepted', jwt: token });
     }
+
+
+
 
     /**
      * @method post
@@ -54,6 +60,10 @@ export class AuthController {
         });
         res.status(201).json({ message: 'User created', jwt: token });
     }
+
+
+
+
     /**
      * @method post
      * @route /login
@@ -71,7 +81,7 @@ export class AuthController {
             return res.status(404).send({ message: 'Incorrect email' });
         }
         if (user.banned) {
-            return res.status(403).send({ message: 'User is banned', banned_reason: user.banned_reason });
+            return res.status(403).send({ message: 'User banned', banned_reason: user.banned_reason });
         }
         if (!password) {
             return res.status(400).send({ message: 'Password required' });
@@ -84,6 +94,9 @@ export class AuthController {
         });
         return res.status(200).send({ message: 'Login successful', jwt: token });
     }
+
+
+
 
     /**
      * @method post
@@ -102,7 +115,7 @@ export class AuthController {
             return res.status(404).send({ message: 'Incorrect email' });
         }
         if (user.banned) {
-            return res.status(403).send({ message: 'User is banned', banned_reason: user.banned_reason });
+            return res.status(403).send({ message: 'User banned', banned_reason: user.banned_reason });
         }
         await user.createPasswordReset().catch(async (err: any) => {
             if (err instanceof Sequelize.UniqueConstraintError) {
@@ -119,15 +132,20 @@ export class AuthController {
             return res.status(201).send({ message: 'Email sent' });
         }
     }
+
+
+
+
     /**
      * @method put
-     * @route /reset-password/:uui
+     * @route /reset-password/:uuid
      * @param req
      * @param res
      * @returns
      */
     public static async resetPassword(req: MyRequest, res: MyResponse) {
         const { uuid } = req.params;
+		console.log(uuid);
         const passwordReset = await PasswordReset.findOne({
             where: { uuid: uuid },
         });
@@ -153,6 +171,10 @@ export class AuthController {
         await passwordReset.destroy();
         res.status(200).send({ message: 'Password updated' });
     }
+
+
+
+
     /**
      * @method get
      * @route /update-token

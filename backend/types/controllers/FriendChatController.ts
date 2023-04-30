@@ -40,7 +40,7 @@ export class FriendChatController {
 
     public static async setSeen(socket: socket, friendID: number) {
         if (socket.decoded.type === 'guest') {
-            socket.emit('error', 'Guests cannot send messages.');
+            socket.emit('error', 'Guests cannot receive private messages.');
         }
         const user = await User.findByPk(socket.decoded.id);
         const chat = await user.getChat(friendID);

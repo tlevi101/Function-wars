@@ -27,7 +27,6 @@ const io = require('socket.io')(http, {
     },
 });
 
-const TIME_TO_RECONNECT = 10000;
 
 io.use(function (socket, next) {
     if (socket.handshake.query && socket.handshake.query.token) {
@@ -132,9 +131,9 @@ app.use('*', (req, res) => {
 // catch any sequelize validation errors
 app.use(function (err, req, res, next) {
     if (err instanceof Sequelize.UniqueConstraintError) {
-        res.status(400).json({ msg: err.errors[0].message });
+        res.status(400).json({ message: err.errors[0].message });
     } else if (err instanceof Sequelize.ValidationError) {
-        res.status(400).json({ msg: err.message });
+        res.status(400).json({ message: err.message });
     }
     // else if (err instanceof Sequelize.DatabaseError) {
     //   res.status(400).json({ error: err.message });
