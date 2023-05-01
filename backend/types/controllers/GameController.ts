@@ -123,6 +123,7 @@ export class GameController {
             field = await Field.findByPk(fieldID);
         }
         if (!field && sockets.length === 2) {
+			console.warn('No field found');
             sockets.forEach(s => {
                 s.emit('error', { message: 'There is no playable field at the moment!' });
                 s.leave('wait-list');
@@ -134,6 +135,7 @@ export class GameController {
             const player: DecodedToken = socket.decoded;
             players.push(player);
         });
+		console.log('creating game');
         const game = await Game.makeGameFromField(field, players, sockets);
         RuntimeMaps.games.set(game.UUID, game);
         console.log(chalk.green('game created, uuid: ' + game.UUID));

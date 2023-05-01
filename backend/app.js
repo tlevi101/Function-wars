@@ -79,6 +79,7 @@ io.use(function (socket, next) {
         });
 
         socket.on('join wait list', async () => {
+			console.debug('join wait list');
             WaitListController.joinWaitList(socket);
         });
 

@@ -13,7 +13,7 @@
         "log:clear": "rm -rf logs/*.json",
         "prettier": "npx prettier --write \"**/*.{js,ts,json}\"",
         "test": "npm run build & npm run db:test && npx jest --watchAll",
-		"coverage": "npm run build & npm run db:test && npx jest --coverage",
+        "coverage": "npm run build & npm run db:test && npx jest --coverage",
         "start": "node server.js",
         "build": "tsc",
         "compile": "tsc && node --trace-warnings ./dist/server.js"
@@ -52,6 +52,7 @@
         "sequelize": "^6.19.0",
         "slug": "^5.3.0",
         "socket.io": "^4.6.1",
+        "socket.io-client": "^4.6.1",
         "socketio-jwt": "^4.6.2",
         "supertest": "^6.3.3",
         "table": "^6.8.0",
