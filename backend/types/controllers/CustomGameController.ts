@@ -91,10 +91,8 @@ export class CustomGameController {
         console.debug(friendIDs);
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
 		console.debug(`Field ID: ${fieldID}, type: ${typeof fieldID}`);
-		try{
-			fieldID = parseInt(fieldID);
-		}
-		catch(err){
+		fieldID = parseInt(fieldID);
+		if(!Number.isInteger(fieldID)){
 			socket.emit('error', { message: 'Field is required', code: 400 });
 			return;
 		}

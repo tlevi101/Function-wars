@@ -220,15 +220,22 @@ module.exports = (sequelize, DataTypes) => {
                     },
                 },
             },
-            is_admin: DataTypes.BOOLEAN,
+            is_admin: {
+				type:DataTypes.BOOLEAN,
+				defaultValue: false,
+			},
             role: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 validate: {
                     isIn: [['super_admin', 'admin', 'user']],
                 },
+				defaultValue: 'user',
             },
-            banned: DataTypes.BOOLEAN,
+            banned: {
+				type:DataTypes.BOOLEAN,
+				defaultValue: false,
+			},
             banned_reason: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -238,8 +245,13 @@ module.exports = (sequelize, DataTypes) => {
                         msg: 'Banned reason must be less than 255 characters',
                     },
                 },
+				defaultValue: null,
             },
-            chat_restriction: DataTypes.BOOLEAN,
+            chat_restriction: { 
+				type:DataTypes.BOOLEAN,
+				defaultValue: false,
+
+			},
         },
         {
             sequelize,

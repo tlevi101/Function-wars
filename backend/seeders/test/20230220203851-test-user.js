@@ -90,7 +90,7 @@ module.exports = {
 				pending: false
 			})
 
-			await users[0].addBlocked(users[3]);
+			await users[0].addBlocked(users[7]);
 
 
 			await users[7].createPasswordReset({

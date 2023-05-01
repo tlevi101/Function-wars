@@ -141,6 +141,6 @@ export class GroupChat {
     }
 
     public userIsInChat(userID: number | string): boolean {
-        return this.users.some(u => u.id === userID);
+        return this.users.some(u => u.id == userID);
     }
 }

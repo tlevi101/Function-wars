@@ -13,6 +13,7 @@
         "log:clear": "rm -rf logs/*.json",
         "prettier": "npx prettier --write \"**/*.{js,ts,json}\"",
         "test": "npm run build & npm run db:test && npx jest --watchAll",
+		"coverage": "npm run build & npm run db:test && npx jest --coverage",
         "start": "node server.js",
         "build": "tsc",
         "compile": "tsc && node --trace-warnings ./dist/server.js"

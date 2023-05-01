@@ -23,9 +23,11 @@ export class GroupChatController {
             return res.status(404).json({ message: 'Group chat not found.' });
         }
         if (!groupChat.userIsInChat(user.id)) {
+			console.log(user.id)
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
         if (!groupChat.userIsInChat(userID)) {
+			console.log(userID);
             return res.status(404).json({ message: 'User not found.' });
         }
         try {
@@ -77,7 +79,6 @@ export class GroupChatController {
         if (!groupChat.userIsInChat(user.id)) {
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
-        //TODO reconnect user here if they are not connected
         return res.status(200).json({ messages: groupChat.getMessagesForUser(user.id) });
     }
 

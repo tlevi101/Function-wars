@@ -1,9 +1,11 @@
 const request = require('supertest');
 const{ app } = require('../app');
 const { User } = require('../models');
+const jsonwebtoken = require('jsonwebtoken');
 
-describe('POST /', () => {
-    it('POST /register-guest name is missing', () => {
+
+describe('AuthController test cases ', () => {
+    test('POST /register-guest name is missing', () => {
         return request(app)
             .post('/register-guest')
             .send()
@@ -18,7 +20,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register-guest name is too short', () => {
+    test('POST /register-guest name is too short', () => {
         return request(app)
             .post('/register-guest')
             .send({ name: 'a' })
@@ -33,7 +35,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register-guest name is too long', () => {
+    test('POST /register-guest name is too long', () => {
         return request(app)
             .post('/register-guest')
             .send({ name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' })
@@ -48,23 +50,33 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register-guest everything went well', () => {
-        return request(app)
+    test('POST /register-guest everything went well', async () => {
+        const response =  await request(app)
             .post('/register-guest')
             .send({ name: 'test' })
             .expect('Content-Type', /json/)
-            .expect(201)
-            .then(res => {
-                expect(res.body).toEqual(
-                    expect.objectContaining({
-                        message: 'Guest accepted',
-                        jwt: expect.any(String),
-                    })
-                );
-            });
+            .expect(201);
+		expect(response.body).toEqual(
+			expect.objectContaining({
+				message: 'Guest accepted',
+				jwt: expect.any(String),
+			})
+		);
+
+		const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+		expect(decoded).toEqual(
+			expect.objectContaining({
+				type: 'guest',
+				name: 'Guest: test',
+				id: expect.any(String),
+				guest:true,
+				JWT_createdAt: expect.any(String),
+				iat: expect.any(Number),
+			})
+		);
     });
 
-    it('POST /register password is missing', () => {
+    test('POST /register password is missing', () => {
         return request(app)
             .post('/register')
             .send()
@@ -79,7 +91,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register password confirmation is missing', () => {
+    test('POST /register password confirmation is missing', () => {
         return request(app)
             .post('/register')
             .send({ password: 'test' })
@@ -94,7 +106,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register passwords do not match', () => {
+    test('POST /register passwords do not match', () => {
         return request(app)
             .post('/register')
             .send({ password: 'test', passwordAgain: 'test2' })
@@ -109,7 +121,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register password is too short', () => {
+    test('POST /register password is too short', () => {
         return request(app)
             .post('/register')
             .send({ password: 'test', passwordAgain: 'test' })
@@ -126,7 +138,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register password is too long', () => {
+    test('POST /register password is too long', () => {
         return request(app)
             .post('/register')
             .send({
@@ -146,7 +158,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register name and email is missing', () => {
+    test('POST /register name and email is missing', () => {
         return request(app)
             .post('/register')
             .send({ password: '12345678', passwordAgain: '12345678' })
@@ -161,7 +173,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register name is too short', () => {
+    test('POST /register name is too short', () => {
         return request(app)
             .post('/register')
             .send({
@@ -182,7 +194,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register name is too long', () => {
+    test('POST /register name is too long', () => {
         return request(app)
             .post('/register')
             .send({
@@ -203,7 +215,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register email is invalid', () => {
+    test('POST /register email is invalid', () => {
         return request(app)
             .post('/register')
             .send({
@@ -223,8 +235,8 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register everything went well', () => {
-        return request(app)
+    test('POST /register everything went well', async () => {
+        const response = await request(app)
             .post('/register')
             .send({
                 name: 'test',
@@ -233,18 +245,31 @@ describe('POST /', () => {
                 passwordAgain: '12345678',
             })
             .expect('Content-Type', /json/)
-            .expect(201)
-            .then(res => {
-                expect(res.body).toEqual(
+            .expect(201);
+                expect(response.body).toEqual(
                     expect.objectContaining({
                         message: 'User created',
                         jwt: expect.any(String),
                     })
                 );
-            });
+			const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+			expect(decoded).toEqual(
+				expect.objectContaining({
+					type: 'user',
+					id: expect.any(Number),
+					name: 'test',
+					email: 'test@test.com',
+					banned: false,
+					banned_reason: null,
+					is_admin: false,
+					role: 'user',
+					JWT_createdAt: expect.any(String),
+					chat_restriction: false,
+				})
+			);
     });
 
-    it('POST /register name already exists', () => {
+    test('POST /register name already exists', () => {
         return request(app)
             .post('/register')
             .send({
@@ -264,7 +289,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register email already exists', () => {
+    test('POST /register email already exists', () => {
         return request(app)
             .post('/register')
             .send({
@@ -284,7 +309,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /register second user is created', () => {
+    test('POST /register second user is created', () => {
         return request(app)
             .post('/register')
             .send({
@@ -305,7 +330,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /login email missing', () => {
+    test('POST /login email missing', () => {
         return request(app)
             .post('/login')
             .send()
@@ -320,7 +345,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /login incorrect email', () => {
+    test('POST /login incorrect email', () => {
         return request(app)
             .post('/login')
             .send({ email: 'test3@test.com' })
@@ -338,7 +363,7 @@ describe('POST /', () => {
 	/**
 	 * @email user6... (@name: banned user) is banned
 	 */
-    it('POST /login user banned', () => {
+    test('POST /login user banned', () => {
         return request(app)
             .post('/login')
             .send({ email: 'user6@functionWars.com' })
@@ -354,7 +379,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /login password missing', () => {
+    test('POST /login password missing', () => {
         return request(app)
             .post('/login')
             .send({ email: 'test@test.com' })
@@ -369,7 +394,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /login incorrect password', () => {
+    test('POST /login incorrect password', () => {
         return request(app)
             .post('/login')
             .send({
@@ -387,26 +412,39 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /login everything went well', () => {
-        return request(app)
+    test('POST /login everything went well', async () => {
+        const response = await request(app)
             .post('/login')
             .send({
                 email: 'test@test.com',
                 password: '12345678',
             })
             .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-                expect(res.body).toEqual(
-                    expect.objectContaining({
-                        message: 'Login successful',
-                        jwt: expect.any(String),
-                    })
-                );
-            });
+            .expect(200);
+		expect(response.body).toEqual(
+			expect.objectContaining({
+				message: 'Login successful',
+				jwt: expect.any(String),
+			})
+		);
+		const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+			expect(decoded).toEqual(
+				expect.objectContaining({
+					type: 'user',
+					id: expect.any(Number),
+					name: 'test',
+					email: 'test@test.com',
+					banned: false,
+					banned_reason: null,
+					is_admin: false,
+					role: 'user',
+					JWT_createdAt: expect.any(String),
+					chat_restriction: false,
+				})
+			);
     });
 
-    it('POST /forgot-password email missing', () => {
+    test('POST /forgot-password email missing', () => {
         return request(app)
             .post('/forgot-password')
             .send()
@@ -421,7 +459,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /forgot-password incorrect email', () => {
+    test('POST /forgot-password incorrect email', () => {
         return request(app)
             .post('/forgot-password')
             .send({ email: 'test5@test.com' })
@@ -436,7 +474,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /forgot-password user banned', () => {
+    test('POST /forgot-password user banned', () => {
         return request(app)
             .post('/forgot-password')
             .send({ email: 'user6@functionWars.com' })
@@ -452,7 +490,7 @@ describe('POST /', () => {
             });
     });
 
-    it('POST /forgot-password everything went well', () => {
+    test('POST /forgot-password everything went well', () => {
         return request(app)
             .post('/forgot-password')
             .send({ email: 'test@test.com' })
@@ -468,7 +506,23 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid uuid is missing', () => {
+	test('POST /forgot-password forgot password resent ', () => {
+        return request(app)
+            .post('/forgot-password')
+            .send({ email: 'test@test.com' })
+            .expect('Content-Type', /json/)
+            .expect(201)
+            .then(res => {
+                expect(res.body).toEqual(
+                    expect.objectContaining({
+                        message: 'Email sent',
+                        uuid: expect.any(String),
+                    })
+                );
+            });
+    });
+
+    test('PUT /reset-password/:uuid uuid is missing', () => {
         return request(app)
             .put('/reset-password/')
             .send()
@@ -483,7 +537,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid uuid is incorrect', async () => {
+    test('PUT /reset-password/:uuid uuid is incorrect', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -503,7 +557,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid link expired', async () => {
+    test('PUT /reset-password/:uuid link expired', async () => {
 		const user =  await User.findOne({where:{
 			email: 'user8@functionWars.com'
 		}});
@@ -523,7 +577,7 @@ describe('POST /', () => {
 			});
     });
 
-    it('PUT /reset-password/:uuid password missing', async () => {
+    test('PUT /reset-password/:uuid password missing', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -543,7 +597,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid passwordAgain is missing', async () => {
+    test('PUT /reset-password/:uuid passwordAgain is missing', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -563,7 +617,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid password and passwordAgain are not the same', async () => {
+    test('PUT /reset-password/:uuid password and passwordAgain are not the same', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -583,7 +637,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid password too short', async () => {
+    test('PUT /reset-password/:uuid password too short', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -605,7 +659,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid password too short', async () => {
+    test('PUT /reset-password/:uuid password too short', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -630,7 +684,7 @@ describe('POST /', () => {
             });
     });
 
-    it('PUT /reset-password/:uuid everything went well', async () => {
+    test('PUT /reset-password/:uuid everything went well', async () => {
         const user = await User.findOne({
             where: { email: 'test@test.com' },
         });
@@ -649,4 +703,95 @@ describe('POST /', () => {
                 );
             });
     });
+});
+
+
+
+describe('AuthController - update token', () => {
+	let token;
+	let badToken;
+	let guestToken;
+
+	beforeAll(async () => {
+		const response = await request(app)
+				.post('/login')
+				.send({
+					email: 'user1@functionWars.com',
+					password: 'password'
+				});
+		token = response.body.jwt;
+
+		const responseGuest = await request(app)
+			.post('/register-guest')
+			.send({ name: 'test guest' })
+			.expect('Content-Type', /json/)
+			.expect(201)
+		guestToken = responseGuest.body.jwt;
+		console.log(responseGuest.body);
+		console.log(responseGuest.body.jwt);
+		badToken = jsonwebtoken.sign(
+			{
+				type: 'user',
+				id: 0,
+				name: 'USer with bad token',
+				email: 'user2102102102@functionWars.com',
+				banned: false,
+				banned_reason: null,
+				is_admin: false,
+				role: 'user',
+				JWT_createdAt: new Date(),
+				chat_restriction: false,
+			},
+			process.env.JWT_SECRET || 'secret',
+			{
+				algorithm: process.env.JWT_ALGO || 'HS256',
+			}
+		)
+	});
+
+
+	test('Guest token', async () => {
+		return request(app)
+			.get('/update-token')
+			.set('Authorization', `Bearer ${guestToken}`)
+			.expect('Content-Type', /json/)
+			.expect(403)
+			.then(res => {
+				expect(res.body).toEqual(
+					expect.objectContaining({
+						message: 'Guest cannot make this request!',
+					})
+				);
+			});
+	});
+
+
+	test('Bad token', async () => {
+		return request(app)
+			.get('/update-token')
+			.set('Authorization', `Bearer ${badToken}`)
+			.expect('Content-Type', /json/)
+			.expect(404)
+			.then(res => {
+				expect(res.body).toEqual(
+					expect.objectContaining({
+						message: 'User not found',
+					})
+				);
+			});
+	});
+
+	test('Everything went well', async () => {
+		const response =  await request(app)
+			.get('/update-token')
+			.set('Authorization', `Bearer ${token}`)
+			.expect('Content-Type', /json/)
+			.expect(200);
+		expect(response.body).toEqual(
+			expect.objectContaining({
+				message: 'Token updated',
+				jwt: expect.any(String),
+			})
+		);
+	});
 });

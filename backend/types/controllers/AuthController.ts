@@ -30,7 +30,7 @@ export class AuthController {
                 algorithm: process.env.JWT_ALGO,
             }
         );
-        res.status(201).json({ message: 'Guest accepted', jwt: token });
+        return res.status(201).json({ message: 'Guest accepted', jwt: token });
     }
 
 
@@ -58,7 +58,7 @@ export class AuthController {
         const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
             algorithm: process.env.JWT_ALGO,
         });
-        res.status(201).json({ message: 'User created', jwt: token });
+        return res.status(201).json({ message: 'User created', jwt: token });
     }
 
 
@@ -169,7 +169,7 @@ export class AuthController {
         const user = await passwordReset.getUser();
         await user.update({ password });
         await passwordReset.destroy();
-        res.status(200).send({ message: 'Password updated' });
+        return res.status(200).send({ message: 'Password updated' });
     }
 
 
@@ -194,6 +194,6 @@ export class AuthController {
         const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET, {
             algorithm: process.env.JWT_ALGO,
         });
-        return res.status(200).send({ message: 'Token updated', jwt: token });
+        return res.status(200).json({ message: 'Token updated', jwt: token });
     }
 }
