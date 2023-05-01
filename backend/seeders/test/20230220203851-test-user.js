@@ -71,6 +71,15 @@ module.exports = {
                 });
             }
 
+			const superAdmin = await User.create({
+				name: 'SuperAdmin',
+				email: 'superAdmin@functionWars.com',
+				password:'password',
+				is_admin: true,
+				role: 'super_admin',
+			});
+
+
 
 
 			await users[0].addMyFriends(users[1]);

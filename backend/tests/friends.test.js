@@ -2,9 +2,7 @@ const supertest = require('supertest');
 const { app } = require('../app');
 const request = supertest(app);
 const { User, Friendship, Chat } = require('../models');
-const friendship = require('../models/friendship');
 const jsonwebtoken = require('jsonwebtoken');
-const { describe, beforeEach } = require('node:test');
 
 /**
  * DB has 8 user in the table from seeder 

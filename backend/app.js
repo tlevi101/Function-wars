@@ -120,7 +120,7 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
 app.use('/', require('./routes/customGame'));
 app.use('/group-chats', require('./routes/groupChats'));
-app.use('/admin/', require('./routes/admin'));
+app.use('/admin', require('./routes/admin'));
 app.use('/', require('./routes/user'));
 app.use('/games', require('./routes/games'));
 
