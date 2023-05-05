@@ -106,6 +106,18 @@ module.exports = {
 				createdAt: new Date().setHours(new Date().getHours()-2)
 			});
 
+
+			const countOfStressUsers = process.env.STRESS_USERS || 0;
+			for (let i = 0; i < countOfStressUsers; i++) {
+				let userName = `stressUser${i+1}`;
+				console.log(userName);
+				const user = await User.create({
+					name: userName,
+					email: `${userName}@functionWars.com`,
+					password: 'password',
+				});
+			}
+
             // for (const user of users) {
             //     const reportCount = faker.datatype.number({ min: 0, max: 3 });
             //     otherUsers = users.filter(u => u.id !== user.id);

@@ -3,6 +3,7 @@ const { app } = require('../app');
 const { User } = require('../../models');
 const request = supertest(app);
 const jsonwebtoken = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 /**
  * DB has 8 user in the table from seeder 
@@ -36,6 +37,7 @@ const getUserTokens= async () => {
 	const userTokens = [];
 	const USER_COUNT_IN_TEST_DB = await User.count({
 		where: {
+			email: {[Op.like]:'user%'},
 			role: 'user',
 		}
 	})

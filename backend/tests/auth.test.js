@@ -2,6 +2,7 @@ const request = require('supertest');
 const{ app } = require('../app');
 const { User } = require('../models');
 const jsonwebtoken = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 
 describe('AuthController test cases ', () => {

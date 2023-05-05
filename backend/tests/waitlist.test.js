@@ -2,6 +2,7 @@ const supertest = require('supertest');
 const { app, io } = require('../app');
 const request = supertest(app);
 const { User, Friendship, Chat } = require('../models');
+const { Op } = require('sequelize');
 const jsonwebtoken = require('jsonwebtoken');
 const Client = require("socket.io-client");
 const { RuntimeMaps } = require('../types/RuntimeMaps');
@@ -15,8 +16,9 @@ describe('wait list tests', () => {
 	const userClients = [];
 	let serverSockets = [];
 	const adminTokens = [];
+	let server;
 	beforeAll(async () => {
-		io.listen(3000);
+		server = io.listen(3000);
 		io.on("connection", (socket) => {
 			serverSockets.push(socket);
 		});
@@ -71,12 +73,15 @@ describe('wait list tests', () => {
 	
 	
 	
-	afterAll(() => {
+	afterAll((done) => {
+		io.close(() => {
+			console.warn('server closed')
+			setTimeout(() => {done()}, 1000);
+		});
 		userClients.forEach((client) => {
 			client.close();
 		});
-		io.close();
-	});
+	}, 10*1000);
 
 	afterEach(async () => {
 		serverSockets.map(socket => {
@@ -220,13 +225,11 @@ describe('wait list tests', () => {
 	  
 		serverSockets[0].on('join wait list', async () => {
 		  await WaitListController.joinWaitList(serverSockets[0]);
-		  expect(RuntimeMaps.waitList.has(users[0].id)).toBe(true);
 		  checkDone();
 		});
 
 		serverSockets[1].on('join wait list', async () => {
 		  await WaitListController.joinWaitList(serverSockets[1]);
-		  expect(RuntimeMaps.waitList.has(users[1].id)).toBe(true);
 		  checkDone();
 		});
 	  
@@ -243,7 +246,7 @@ describe('wait list tests', () => {
 		  expect(RuntimeMaps.groupChats.has('chat-'+room)).toBe(true);
 		  expect(RuntimeMaps.groupChats.get('chat-'+room).Users.some(player => player.id == users[0].id)).toBe(true);
 		  const response = await request.get(`/games/${room}`).set('Authorization', `Bearer ${userTokens[0]}`);
-		validateGetGameResponse(response, room);
+			validateGetGameResponse(response, room);
 		  expect(response.status).toBe(200);
 		  checkDone();
 		});

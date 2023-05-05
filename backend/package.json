@@ -12,8 +12,9 @@
         "db:test": "NODE_ENV=test npx sequelize db:migrate:undo:all --env test && NODE_ENV=test npx sequelize db:migrate --env test && NODE_ENV=test npx sequelize db:seed:all $* --seeders-path seeders/test --env test",
         "log:clear": "rm -rf logs/*.json",
         "prettier": "npx prettier --write \"**/*.{js,ts,json}\"",
-        "test": "npm run build & npm run db:test && npx jest --watchAll",
-        "coverage": "npm run build & npm run db:test && npx jest --coverage",
+        "test": "npm run build & STRESS_USERS=50 npm run db:test && npx jest --verbose",
+		"test:stress" : "npm run build & STRESS_USERS=5000 npm run db:test && npx jest -t \"stress\" --verbose",
+        "coverage": "npm run build && STRESS_USERS=50 npx jest --coverage",
         "start": "node server.js",
         "build": "tsc",
         "compile": "tsc && node --trace-warnings ./dist/server.js"

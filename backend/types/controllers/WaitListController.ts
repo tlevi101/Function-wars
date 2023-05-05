@@ -37,10 +37,9 @@ export class WaitListController {
 
     private static async createGame(size: number) {
         const sockets = Array.from(RuntimeMaps.waitList.values()).slice(0, size);
+        await Promise.all(sockets.map(socket => {
+			WaitListController.leaveWaitList(socket);
+        }));
         await GameController.createGame(sockets);
-        sockets.forEach(socket => {
-            socket.leave('wait-list');
-            RuntimeMaps.waitList.delete(socket.decoded.id);
-        });
     }
 }
