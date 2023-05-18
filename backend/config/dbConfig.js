@@ -1,5 +1,5 @@
 require('dotenv').config();
-const dbConfig = {
+const dbConfig = process.env.DB_DIALECT === 'mysql' ? {
     development: {
         host: process.env.DB_HOST,
         username: process.env.DB_USERNAME,
@@ -16,6 +16,17 @@ const dbConfig = {
         dialect: 'mysql',
         logging: process.env.DB_LOGGING === 'true',
     },
+} : {
+	development: {
+		dialect: 'sqlite',
+		storage: process.env.DB_STORAGE_PATH + '/db_development.sqlite',
+		logging: process.env.DB_LOGGING === 'true',
+	},
+	test: {
+		dialect: 'sqlite',
+		storage: process.env.DB_STORAGE_PATH + '/db_test.sqlite',
+		logging: process.env.DB_LOGGING === 'true',
+	},
 };
 
 module.exports = dbConfig;
