@@ -19,6 +19,8 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
     user : DecodedToken | undefined;
     capacity = 2;
     userCount = 0;
+	fieldID = 0;
+	ownerLeft = false;
 	otherPlayers: DecodedToken[] = [];
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
@@ -29,7 +31,8 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         private waitListService: WaitListService
     ) {
         this.waitRoomService.waitRoomDeleted().subscribe(()=>{
-            this.displayInfo('Owner left the wait room.', 404);
+            this.ownerLeft = true;
+			this.displayInfo('Owner left the wait room.', 404);
         })
         this.waitRoomService.userLeftWaitRoom().subscribe(()=>{
 			this.sendGetWaitingRoomRequest();
@@ -89,9 +92,12 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
 				this.otherPlayers = waitRoom.players.filter((player) => player.id !== this.user?.id);
                 this.capacity = waitRoom.capacity;
                 this.userCount = waitRoom.userCount;
+				this.fieldID = waitRoom.fieldID;
             },
             (err:any) => {
-                this.displayInfo(err.error.message, err.status);
+				if(!this.ownerLeft){
+					this.displayInfo(err.error.message, err.status);
+				}
             },
             () => {
                 subscription.unsubscribe();
@@ -122,6 +128,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
 			() => {
 				this.displayInfo('Player kicked successfully');
 				this.otherPlayers = this.otherPlayers.filter((player) => player.id != playerID);
+				this.userCount--;
 			},
 			(err:any) => {
 				this.displayInfo(err.error.message);

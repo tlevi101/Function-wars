@@ -344,8 +344,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             ctx.fillStyle = 'yellowgreen';
-            ctx.beginPath();
             for (let i = 0; i < this.players.length; i++) {
+				ctx.beginPath();
                 ctx.ellipse(
                     this.players[i].location.x,
                     this.players[i].location.y,
@@ -356,8 +356,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                     2 * Math.PI
                 );
                 ctx.fill();
+				ctx.closePath();
             }
-            ctx.closePath();
         }
     }
     drawDamages(xLimit: number = this.field.nativeElement.width) {

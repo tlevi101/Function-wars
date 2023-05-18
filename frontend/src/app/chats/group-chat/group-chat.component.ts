@@ -224,6 +224,10 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
         return this.user?.type==='user' && this.user?.chat_restriction;
     }
 
+	isUser() {
+		return this.user?.type==='user';
+	}
+
     scrollToBottom(): void {
         try {
             setTimeout(() => {

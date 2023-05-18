@@ -51,6 +51,7 @@ export class RegisterComponent implements OnInit {
                 console.log(res);
                 if (this.rememberMe?.value) localStorage.setItem('token', res.jwt);
                 else sessionStorage.setItem('token', res.jwt);
+				this.authService.connectSocket(res.jwt);
                 this.router.navigate(['/']);
             },
             err => {

@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center mt-5">
     <div class="overflow-x-scroll p-4">
         <div class="d-flex gap-2 ">
-            <app-scale-able-field [scale]="0.7"></app-scale-able-field>
+            <app-scale-able-field *ngIf="fieldID!==0" [scale]="0.7" [fieldId]="fieldID"></app-scale-able-field>
             <div class="d-flex flex-column chat p-4">
 				<div *ngIf="isOwner" class="users d-flex">
 					<div class="player-card" *ngFor="let player of otherPlayers">
@@ -14,8 +14,8 @@
                 <app-group-chat
                     *ngIf="chatRoomUUID !== ''"
                     [roomUUID]="chatRoomUUID"
-                    [chatMessagesMaxHeight]="700 * 0.7 - (isOwner ? 200 : 75)"
-                    class="mt-auto"></app-group-chat>
+                    [chatMessagesMaxHeight]="700 * 0.7 - (isOwner && otherPlayers.length>0 ? 175 : 75)"
+                    class="mt-auto mw-100"></app-group-chat>
                 <div  class="d-flex gap-3 mt-2">
                     <button *ngIf="ownerID === user?.id" type="button" class="btn btn-primary" (click)="cancelCustomGame()">Cancel custom game</button>
                     <span class="text-center mt-auto  mb-auto">Users in game: {{userCount+'/'+capacity}}</span>

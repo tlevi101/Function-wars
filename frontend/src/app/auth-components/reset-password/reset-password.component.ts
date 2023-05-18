@@ -77,7 +77,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     public getPasswordConfirmationError(): string {
-        if (this.resetPasswordForm?.hasError('notEquivalent')) return 'Passwords do not match';
+        if (this.passwordConfirmation?.hasError('notEquivalent')) return 'Passwords do not match';
         return '';
     }
     public getPasswordConfirmationState(): string {

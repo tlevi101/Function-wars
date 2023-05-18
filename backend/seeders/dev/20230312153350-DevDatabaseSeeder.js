@@ -74,7 +74,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(chalk.red('DevDatabaseSeeder could not run properly, because of this error:'));
-            console.log(chalk.gray(err));
+            console.log(err);
         }
     },
     async down(queryInterface, Sequelize) {

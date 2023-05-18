@@ -58,7 +58,10 @@ export class AuthService {
 			});
 	}
 
-	connectSocket() {
+	connectSocket(token: string) {
+		this.socket.ioSocket.io.opts.query = {
+			token: token
+		  };
 		this.socket.connect();
 	}
 

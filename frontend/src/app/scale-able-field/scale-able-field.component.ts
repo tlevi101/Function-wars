@@ -9,7 +9,7 @@ import { FieldResponseInterface } from '../interfaces/backend-body.interfaces';
 })
 export class ScaleAbleFieldComponent implements OnInit, AfterViewInit {
     @Input() scale = 0.5;
-    @Input() fieldId = 2;
+    @Input() fieldId = 0;
     @ViewChild('field') fieldCanvas!: ElementRef<HTMLCanvasElement>;
     field: FieldResponseInterface | undefined;
     constructor(private fieldService: FieldService) {}
@@ -49,8 +49,8 @@ export class ScaleAbleFieldComponent implements OnInit, AfterViewInit {
                     ctx.ellipse(
                         objects[i].location.x * this.scale,
                         objects[i].location.y * this.scale,
-                        objects[i].dimension.width * this.scale,
-                        objects[i].dimension.height * this.scale,
+                        (objects[i].dimension.width/2) * this.scale,
+                        (objects[i].dimension.height/2) * this.scale,
                         0,
                         0,
                         2 * Math.PI
