@@ -221,7 +221,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
-            ctx.strokeStyle = 'red';
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
             ctx.fillStyle = 'red';
             ctx.beginPath();
             ctx.moveTo(this.lastFunctionPoints.rightSide[0].x, this.lastFunctionPoints.rightSide[0].y);
