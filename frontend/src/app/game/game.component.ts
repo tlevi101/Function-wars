@@ -49,8 +49,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     }
 
-    ngOnDestroy(): void {
-    }
+    ngOnDestroy(): void {}
 
     ngOnInit() {
         this.activatedRoute.paramMap.subscribe((params: any) => {
@@ -89,11 +88,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             this.infoComponent.buttonLink = '/';
         });
 
-		this.gameService.listenUserBanned().subscribe(({message}) => {
-			this.infoComponent.description = message;
-			this.infoComponent.buttonText = 'Quit';
-			this.infoComponent.buttonLink = '/';
-		})
+        this.gameService.listenUserBanned().subscribe(({ message }) => {
+            this.infoComponent.description = message;
+            this.infoComponent.buttonText = 'Quit';
+            this.infoComponent.buttonLink = '/';
+        });
     }
 
     ngAfterViewInit() {
@@ -189,22 +188,29 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     async animate(newObjects?: ObjectInterface[]) {
         let tickCount = 0;
         const unitPerTick = 0.3;
-        const unitPerSec = 5
+        const unitPerSec = 5;
         const speed = unitPerSec * unitPerTick;
         const ticksPerSecond = 1000 / (speed * this.ratio);
         // const tickRate = 1000 / ticksPerSecond;
-        console.log('lastFunctionLength: ', this.lastFunctionLength)
+        console.log('lastFunctionLength: ', this.lastFunctionLength);
         console.log('ticksPerSecond: ', ticksPerSecond);
         await new Promise<void>(resolve => {
             const timer = setInterval(() => {
                 tickCount++;
                 this.draw(tickCount * this.ratio * unitPerTick);
-                const rightLastPoint = this.lastFunctionPoints?.rightSide[this.lastFunctionPoints?.rightSide.length - 1];
+                const rightLastPoint =
+                    this.lastFunctionPoints?.rightSide[this.lastFunctionPoints?.rightSide.length - 1];
                 const rightFirstPoint = this.lastFunctionPoints?.rightSide[0];
                 const leftLastPoint = this.lastFunctionPoints?.leftSide[this.lastFunctionPoints?.leftSide.length - 1];
                 const leftFirstPoint = this.lastFunctionPoints?.leftSide[0];
-                if (( !rightLastPoint || !rightFirstPoint || tickCount * this.ratio * unitPerTick + rightFirstPoint.x  >= rightLastPoint.x) &&
-					( !leftLastPoint || !leftFirstPoint || leftFirstPoint.x-tickCount * this.ratio * unitPerTick <= leftLastPoint.x)) {
+                if (
+                    (!rightLastPoint ||
+                        !rightFirstPoint ||
+                        tickCount * this.ratio * unitPerTick + rightFirstPoint.x >= rightLastPoint.x) &&
+                    (!leftLastPoint ||
+                        !leftFirstPoint ||
+                        leftFirstPoint.x - tickCount * this.ratio * unitPerTick <= leftLastPoint.x)
+                ) {
                     setTimeout(() => {
                         this.lastDamages = {};
                     }, 100);
@@ -345,7 +351,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (ctx) {
             ctx.fillStyle = 'yellowgreen';
             for (let i = 0; i < this.players.length; i++) {
-				ctx.beginPath();
+                ctx.beginPath();
                 ctx.ellipse(
                     this.players[i].location.x,
                     this.players[i].location.y,
@@ -356,7 +362,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                     2 * Math.PI
                 );
                 ctx.fill();
-				ctx.closePath();
+                ctx.closePath();
             }
         }
     }
@@ -365,7 +371,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (ctx) {
             ctx.fillStyle = '#D6DEEB';
             if (
-                this.lastFunctionPoints && this.lastFunctionPoints.rightSide.length > 0 &&
+                this.lastFunctionPoints &&
+                this.lastFunctionPoints.rightSide.length > 0 &&
                 xLimit + this.lastFunctionPoints.rightSide[0].x >=
                     this.lastFunctionPoints.rightSide[this.lastFunctionPoints.rightSide.length - 1].x &&
                 this.lastDamages.rightSide
@@ -373,7 +380,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.drawNewDamage(this.lastDamages.rightSide);
             }
             if (
-                this.lastFunctionPoints && this.lastFunctionPoints.leftSide.length > 0 &&
+                this.lastFunctionPoints &&
+                this.lastFunctionPoints.leftSide.length > 0 &&
                 this.lastFunctionPoints.leftSide[0].x - xLimit <=
                     this.lastFunctionPoints.leftSide[this.lastFunctionPoints.leftSide.length - 1].x &&
                 this.lastDamages.leftSide

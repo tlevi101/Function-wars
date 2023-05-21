@@ -15,7 +15,7 @@ export class NewGameComponent implements OnInit {
     canCreateGame = false;
     showWaiting = false;
     showCreateCustomGame = false;
-	user : DecodedToken | undefined;
+    user: DecodedToken | undefined;
     @ViewChild('onWaiting') onWaiting!: OnWaitingComponent;
     constructor(
         private jwtService: JwtService,
@@ -23,23 +23,23 @@ export class NewGameComponent implements OnInit {
         private fieldService: FieldService,
         private waitListService: WaitListService
     ) {
-		this.user = jwtService.getDecodedAccessToken();
-	}
+        this.user = jwtService.getDecodedAccessToken();
+    }
 
     ngOnInit(): void {
         if (!this.jwtService.isTokenValid()) {
             this.router.navigate(['/login']);
         }
-		if(this.user && this.user.type === 'user'){
-			this.fieldService.getFields().subscribe(
-				(response: any) => {
-					this.canCreateGame = response.fields.length > 0;
-				},
-				(error: any) => {
-					//TODO handle error
-				}
-			);
-		}
+        if (this.user && this.user.type === 'user') {
+            this.fieldService.getFields().subscribe(
+                (response: any) => {
+                    this.canCreateGame = response.fields.length > 0;
+                },
+                (error: any) => {
+                    //TODO handle error
+                }
+            );
+        }
         this.waitListService.joinedGame().subscribe((response: any) => {
             console.log(response);
             this.showWaiting = false;
@@ -57,9 +57,9 @@ export class NewGameComponent implements OnInit {
         this.waitListService.leaveWaitList();
     }
 
-	get isGuest(): boolean {
-		return this.user?.type === 'guest';
-	}
+    get isGuest(): boolean {
+        return this.user?.type === 'guest';
+    }
 
     protected readonly onpageshow = onpageshow;
 }

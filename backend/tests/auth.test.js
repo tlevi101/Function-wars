@@ -1,9 +1,8 @@
 const request = require('supertest');
-const{ app } = require('../app');
+const { app } = require('../app');
 const { User } = require('../models');
 const jsonwebtoken = require('jsonwebtoken');
 const { Op } = require('sequelize');
-
 
 describe('AuthController test cases ', () => {
     test('POST /register-guest name is missing', () => {
@@ -52,29 +51,29 @@ describe('AuthController test cases ', () => {
     });
 
     test('POST /register-guest everything went well', async () => {
-        const response =  await request(app)
+        const response = await request(app)
             .post('/register-guest')
             .send({ name: 'test' })
             .expect('Content-Type', /json/)
             .expect(201);
-		expect(response.body).toEqual(
-			expect.objectContaining({
-				message: 'Guest accepted',
-				jwt: expect.any(String),
-			})
-		);
+        expect(response.body).toEqual(
+            expect.objectContaining({
+                message: 'Guest accepted',
+                jwt: expect.any(String),
+            })
+        );
 
-		const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
-		expect(decoded).toEqual(
-			expect.objectContaining({
-				type: 'guest',
-				name: 'Guest: test',
-				id: expect.any(String),
-				guest:true,
-				JWT_createdAt: expect.any(String),
-				iat: expect.any(Number),
-			})
-		);
+        const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+        expect(decoded).toEqual(
+            expect.objectContaining({
+                type: 'guest',
+                name: 'Guest: test',
+                id: expect.any(String),
+                guest: true,
+                JWT_createdAt: expect.any(String),
+                iat: expect.any(Number),
+            })
+        );
     });
 
     test('POST /register password is missing', () => {
@@ -168,7 +167,8 @@ describe('AuthController test cases ', () => {
             .then(res => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        message: 'notNull Violation: User.name cannot be null,\nnotNull Violation: User.email cannot be null',
+                        message:
+                            'notNull Violation: User.name cannot be null,\nnotNull Violation: User.email cannot be null',
                     })
                 );
             });
@@ -247,27 +247,27 @@ describe('AuthController test cases ', () => {
             })
             .expect('Content-Type', /json/)
             .expect(201);
-                expect(response.body).toEqual(
-                    expect.objectContaining({
-                        message: 'User created',
-                        jwt: expect.any(String),
-                    })
-                );
-			const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
-			expect(decoded).toEqual(
-				expect.objectContaining({
-					type: 'user',
-					id: expect.any(Number),
-					name: 'test',
-					email: 'test@test.com',
-					banned: false,
-					banned_reason: null,
-					is_admin: false,
-					role: 'user',
-					JWT_createdAt: expect.any(String),
-					chat_restriction: false,
-				})
-			);
+        expect(response.body).toEqual(
+            expect.objectContaining({
+                message: 'User created',
+                jwt: expect.any(String),
+            })
+        );
+        const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+        expect(decoded).toEqual(
+            expect.objectContaining({
+                type: 'user',
+                id: expect.any(Number),
+                name: 'test',
+                email: 'test@test.com',
+                banned: false,
+                banned_reason: null,
+                is_admin: false,
+                role: 'user',
+                JWT_createdAt: expect.any(String),
+                chat_restriction: false,
+            })
+        );
     });
 
     test('POST /register name already exists', () => {
@@ -361,9 +361,9 @@ describe('AuthController test cases ', () => {
             });
     });
 
-	/**
-	 * @email user6... (@name: banned user) is banned
-	 */
+    /**
+     * @email user6... (@name: banned user) is banned
+     */
     test('POST /login user banned', () => {
         return request(app)
             .post('/login')
@@ -422,27 +422,27 @@ describe('AuthController test cases ', () => {
             })
             .expect('Content-Type', /json/)
             .expect(200);
-		expect(response.body).toEqual(
-			expect.objectContaining({
-				message: 'Login successful',
-				jwt: expect.any(String),
-			})
-		);
-		const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
-			expect(decoded).toEqual(
-				expect.objectContaining({
-					type: 'user',
-					id: expect.any(Number),
-					name: 'test',
-					email: 'test@test.com',
-					banned: false,
-					banned_reason: null,
-					is_admin: false,
-					role: 'user',
-					JWT_createdAt: expect.any(String),
-					chat_restriction: false,
-				})
-			);
+        expect(response.body).toEqual(
+            expect.objectContaining({
+                message: 'Login successful',
+                jwt: expect.any(String),
+            })
+        );
+        const decoded = jsonwebtoken.verify(response.body.jwt, process.env.JWT_SECRET || 'secret');
+        expect(decoded).toEqual(
+            expect.objectContaining({
+                type: 'user',
+                id: expect.any(Number),
+                name: 'test',
+                email: 'test@test.com',
+                banned: false,
+                banned_reason: null,
+                is_admin: false,
+                role: 'user',
+                JWT_createdAt: expect.any(String),
+                chat_restriction: false,
+            })
+        );
     });
 
     test('POST /forgot-password email missing', () => {
@@ -507,7 +507,7 @@ describe('AuthController test cases ', () => {
             });
     });
 
-	test('POST /forgot-password forgot password resent ', () => {
+    test('POST /forgot-password forgot password resent ', () => {
         return request(app)
             .post('/forgot-password')
             .send({ email: 'test@test.com' })
@@ -559,23 +559,25 @@ describe('AuthController test cases ', () => {
     });
 
     test('PUT /reset-password/:uuid link expired', async () => {
-		const user =  await User.findOne({where:{
-			email: 'user8@functionWars.com'
-		}});
+        const user = await User.findOne({
+            where: {
+                email: 'user8@functionWars.com',
+            },
+        });
         const passwordReset = await user.getPasswordReset();
-		const uuid = passwordReset.getUuid();
+        const uuid = passwordReset.getUuid();
         return request(app)
             .put(`/reset-password/${uuid}`)
             .send({ password: '12345678', passwordAgain: '12345678' })
             .expect('Content-Type', /json/)
             .expect(400)
             .then(res => {
-				expect(res.body).toEqual(
-					expect.objectContaining({
-						message: 'Link expired',
-					})
-				)
-			});
+                expect(res.body).toEqual(
+                    expect.objectContaining({
+                        message: 'Link expired',
+                    })
+                );
+            });
     });
 
     test('PUT /reset-password/:uuid password missing', async () => {
@@ -706,93 +708,87 @@ describe('AuthController test cases ', () => {
     });
 });
 
-
-
 describe('AuthController - update token', () => {
-	let token;
-	let badToken;
-	let guestToken;
+    let token;
+    let badToken;
+    let guestToken;
 
-	beforeAll(async () => {
-		const response = await request(app)
-				.post('/login')
-				.send({
-					email: 'user1@functionWars.com',
-					password: 'password'
-				});
-		token = response.body.jwt;
+    beforeAll(async () => {
+        const response = await request(app).post('/login').send({
+            email: 'user1@functionWars.com',
+            password: 'password',
+        });
+        token = response.body.jwt;
 
-		const responseGuest = await request(app)
-			.post('/register-guest')
-			.send({ name: 'test guest' })
-			.expect('Content-Type', /json/)
-			.expect(201)
-		guestToken = responseGuest.body.jwt;
-		console.log(responseGuest.body);
-		console.log(responseGuest.body.jwt);
-		badToken = jsonwebtoken.sign(
-			{
-				type: 'user',
-				id: 0,
-				name: 'USer with bad token',
-				email: 'user2102102102@functionWars.com',
-				banned: false,
-				banned_reason: null,
-				is_admin: false,
-				role: 'user',
-				JWT_createdAt: new Date(),
-				chat_restriction: false,
-			},
-			process.env.JWT_SECRET || 'secret',
-			{
-				algorithm: process.env.JWT_ALGO || 'HS256',
-			}
-		)
-	});
+        const responseGuest = await request(app)
+            .post('/register-guest')
+            .send({ name: 'test guest' })
+            .expect('Content-Type', /json/)
+            .expect(201);
+        guestToken = responseGuest.body.jwt;
+        console.log(responseGuest.body);
+        console.log(responseGuest.body.jwt);
+        badToken = jsonwebtoken.sign(
+            {
+                type: 'user',
+                id: 0,
+                name: 'USer with bad token',
+                email: 'user2102102102@functionWars.com',
+                banned: false,
+                banned_reason: null,
+                is_admin: false,
+                role: 'user',
+                JWT_createdAt: new Date(),
+                chat_restriction: false,
+            },
+            process.env.JWT_SECRET || 'secret',
+            {
+                algorithm: process.env.JWT_ALGO || 'HS256',
+            }
+        );
+    });
 
+    test('Guest token', async () => {
+        return request(app)
+            .get('/update-token')
+            .set('Authorization', `Bearer ${guestToken}`)
+            .expect('Content-Type', /json/)
+            .expect(403)
+            .then(res => {
+                expect(res.body).toEqual(
+                    expect.objectContaining({
+                        message: 'Guest cannot make this request!',
+                    })
+                );
+            });
+    });
 
-	test('Guest token', async () => {
-		return request(app)
-			.get('/update-token')
-			.set('Authorization', `Bearer ${guestToken}`)
-			.expect('Content-Type', /json/)
-			.expect(403)
-			.then(res => {
-				expect(res.body).toEqual(
-					expect.objectContaining({
-						message: 'Guest cannot make this request!',
-					})
-				);
-			});
-	});
+    test('Bad token', async () => {
+        return request(app)
+            .get('/update-token')
+            .set('Authorization', `Bearer ${badToken}`)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => {
+                expect(res.body).toEqual(
+                    expect.objectContaining({
+                        message: 'User not found',
+                    })
+                );
+            });
+    });
 
-
-	test('Bad token', async () => {
-		return request(app)
-			.get('/update-token')
-			.set('Authorization', `Bearer ${badToken}`)
-			.expect('Content-Type', /json/)
-			.expect(404)
-			.then(res => {
-				expect(res.body).toEqual(
-					expect.objectContaining({
-						message: 'User not found',
-					})
-				);
-			});
-	});
-
-	test('Everything went well', async () => {
-		const response =  await request(app)
-			.get('/update-token')
-			.set('Authorization', `Bearer ${token}`)
-			.expect('Content-Type', /json/)
-			.expect(200);
-		expect(response.body).toEqual(
-			expect.objectContaining({
-				message: 'Token updated',
-				jwt: expect.any(String),
-			})
-		);
-	});
+    test('Everything went well', async () => {
+        const response = await request(app)
+            .get('/update-token')
+            .set('Authorization', `Bearer ${token}`)
+            .expect('Content-Type', /json/)
+            .expect(200);
+        expect(response.body).toEqual(
+            expect.objectContaining({
+                message: 'Token updated',
+                jwt: expect.any(String),
+            })
+        );
+    });
 });

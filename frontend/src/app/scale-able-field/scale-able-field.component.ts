@@ -49,8 +49,8 @@ export class ScaleAbleFieldComponent implements OnInit, AfterViewInit {
                     ctx.ellipse(
                         objects[i].location.x * this.scale,
                         objects[i].location.y * this.scale,
-                        (objects[i].dimension.width/2) * this.scale,
-                        (objects[i].dimension.height/2) * this.scale,
+                        (objects[i].dimension.width / 2) * this.scale,
+                        (objects[i].dimension.height / 2) * this.scale,
                         0,
                         0,
                         2 * Math.PI

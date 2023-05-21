@@ -98,31 +98,26 @@ export class Shape {
         throw new Error('Method not implemented.');
     }
 
-
     public async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
 
+    public static async pointInsideOfAnyDamage(point: Point, damages: DamageCircle[]): Promise<boolean> {
+        for await (const damage of damages) {
+            if (damage.pointIsInside(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-
-	public static async pointInsideOfAnyDamage(point: Point, damages: DamageCircle[]): Promise<boolean> {
-		for await (const damage of damages) {
-			if (damage.pointIsInside(point)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static async getDamagesFromObjects(objects: (Ellipse | Rectangle)[]): Promise<DamageCircle[]> {
-		const damages: DamageCircle[] = [];
-		for await (const object of objects) {
-			damages.push(...object.Damages);
-		}
-		return damages;
-	}
-
-
+    public static async getDamagesFromObjects(objects: (Ellipse | Rectangle)[]): Promise<DamageCircle[]> {
+        const damages: DamageCircle[] = [];
+        for await (const object of objects) {
+            damages.push(...object.Damages);
+        }
+        return damages;
+    }
 
     get Dimension(): Dimension {
         return this.dimension;
@@ -175,9 +170,9 @@ export class Ellipse extends Shape {
     }
 
     public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
-		if(await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))){
-			return false;
-		}
+        if (await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))) {
+            return false;
+        }
         const x = point.x - this.Location.x;
         const y = point.y - this.Location.y;
         const a = this.Dimension.width;
@@ -306,9 +301,9 @@ export class Rectangle extends Shape {
      * @return boolean
      */
     public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
-		if(await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))){
-			return false;
-		}
+        if (await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))) {
+            return false;
+        }
         const crossProducts: number[] = [];
         for (let i = 0; i < this.angles.length - 1; i++) {
             const sideVector = await Vector.initFromPoints(this.angles[i], this.angles[i + 1]);
@@ -347,7 +342,7 @@ export class Circle {
         return { location: this.location.toJSON(), radius: this.radius };
     }
 
-	public pointIsInside(point: Point): boolean {
+    public pointIsInside(point: Point): boolean {
         return point.distance(this.location) < this.radius;
     }
 

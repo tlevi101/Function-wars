@@ -16,8 +16,8 @@ const MyLogger = require('../../logs/logger.js');
 /**
  * @property [playerID : string] : string
  */
-export interface SubmittedFunction{
-	[playerID: string | number]: string;
+export interface SubmittedFunction {
+    [playerID: string | number]: string;
 }
 
 export class Game {
@@ -29,7 +29,7 @@ export class Game {
     private uuid: string;
     private sockets: any[];
     private gameOver = false;
-	private submittedFunctions: SubmittedFunction[] = [];
+    private submittedFunctions: SubmittedFunction[] = [];
     constructor(
         players: PlayerInterface[],
         objects: ObjectInterface[],
@@ -53,10 +53,11 @@ export class Game {
                 });
             }
         });
-        this.uuid = `game-${field.id}-${players.map(player => {
-				return typeof player.id==='string' ? player.id.substring(0,3) : player.id
-			}).join('')
-		}`;
+        this.uuid = `game-${field.id}-${players
+            .map(player => {
+                return typeof player.id === 'string' ? player.id.substring(0, 3) : player.id;
+            })
+            .join('')}`;
         this.field = field;
         this.currentPlayer =
             currentPlayer !== undefined
@@ -75,10 +76,10 @@ export class Game {
     }
 
     public async submitFunction(func: string): Promise<void | never> {
-		if(this.submittedFunctions.some(submittedFunction => submittedFunction[this.CurrentPlayer.ID] === func)){
-			throw new Error('Function already submitted')
-		}
-		this.submittedFunctions.push({[this.currentPlayer.ID]:func});
+        if (this.submittedFunctions.some(submittedFunction => submittedFunction[this.CurrentPlayer.ID] === func)) {
+            throw new Error('Function already submitted');
+        }
+        this.submittedFunctions.push({ [this.currentPlayer.ID]: func });
         const funcCalculator = new FuncCalculator(func, this.currentPlayer.Location.x, this.currentPlayer.Location.y);
         if (!(await funcCalculator.isValidFunction())) {
             throw new Error('Invalid function');
@@ -274,36 +275,53 @@ export class Game {
         return this.players.find(player => player.ID === playerID);
     }
 
-	public static async getFunctionLength(points:{leftSide:PointInterface[], rightSide:PointInterface[]}): Promise<number> {
-		type Prev = {point:Point | undefined, distance:number};
-		const leftSideLength = (await new Promise<Prev>(
-			(resolve)=>resolve(points.leftSide.reduce((prev:Prev, curr) => {
-				const point = new Point(curr.x, curr.y);
-				if(!prev.point) {
-					prev.point = point;
-					return prev;
-				}
-				return {
-					point: point,
-					distance: prev.distance + prev.point.distance(point)
-				};
-			}, {point:undefined, distance:0}))
-		)).distance;
-		const rightSideLength = (await new Promise<Prev>(
-			(resolve)=>resolve(points.rightSide.reduce((prev:Prev, curr) => {
-				const point = new Point(curr.x, curr.y);
-				if(!prev.point) {
-					prev.point = point;
-					return prev;
-				}
-				return {
-					point: point,
-					distance: prev.distance + prev.point.distance(point)
-				};
-			}, {point:undefined, distance:0}))
-		)).distance;
-		return leftSideLength + rightSideLength;
-	}
+    public static async getFunctionLength(points: {
+        leftSide: PointInterface[];
+        rightSide: PointInterface[];
+    }): Promise<number> {
+        type Prev = { point: Point | undefined; distance: number };
+        const leftSideLength = (
+            await new Promise<Prev>(resolve =>
+                resolve(
+                    points.leftSide.reduce(
+                        (prev: Prev, curr) => {
+                            const point = new Point(curr.x, curr.y);
+                            if (!prev.point) {
+                                prev.point = point;
+                                return prev;
+                            }
+                            return {
+                                point: point,
+                                distance: prev.distance + prev.point.distance(point),
+                            };
+                        },
+                        { point: undefined, distance: 0 }
+                    )
+                )
+            )
+        ).distance;
+        const rightSideLength = (
+            await new Promise<Prev>(resolve =>
+                resolve(
+                    points.rightSide.reduce(
+                        (prev: Prev, curr) => {
+                            const point = new Point(curr.x, curr.y);
+                            if (!prev.point) {
+                                prev.point = point;
+                                return prev;
+                            }
+                            return {
+                                point: point,
+                                distance: prev.distance + prev.point.distance(point),
+                            };
+                        },
+                        { point: undefined, distance: 0 }
+                    )
+                )
+            )
+        ).distance;
+        return leftSideLength + rightSideLength;
+    }
 
     get CurrentPlayer(): Player {
         return this.currentPlayer;

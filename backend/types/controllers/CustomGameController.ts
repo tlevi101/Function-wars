@@ -6,9 +6,6 @@ import { GroupChatController } from './GroupChatController';
 import { GameController } from './GameController';
 const { User } = require('../../models');
 export class CustomGameController {
-
-
-
     //*****************//
     //Route controllers//
     //*****************//
@@ -23,8 +20,6 @@ export class CustomGameController {
         const waitingRooms = WaitingRoom.publicRoomsFree(Array.from(req.waitingRooms.values()));
         return res.status(200).json({ customGames: WaitingRoom.toFrontendAll(waitingRooms) });
     }
-
-
 
     /**
      * @route GET /wait-rooms/:roomUUID
@@ -41,44 +36,36 @@ export class CustomGameController {
         return res.status(200).json({ waitRoom: room.toFrontend() });
     }
 
-
-
-	/**
-	 * @method POST
-	 * @route /wait-rooms/:roomUUID/:userID/kick
-	 * @param req
-	 * @param res
-	 */
-	public static async kickPlayer(req: MyRequest, res: MyResponse) {
-		const { roomUUID, userID } = req.params;
-		const { user } = req;
-		if(user.type === 'guest') {
-			return res.status(403).json({ message: 'Guest cannot make this request!' });
-		}
-		const room = req.waitingRooms.get(roomUUID);
-		if (!room) {
-			return res.status(404).json({ message: 'Room not found' });
-		}
-		if(!room.isOwner(user.id)){
-			return res.status(403).json({ message: 'You are not the owner of this room' });	
-		}
-		if(!room.userIsInRoom(userID)){
-			console.debug(`User ${userID} not in room`);
-			return res.status(404).json({ message: 'User not in room' });
-		}
-		room.kickPlayer(userID);
-		return res.status(200).json({ message: 'Player kicked' });
-	}
-
-
-
+    /**
+     * @method POST
+     * @route /wait-rooms/:roomUUID/:userID/kick
+     * @param req
+     * @param res
+     */
+    public static async kickPlayer(req: MyRequest, res: MyResponse) {
+        const { roomUUID, userID } = req.params;
+        const { user } = req;
+        if (user.type === 'guest') {
+            return res.status(403).json({ message: 'Guest cannot make this request!' });
+        }
+        const room = req.waitingRooms.get(roomUUID);
+        if (!room) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+        if (!room.isOwner(user.id)) {
+            return res.status(403).json({ message: 'You are not the owner of this room' });
+        }
+        if (!room.userIsInRoom(userID)) {
+            console.debug(`User ${userID} not in room`);
+            return res.status(404).json({ message: 'User not in room' });
+        }
+        room.kickPlayer(userID);
+        return res.status(200).json({ message: 'Player kicked' });
+    }
 
     //******************//
     //Socket controllers//
     //******************//
-
-
-
 
     /**
      * @event create custom game
@@ -90,12 +77,12 @@ export class CustomGameController {
     public static async createCustomGame(socket: socket, fieldID: any, isPrivate: boolean, friendIDs?: number[]) {
         console.debug(friendIDs);
         console.debug(`User (${socket.decoded.name}) created a custom game.`);
-		console.debug(`Field ID: ${fieldID}, type: ${typeof fieldID}`);
-		fieldID = parseInt(fieldID);
-		if(!Number.isInteger(fieldID)){
-			socket.emit('error', { message: 'Field is required', code: 400 });
-			return;
-		}
+        console.debug(`Field ID: ${fieldID}, type: ${typeof fieldID}`);
+        fieldID = parseInt(fieldID);
+        if (!Number.isInteger(fieldID)) {
+            socket.emit('error', { message: 'Field is required', code: 400 });
+            return;
+        }
         const room = await new Promise<WaitingRoom>(resolve => {
             resolve(new WaitingRoom(socket.decoded, fieldID, socket, isPrivate));
         });
@@ -109,9 +96,6 @@ export class CustomGameController {
         }
         socket.emit('waiting room created', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
     }
-
-
-
 
     /**
      * @event join waiting room
@@ -145,9 +129,6 @@ export class CustomGameController {
         socket.emit('waiting room joined');
     }
 
-
-
-
     /**
      * @event leave waiting room
      * @param socket
@@ -166,9 +147,6 @@ export class CustomGameController {
         GroupChatController.leaveGroupChat(socket);
     }
 
-
-
-
     public static async ownerLeft(socket: socket) {
         const room = await this.getWaitingRoomByOwner(socket.decoded);
         const groupChat = RuntimeMaps.groupChats.get(room?.ChatUUID || '');
@@ -179,9 +157,6 @@ export class CustomGameController {
         return !room.ownerIsOnline;
     }
 
-
-
-
     public static async deleteWaitingRoom(socket: socket) {
         const room = await this.getWaitingRoomByOwner(socket.decoded);
         if (!room) {
@@ -191,12 +166,9 @@ export class CustomGameController {
         console.log(`Wait room (${room.UUID} deleted`);
         socket.to(room.UUID).emit('wait room owner left');
         room.destroy();
-       
-		await GroupChatController.deleteGroupChatByUUID(room.ChatUUID);
+
+        await GroupChatController.deleteGroupChatByUUID(room.ChatUUID);
     }
-
-
-
 
     public static async startGame(socket: socket) {
         const room = await this.getWaitingRoomByOwner(socket.decoded);
@@ -207,55 +179,41 @@ export class CustomGameController {
         await GameController.createGame(room.Sockets, room.FieldID);
     }
 
-
-
-
     private static async findWaitingRoom(where: (waitRoom: WaitingRoom) => boolean): Promise<WaitingRoom | null> {
         for await (const [key, waitRoom] of RuntimeMaps.waitingRooms.entries()) {
             if (where(waitRoom)) {
                 return waitRoom;
             }
         }
-        
-		return null;
+
+        return null;
     }
-
-
-
 
     public static async getWaitingRoomByUser(user: DecodedToken) {
         return await CustomGameController.findWaitingRoom(room => room.userIsInRoom(user.id));
     }
 
-
-
-
     public static async getWaitingRoomByOwner(user: DecodedToken) {
         if (user.type === 'guest') return;
-        
-		return await CustomGameController.findWaitingRoom(room => room.isOwner(user.id));
+
+        return await CustomGameController.findWaitingRoom(room => room.isOwner(user.id));
     }
-
-
-
 
     private static async sendInvites(socket: socket, friendIDs: number[]) {
         const user = await User.findOne({ where: { id: socket.decoded.id } });
         const room = await this.getWaitingRoomByOwner(socket.decoded);
-        
-		if (!room) {
+
+        if (!room) {
             console.error(`Wait room for user ${socket.decoded.name} not found`);
             return;
         }
-        
-		
-		if (!user) {
+
+        if (!user) {
             console.error(`User ${socket.decoded.name} not found`);
             return;
         }
-        
-		
-		friendIDs.forEach(friendID => {
+
+        friendIDs.forEach(friendID => {
             if (user.isFriend(friendID)) {
                 const friendSocket = RuntimeMaps.onlineUsers.get(friendID)?.socketID;
                 if (friendSocket) {

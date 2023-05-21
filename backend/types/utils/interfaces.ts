@@ -63,7 +63,6 @@ export interface MutesInterface {
     mutedUser: UserInterface;
 }
 
-
 export interface GroupChatInterface {
     messages: MessageInterface[];
     users: UserInterface[];

@@ -1,16 +1,15 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Pagination} from "../pagination";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Pagination } from '../pagination';
 
 @Component({
-  selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.scss']
+    selector: 'app-pagination',
+    templateUrl: './pagination.component.html',
+    styleUrls: ['./pagination.component.scss'],
 })
-export class PaginationComponent implements OnInit{
-
+export class PaginationComponent implements OnInit {
     pagination: Pagination;
-    @Input() collectionSize=0;
-    @Input() pageSize= 7;
+    @Input() collectionSize = 0;
+    @Input() pageSize = 7;
     @Output() pageChanged = new EventEmitter<number>();
     constructor() {
         this.pagination = new Pagination(0);
@@ -20,18 +19,16 @@ export class PaginationComponent implements OnInit{
         this.pagination = new Pagination(this.collectionSize, this.pageSize);
     }
 
-
-    turnPageTo(page:number){
+    turnPageTo(page: number) {
         this.pagination.turnPageTo(page);
         this.pageChanged.emit(this.pagination.page);
     }
-    turnPageNext(){
+    turnPageNext() {
         this.pagination.incrementCurrentPageBy(1);
         this.pageChanged.emit(this.pagination.page);
     }
-    turnPagePrevious(){
+    turnPagePrevious() {
         this.pagination.incrementCurrentPageBy(-1);
         this.pageChanged.emit(this.pagination.page);
     }
-
 }

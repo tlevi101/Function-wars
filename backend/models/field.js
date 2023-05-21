@@ -26,12 +26,12 @@ module.exports = (sequelize, DataTypes) => {
             name: DataTypes.STRING,
             user_id: DataTypes.INTEGER,
             is_admin_field: {
-				type:DataTypes.BOOLEAN,
-				defaultValue:false,
-			},
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
             field: {
-				type:DataTypes.JSON,
-			},
+                type: DataTypes.JSON,
+            },
             deletedAt: DataTypes.DATE,
         },
         {

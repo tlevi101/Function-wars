@@ -7,7 +7,7 @@ import { Socket } from 'ngx-socket-io';
 export class SocketErrorService {
     constructor(private socket: Socket) {}
 
-    listenError(){
-        return this.socket.fromEvent<{message:string, code:number}>('error')
+    listenError() {
+        return this.socket.fromEvent<{ message: string; code: number }>('error');
     }
 }

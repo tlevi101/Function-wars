@@ -23,9 +23,9 @@ export class RegisterGuestComponent implements OnInit {
     public submit() {
         this.authService.registerGuest(this.guestForm.value).subscribe(
             (res: any) => {
-				console.log(res);
+                console.log(res);
                 sessionStorage.setItem('token', res.jwt);
-				this.authService.connectSocket(res.jwt);
+                this.authService.connectSocket(res.jwt);
                 this.router.navigate(['/']);
             },
             err => {

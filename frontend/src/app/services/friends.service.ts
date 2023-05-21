@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {EventEmitter, Injectable} from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {DecodedToken} from "../interfaces/token.interface";
-import {Socket} from "ngx-socket-io";
+import { DecodedToken } from '../interfaces/token.interface';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
     providedIn: 'root',
@@ -10,7 +10,7 @@ import {Socket} from "ngx-socket-io";
 export class FriendsService {
     private hr;
     private url;
-    public friendDeleted : EventEmitter<number>;
+    public friendDeleted: EventEmitter<number>;
     constructor(private http: HttpClient, private socket: Socket) {
         this.friendDeleted = new EventEmitter();
         this.url = 'http://localhost:4000/friends';
@@ -23,8 +23,11 @@ export class FriendsService {
         return this.http.get(`${this.url}`, { headers: this.hr });
     }
 
-    getOnlineFriends():Observable<{friends: {id:number, name:string, unreadMessages:number}[]}> {
-        return this.http.get<{friends: {id:number, name:string, unreadMessages:number}[]}>(`${this.url}/online`, { headers: this.hr });
+    getOnlineFriends(): Observable<{ friends: { id: number; name: string; unreadMessages: number }[] }> {
+        return this.http.get<{ friends: { id: number; name: string; unreadMessages: number }[] }>(
+            `${this.url}/online`,
+            { headers: this.hr }
+        );
     }
 
     deleteFriend(friendId: number) {
@@ -50,11 +53,11 @@ export class FriendsService {
         return this.http.post<{ message: string }>(`${this.url}/${friendId}`, {}, { headers: this.hr });
     }
 
-    receiveInvite(): Observable<{inviter:DecodedToken, customGameUUID:string}> {
+    receiveInvite(): Observable<{ inviter: DecodedToken; customGameUUID: string }> {
         return this.socket.fromEvent('receive invite');
     }
 
-    inviteRejected(invite:{inviterID:number, invitedID:number}){
-        this.socket.emit('reject invite', {invite});
+    inviteRejected(invite: { inviterID: number; invitedID: number }) {
+        this.socket.emit('reject invite', { invite });
     }
 }

@@ -43,7 +43,7 @@ export interface Action {
     confirmRequired: (data?: any) => boolean;
     confirmType?: ConfirmType;
     confirmData?: ConfirmWithInputData | ConfirmData;
-    visibleWhen?: (data?: any, user?:DecodedToken) => boolean;
+    visibleWhen?: (data?: any, user?: DecodedToken) => boolean;
 }
 
 export interface BaseData {
@@ -64,7 +64,7 @@ export interface BaseData {
 export class BaseListComponent {
     selectedDataForAction: any = null;
     lastAction: Action | null = null;
-	user: DecodedToken | undefined;
+    user: DecodedToken | undefined;
     @Input() collectionSize = 0;
     @Input() pageSize = 7;
     @Input() page = 1;
@@ -80,9 +80,9 @@ export class BaseListComponent {
         data: any[];
         confirmInput?: string;
     }> = new EventEmitter();
-    constructor(private jwt:JwtService) {
-		this.user =  jwt.getDecodedAccessToken();
-		console.log(this.user)
+    constructor(private jwt: JwtService) {
+        this.user = jwt.getDecodedAccessToken();
+        console.log(this.user);
     }
 
     actionClicked(action: Action, dataId: number | undefined = undefined): void {

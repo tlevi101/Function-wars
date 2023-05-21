@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { NavigatedService } from './navigated.service';
 
 describe('NavigatedService', () => {
-  let service: NavigatedService;
+    let service: NavigatedService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(NavigatedService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(NavigatedService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 });

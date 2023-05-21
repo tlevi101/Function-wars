@@ -28,7 +28,7 @@ export class GroupChatService {
         this.socket.emit('join group chat', { roomUUID });
     }
 
-    public newUserJoinedGroupChat(){
+    public newUserJoinedGroupChat() {
         return this.socket.fromEvent('new user joined group chat');
     }
     public getOtherUsersStatus(roomUUID: string) {

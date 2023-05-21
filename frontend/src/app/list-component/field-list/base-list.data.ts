@@ -14,7 +14,7 @@ const confirmData: ConfirmData = {
 };
 const deleteHTML = `<i class="fs-4 bi bi-trash3-fill text-danger"></i>`;
 const editHTML = `<i class="fs-4 bi bi-pencil-square text-primary"></i>`;
-const restoreHTML = `<i class="fs-4 text-primary bi bi-arrow-clockwise"></i>`
+const restoreHTML = `<i class="fs-4 text-primary bi bi-arrow-clockwise"></i>`;
 const singularActions: Action[] = [
     {
         type: 'edit',
@@ -35,11 +35,11 @@ const singularActions: Action[] = [
         HTML: restoreHTML,
         tooltip: 'Restore Field',
         confirmRequired: () => false,
-        visibleWhen: (field:any) => {
+        visibleWhen: (field: any) => {
             console.log(field);
-            return field.deletedAt!==null;
-        }
-    }
+            return field.deletedAt !== null;
+        },
+    },
 ];
 
 const pluralActions: Action[] = [

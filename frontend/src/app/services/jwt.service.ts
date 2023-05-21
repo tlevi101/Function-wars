@@ -23,26 +23,26 @@ export class JwtService {
         }
     }
 
-	public updateToken(token?: string) {
-		if(!token){
-			localStorage.removeItem('token');
-			sessionStorage.removeItem('token');
-			return;
-		}
-		if(localStorage.getItem('token')) {
-			localStorage.setItem('token', token);
-		} else {
-			sessionStorage.setItem('token', token);
-		}
-	}
+    public updateToken(token?: string) {
+        if (!token) {
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+            return;
+        }
+        if (localStorage.getItem('token')) {
+            localStorage.setItem('token', token);
+        } else {
+            sessionStorage.setItem('token', token);
+        }
+    }
 
-	public removeToken(){
-		localStorage.removeItem('token');
-		sessionStorage.removeItem('token');
-	}
+    public removeToken() {
+        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
+    }
 
-	public isGuestToken(): boolean {
-		const decodedToken = this.getDecodedAccessToken();
-		return decodedToken?.type === 'guest';
-	}
+    public isGuestToken(): boolean {
+        const decodedToken = this.getDecodedAccessToken();
+        return decodedToken?.type === 'guest';
+    }
 }

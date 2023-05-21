@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "nodemon -e ts,js --ignore dist  --exec npm run compile",
         "db:dev": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/dev",
-		"dn:prod": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/prod",
+        "dn:prod": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/prod",
         "db:dev:fresh": "npx sequelize db:create && npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/dev",
         "db:dev:fresh:last": "npx sequelize db:migrate:undo && npx sequelize db:migrate && npx sequelize db:seed:all  --seeders-path seeders/dev",
         "db:test": "NODE_ENV=test npx sequelize db:create && NODE_ENV=test npx sequelize db:migrate:undo:all --env test && NODE_ENV=test npx sequelize db:migrate --env test && NODE_ENV=test npx sequelize db:seed:all $* --seeders-path seeders/test --env test",
@@ -15,11 +15,11 @@
         "log:clear": "rm -rf logs/*.json",
         "prettier": "npx prettier --write \"**/*.{js,ts,json}\"",
         "test": "npm run build & STRESS_USERS=50 npm run db:test && npx jest --verbose",
-		"win:test": "set STRESS_USERS=50&& npm run win:db:test && npx jest --verbose --detectOpenHandles",
+        "win:test": "set STRESS_USERS=50&& npm run win:db:test && npx jest --verbose --detectOpenHandles",
         "test:stress": "npm run build & STRESS_USERS=5000 npm run db:test && npx jest -t \"stress\" --verbose",
-		"win:test:stress": "set STRESS_USERS=5000&& npm run win:db:test && npx jest -t \"stress\" --verbose",
+        "win:test:stress": "set STRESS_USERS=5000&& npm run win:db:test && npx jest -t \"stress\" --verbose",
         "coverage": "npm run build && STRESS_USERS=50 npx jest --coverage",
-		"win:coverage": "set STRESS_USERS=50&& npm run win:db:test && npx jest --coverage", 
+        "win:coverage": "set STRESS_USERS=50&& npm run win:db:test && npx jest --coverage",
         "start": "node server.js",
         "build": "tsc",
         "compile": "tsc && node --trace-warnings ./dist/server.js"

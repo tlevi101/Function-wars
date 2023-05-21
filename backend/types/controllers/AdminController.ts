@@ -6,9 +6,6 @@ const { User } = require('../../models');
 const { Op } = require('sequelize');
 
 export class AdminController {
-
-
-
     /**
      * @method get
      * @route /admins
@@ -21,7 +18,6 @@ export class AdminController {
         }
         return res.status(200).json({ admins: await User.findAll({ where: { is_admin: true } }) });
     }
-
 
     /**
      * @method get
@@ -36,9 +32,6 @@ export class AdminController {
         return res.status(200).json({ users: await User.findAll({ where: { is_admin: false } }) });
     }
 
-
-
-
     /**
      * @method put
      * @route /users/:id/ban
@@ -46,7 +39,7 @@ export class AdminController {
      * @param res
      */
     public static async banUser(req: MyRequest, res: MyResponse) {
-		if (req.user.type === 'guest' || !req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         const { id } = req.params;
@@ -69,9 +62,6 @@ export class AdminController {
         return res.status(200).send({ message: 'User banned.' });
     }
 
-
-
-
     /**
      * @method put
      * @route /users/:id/unban
@@ -79,7 +69,7 @@ export class AdminController {
      * @param res
      */
     public static async unbanUser(req: MyRequest, res: MyResponse) {
-		if (req.user.type === 'guest' || !req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         const { id } = req.params;
@@ -95,9 +85,6 @@ export class AdminController {
         return res.status(200).send({ message: 'User unbanned.' });
     }
 
-
-
-
     /**
      * @method put
      * @route /users/:userID/make-admin
@@ -105,7 +92,7 @@ export class AdminController {
      * @param res
      */
     public static async makeAdmin(req: MyRequest, res: MyResponse) {
-		if (req.user.type === 'guest' || !req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         const { userID } = req.params;
@@ -120,9 +107,6 @@ export class AdminController {
         return res.status(200).send({ message: 'User is now admin.' });
     }
 
-
-
-
     /**
      * @method put
      * @route /users/:userID/remove-admin
@@ -130,7 +114,7 @@ export class AdminController {
      * @param res
      */
     public static async removeAdmin(req: MyRequest, res: MyResponse) {
-		if (req.user.type === 'guest' || !req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         const { userID } = req.params;
@@ -142,12 +126,9 @@ export class AdminController {
             return res.status(403).send({ message: 'You cannot change super admin.' });
         }
         await users.update({ is_admin: false, role: 'user' });
-        return res.status(200).send({ message: "User is no longer admin." });
+        return res.status(200).send({ message: 'User is no longer admin.' });
     }
 
-
-
-	
     /**
      * @method put
      * @route /users/:id/add-remove-chat-restriction
@@ -155,7 +136,7 @@ export class AdminController {
      * @param res
      */
     public static async addOrRemoveChatRestriction(req: MyRequest, res: MyResponse) {
-		if (req.user.type === 'guest' || !req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         const { id } = req.params;
@@ -163,14 +144,13 @@ export class AdminController {
         if (!user) {
             return res.status(404).send({ message: 'User not found.' });
         }
-		await ReportController.markUserReportsAsHandled(user.id);
-        if (user.chat_restriction){ 
-			await user.update({ chat_restriction: false });
-			return res.status(200).send({ message: "User's chat restriction removed" });
-		}
-        else {
-			await user.update({ chat_restriction: true });
-			return res.status(200).send({ message: 'User is now chat restricted.'  });
+        await ReportController.markUserReportsAsHandled(user.id);
+        if (user.chat_restriction) {
+            await user.update({ chat_restriction: false });
+            return res.status(200).send({ message: "User's chat restriction removed" });
+        } else {
+            await user.update({ chat_restriction: true });
+            return res.status(200).send({ message: 'User is now chat restricted.' });
         }
     }
 }

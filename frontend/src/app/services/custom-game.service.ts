@@ -34,14 +34,14 @@ export class CustomGameService {
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${this.token || ''}`);
     }
-    public createCustomGame(fieldID: number, isPrivate: boolean, friendIDs:number[]) {
+    public createCustomGame(fieldID: number, isPrivate: boolean, friendIDs: number[]) {
         this.socket.emit('create custom game', { fieldID, isPrivate, friendIDs });
     }
     public waitRoomCreated() {
         return this.socket.fromEvent<{ roomUUID: string; groupChatUUID: string }>('waiting room created');
     }
-    public waitRoomDeleted(){
-        return this.socket.fromEvent('wait room owner left')
+    public waitRoomDeleted() {
+        return this.socket.fromEvent('wait room owner left');
     }
     public joinCustomGame(roomUUID: string) {
         this.socket.emit('join custom game', { roomUUID });
@@ -55,11 +55,11 @@ export class CustomGameService {
         this.socket.emit('leave custom game', { roomUUID });
     }
 
-    public newUserJoined(){
+    public newUserJoined() {
         return this.socket.fromEvent('user joined waiting room');
     }
 
-    public userLeftWaitRoom(){
+    public userLeftWaitRoom() {
         return this.socket.fromEvent('user left wait room');
     }
 
@@ -70,18 +70,20 @@ export class CustomGameService {
     }
 
     public getWaitingRoom(roomUUID: string) {
-        return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/wait-rooms/${roomUUID}`, { headers: this.hr });
+        return this.http.get<{ waitRoom: WaitRoomResponseInterface }>(`${this.url}/wait-rooms/${roomUUID}`, {
+            headers: this.hr,
+        });
     }
 
-    public startGame(){
+    public startGame() {
         this.socket.emit('start custom game');
     }
 
-	public kickPlayer(playerID:number | string, roomUUID:string){
-		return this.http.post(`${this.url}/wait-rooms/${roomUUID}/${playerID}/kick`,{},{headers:this.hr});
-	}
+    public kickPlayer(playerID: number | string, roomUUID: string) {
+        return this.http.post(`${this.url}/wait-rooms/${roomUUID}/${playerID}/kick`, {}, { headers: this.hr });
+    }
 
-	public listenKicked(){
-		return this.socket.fromEvent('kicked from wait room');
-	}
+    public listenKicked() {
+        return this.socket.fromEvent('kicked from wait room');
+    }
 }

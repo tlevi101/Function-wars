@@ -3,10 +3,6 @@ import { Op } from 'sequelize';
 const { User, Chat, Friendship } = require('../../models');
 
 export class FriendsController {
-
-
-
-
     /**
      * @method get
      * @route '/friends'
@@ -18,9 +14,6 @@ export class FriendsController {
         const friends = await FriendsController.getUserFriends(req.user.id);
         return res.status(200).json({ friends: friends });
     }
-
-
-
 
     /**
      * @method get
@@ -35,9 +28,6 @@ export class FriendsController {
         return res.status(200).json({ friends: friends });
     }
 
-
-
-
     /**
      * @method get
      * @route /friends/requests
@@ -49,7 +39,7 @@ export class FriendsController {
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'User not found.' });
         }
         let requests = await user.getFriendRequests();
         requests = requests.map((request: any) => {
@@ -58,10 +48,7 @@ export class FriendsController {
         return res.status(200).json({ requests: requests });
     }
 
-
-
-
-	/**
+    /**
      * @method get
      * @route /friends/:id/chat
      * @param req
@@ -73,7 +60,7 @@ export class FriendsController {
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad User not found.' });
+            return res.status(404).json({ message: 'Bad User not found.' });
         }
         const friend = await User.findOne({ where: { id: id } });
         if (!friend) {
@@ -99,9 +86,6 @@ export class FriendsController {
         return res.status(200).json({ chat: chat });
     }
 
-
-
-
     /**
      * @method put
      * @route /friends/requests/:id/accept
@@ -116,7 +100,7 @@ export class FriendsController {
         console.log(id);
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'User not found.' });
         }
         const friendship = await Friendship.findOne({
             where: {
@@ -135,9 +119,6 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend request accepted.' });
     }
 
-
-
-
     /**
      * @method delete
      * @route /friends/requests/:id/reject
@@ -150,7 +131,7 @@ export class FriendsController {
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'User not found.' });
         }
         const friendship = await Friendship.findOne({
             where: {
@@ -169,9 +150,6 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend request rejected.' });
     }
 
-
-
-
     /**
      * @method delete
      * @route /friends/:id
@@ -183,7 +161,7 @@ export class FriendsController {
         const userJWT = req.user;
         const user = await User.findOne({ where: { email: userJWT.email } });
         if (!user) {
-			return res.status(404).json({ message: 'User not found.' });
+            return res.status(404).json({ message: 'User not found.' });
         }
         const { id } = req.params;
         const friendship = await Friendship.findOne({
@@ -216,10 +194,6 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend deleted.' });
     }
 
-
-
-
-
     /**
      * @method post
      * @route /friends/:id
@@ -231,13 +205,13 @@ export class FriendsController {
         const { name } = req.user;
         const { id } = req.params;
         const user = await User.findOne({ where: { name: name } });
-		const otherUser = await User.findByPk(id)
-		if(!user) {
-			return res.status(404).json({ message: 'User not found.' });
-		}
-		if(!otherUser) {
-			return res.status(404).json({ message: 'Other user not found.' });
-		}
+        const otherUser = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        if (!otherUser) {
+            return res.status(404).json({ message: 'Other user not found.' });
+        }
         if (user.id == id) {
             return res.status(403).json({ message: "You can't add yourself as a friend." });
         }
@@ -257,11 +231,7 @@ export class FriendsController {
         return res.status(200).json({ message: 'Friend request sent.' });
     }
 
-   
-	
-	
-	
-	private static async getUserFriends(userID: number) {
+    private static async getUserFriends(userID: number) {
         const user = await User.findByPk(userID);
         let friends = await user.getFriends();
         friends = await Promise.all(

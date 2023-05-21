@@ -16,8 +16,6 @@ export interface ResetPasswordBodyInterface {
     passwordAgain: string;
 }
 
-
-
 export interface FieldListResponseInterface {
     id: number;
     name: string;
