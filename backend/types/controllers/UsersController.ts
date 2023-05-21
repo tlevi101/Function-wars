@@ -13,6 +13,7 @@ export class UsersController{
 	 * @returns 
 	 */
 	public static async reportUSer(req: MyRequest, res: MyResponse) {
+        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
 		const { name } = req.user;
 		const { id } = req.params;
 		const { description } = req.body;
@@ -52,7 +53,7 @@ export class UsersController{
 		}
 		const blockedUser = await User.findByPk(id);
 		if (!blockedUser) {
-			return res.status(404).json({ message: 'Blocked user not found.' });
+			return res.status(404).json({ message: 'Other user not found.' });
 		}
 		if (user.id === id) {
 			return res.status(403).json({ message: "You can't block yourself." });

@@ -57,15 +57,14 @@ export interface DecodedUser {
     iat: number;
 }
 /**
- * @property guest : true
+ * @property type : 'guest'
  * @property name : string
  * @property uuid : string
  * @property JWT_created_at : Date
  * @property iat : number
  */
 export interface GuestUser {
-    type: 'guest';
-    readonly guest: true;
+    readonly type: 'guest';
     name: string;
     id: string;
     JWT_created_at: Date;
@@ -85,7 +84,7 @@ export type socket = {
     to(socketID: string): socket;
 };
 
-type userID = number;
+type userID = number | string;
 export type GamesMap = Map<string, Game>;
 export type GroupChatsMap = Map<string, GroupChat>;
 export type WaitListMap = Map<userID, socket>;

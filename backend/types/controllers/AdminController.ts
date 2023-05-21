@@ -16,13 +16,11 @@ export class AdminController {
      * @param res
      */
     public static async getAdmins(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         return res.status(200).json({ admins: await User.findAll({ where: { is_admin: true } }) });
     }
-
 
 
     /**
@@ -32,8 +30,7 @@ export class AdminController {
      * @param res
      */
     public static async getUsers(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) {
+        if (req.user.type === 'guest' || !req.user.is_admin) {
             return res.status(403).json({ message: 'You are not an admin!' });
         }
         return res.status(200).json({ users: await User.findAll({ where: { is_admin: false } }) });
@@ -49,8 +46,9 @@ export class AdminController {
      * @param res
      */
     public static async banUser(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin!' });
+		if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'You are not an admin!' });
+        }
         const { id } = req.params;
         const { banned_reason } = req.body;
         const user = await User.findOne({
@@ -81,8 +79,9 @@ export class AdminController {
      * @param res
      */
     public static async unbanUser(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin!' });
+		if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'You are not an admin!' });
+        }
         const { id } = req.params;
         const user = await User.findOne({
             where: {
@@ -106,8 +105,9 @@ export class AdminController {
      * @param res
      */
     public static async makeAdmin(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin!' });
+		if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'You are not an admin!' });
+        }
         const { userID } = req.params;
         const users = await User.findByPk(userID);
         if (!users) {
@@ -130,8 +130,9 @@ export class AdminController {
      * @param res
      */
     public static async removeAdmin(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin!' });
+		if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'You are not an admin!' });
+        }
         const { userID } = req.params;
         const users = await User.findByPk(userID);
         if (!users) {
@@ -154,8 +155,9 @@ export class AdminController {
      * @param res
      */
     public static async addOrRemoveChatRestriction(req: MyRequest, res: MyResponse) {
-        if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
-        if (!req.user.is_admin) return res.status(403).json({ message: 'You are not an admin!' });
+		if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'You are not an admin!' });
+        }
         const { id } = req.params;
         const user = await User.findByPk(id);
         if (!user) {

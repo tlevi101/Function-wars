@@ -97,7 +97,7 @@ io.use(function (socket, next) {
     })
     .on('disconnect', socket => {});
 
-//use socket in routes
+//use socketIO in routes
 app.use(function (req, res, next) {
     res.io = io;
     next();

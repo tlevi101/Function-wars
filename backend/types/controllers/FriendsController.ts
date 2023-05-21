@@ -49,7 +49,7 @@ export class FriendsController {
         const { email } = req.user;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'User not found.' });
         }
         let requests = await user.getFriendRequests();
         requests = requests.map((request: any) => {
@@ -73,7 +73,7 @@ export class FriendsController {
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'Bad User not found.' });
         }
         const friend = await User.findOne({ where: { id: id } });
         if (!friend) {
@@ -116,7 +116,7 @@ export class FriendsController {
         console.log(id);
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'User not found.' });
         }
         const friendship = await Friendship.findOne({
             where: {
@@ -150,7 +150,7 @@ export class FriendsController {
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'User not found.' });
         }
         const friendship = await Friendship.findOne({
             where: {
@@ -183,7 +183,7 @@ export class FriendsController {
         const userJWT = req.user;
         const user = await User.findOne({ where: { email: userJWT.email } });
         if (!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'User not found.' });
         }
         const { id } = req.params;
         const friendship = await Friendship.findOne({
@@ -233,10 +233,10 @@ export class FriendsController {
         const user = await User.findOne({ where: { name: name } });
 		const otherUser = await User.findByPk(id)
 		if(!user) {
-			return res.status(404).json({ message: 'Bad token! User not found.' });
+			return res.status(404).json({ message: 'User not found.' });
 		}
 		if(!otherUser) {
-			return res.status(404).json({ message: 'User not found.' });
+			return res.status(404).json({ message: 'Other user not found.' });
 		}
         if (user.id == id) {
             return res.status(403).json({ message: "You can't add yourself as a friend." });
