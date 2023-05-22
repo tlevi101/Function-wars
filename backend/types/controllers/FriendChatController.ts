@@ -13,7 +13,7 @@ export class FriendChatController {
 
     public static async sendMessage(socket: socket, message: string, friendID: number) {
         if (socket.decoded.type === 'guest') {
-            socket.emit('error', 'Guests cannot send messages.');
+            socket.emit('error', {message:'Guests cannot send messages.', code: 403});
         }
         const user = await User.findByPk(socket.decoded.id);
         let chat = await user.getChat(friendID);
@@ -21,6 +21,7 @@ export class FriendChatController {
             const friendship = await user.getFriendShip(friendID);
             if (!friendship) {
                 console.error('Message not sent. Friendship not found.');
+            	socket.emit('error', {message:'Friend not found.', code: 404});
                 return;
             }
             let newMessages = [];
@@ -40,9 +41,15 @@ export class FriendChatController {
 
     public static async setSeen(socket: socket, friendID: number) {
         if (socket.decoded.type === 'guest') {
-            socket.emit('error', 'Guests cannot receive private messages.');
+            socket.emit('error', {message:'Guests cannot send messages.', code: 403});
         }
-        const user = await User.findByPk(socket.decoded.id);
+		const user = await User.findByPk(socket.decoded.id);
+		const friendship = await user.getFriendShip(friendID);
+		if (!friendship) {
+			console.error('Message not sent. Friendship not found.');
+			socket.emit('error', {message:'Friend not found.', code: 404});
+			return;
+		}
         const chat = await user.getChat(friendID);
         if (!chat) {
             console.error('Chat not found.');

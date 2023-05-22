@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {CustomGameService} from "../services/custom-game.service";
 import {InfoComponent} from "../pop-up/info/info.component";
@@ -11,7 +11,7 @@ import {WaitListService} from "../services/wait-list.service";
   templateUrl: './wait-room.component.html',
   styleUrls: ['./wait-room.component.scss']
 })
-export class WaitRoomComponent implements OnInit, OnDestroy{
+export class WaitRoomComponent implements OnInit{
 
     roomUUID = '';
     chatRoomUUID = '';
@@ -66,9 +66,6 @@ export class WaitRoomComponent implements OnInit, OnDestroy{
         })
     }
 
-    ngOnDestroy(): void {
-        this.waitRoomService.leaveCustomGame(this.roomUUID);
-    }
 
     private listenWaitRoomJoined(){
         const subscription = this.waitRoomService.customGameJoined().subscribe(

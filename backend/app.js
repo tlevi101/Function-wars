@@ -52,19 +52,20 @@ io.use(function (socket, next) {
         socket.on('join custom game', async ({ roomUUID }) => {
             console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
             await CustomGameController.joinWaitingRoom(socket, roomUUID);
-            await GroupChatController.joinGroupChat(socket, 'chat-' + roomUUID);
         });
 
         socket.on('start custom game', async () => {
             CustomGameController.startGame(socket);
         });
-        socket.on('leave custom game', async ({ roomUUID }) => {
-            await CustomGameController.leaveWaitingRoom(socket, roomUUID);
-        });
 
-        socket.on('join group chat', async ({ roomUUID }) => {
-            await GroupChatController.joinGroupChat(socket, roomUUID);
-        });
+		//route change and disconnect handles this, no need for this
+        // socket.on('leave custom game', async ({ roomUUID }) => {
+        //     await CustomGameController.leaveWaitingRoom(socket, roomUUID);
+        // });
+
+        // socket.on('join group chat', async ({ roomUUID }) => {
+        //     await GroupChatController.joinGroupChat(socket, roomUUID);
+        // });
 
         socket.on('reject invite', async ({ invite }) => {
             RuntimeMaps.invites.delete(invite);

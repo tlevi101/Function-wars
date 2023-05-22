@@ -6,6 +6,7 @@
     "main": "server.js",
     "scripts": {
         "dev": "nodemon -e ts,js --ignore dist  --exec npm run compile",
+		"db": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/prod",
         "db:dev": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/dev",
 		"dn:prod": "npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/prod",
         "db:dev:fresh": "npx sequelize db:create && npx sequelize db:migrate:undo:all && npx sequelize db:migrate && npx sequelize db:seed:all --seeders-path seeders/dev",
@@ -18,8 +19,8 @@
 		"win:test": "set STRESS_USERS=50&& npm run win:db:test && npx jest --verbose --detectOpenHandles",
         "test:stress": "npm run build & STRESS_USERS=5000 npm run db:test && npx jest -t \"stress\" --verbose",
 		"win:test:stress": "set STRESS_USERS=5000&& npm run win:db:test && npx jest -t \"stress\" --verbose",
-        "coverage": "npm run build && STRESS_USERS=50 npx jest --coverage",
-		"win:coverage": "set STRESS_USERS=50&& npm run win:db:test && npx jest --coverage", 
+        "coverage": "npm run build && STRESS_USERS=50 npx jest --coverage --detectOpenHandles",
+		"win:coverage": "set STRESS_USERS=50&& npm run win:db:test && npx jest --coverage --detectOpenHandles", 
         "start": "node server.js",
         "build": "tsc",
         "compile": "tsc && node --trace-warnings ./dist/server.js"
