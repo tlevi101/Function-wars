@@ -12,18 +12,18 @@ export interface PlayerInterface {
     id: number | string;
     name: string;
     location: PointInterface;
-    dimension: { width: number; height: number };
+    dimension: Dimension;
     avoidArea: { location: PointInterface; radius: number };
 }
 export interface PlayerFieldInterface {
     location: PointInterface;
-    dimension: { width: number; height: number };
+    dimension: Dimension;
     avoidArea: { location: PointInterface; radius: number };
 }
 export interface ObjectInterface {
     type: string;
     location: PointInterface;
-    dimension: { width: number; height: number };
+    dimension: Dimension;
     avoidArea: { location: PointInterface; radius: number };
     damages: { location: PointInterface; radius: number }[];
 }
@@ -31,7 +31,7 @@ export interface FieldInterface {
     id: number;
     name: string;
     field: {
-        dimension: { width: number; height: number };
+        dimension: Dimension;
         players: PlayerFieldInterface[];
         objects: ObjectInterface[];
     };
@@ -54,13 +54,13 @@ export interface UserInterface {
     id: number | string;
     name: string;
 }
-export interface MutesInterface {
-    mutedBy: UserInterface;
-    mutedUser: UserInterface;
-}
 export interface MessageInterface {
     from: UserInterface;
     message: string;
+}
+export interface MutesInterface {
+    mutedBy: UserInterface;
+    mutedUser: UserInterface;
 }
 
 export interface GroupChatInterface {

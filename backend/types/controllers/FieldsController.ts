@@ -194,7 +194,7 @@ export class FieldsController {
     //*********//
     private static validateField(field: any) {
         const schema = Joi.object().keys({
-            name: Joi.string().min(4).required(),
+            name: Joi.string().required(),
             field: Joi.object()
                 .required()
                 .keys({

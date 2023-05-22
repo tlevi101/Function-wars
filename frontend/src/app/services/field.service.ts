@@ -50,7 +50,7 @@ export class FieldService {
         return this.http.get(`${url}/${gameUUID}/players`, { headers: this.hr });
     }
 
-	restoreField(fieldId: number) {
-		return this.http.put(`${this.url}/${fieldId}/restore`, {}, { headers: this.hr });
-	}
+    restoreField(fieldId: number) {
+        return this.http.put(`${this.url}/${fieldId}/restore`, {}, { headers: this.hr });
+    }
 }

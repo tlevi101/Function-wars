@@ -7,7 +7,7 @@ import { Socket } from 'ngx-socket-io';
 export class NavigatedService {
     constructor(private socket: Socket) {}
 
-    public routeChange(url:string) {
-        this.socket.emit('route change', {url});
+    public routeChange(url: string) {
+        this.socket.emit('route change', { url });
     }
 }

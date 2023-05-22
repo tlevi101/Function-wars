@@ -16,24 +16,6 @@ export interface ResetPasswordBodyInterface {
     passwordAgain: string;
 }
 
-export interface FieldBodyInterface {
-    name: string;
-    field: {
-        dimension: { width: number; height: number };
-        players: PlayerInterface[];
-        objects: ObjectInterface[];
-    };
-}
-
-export interface FieldResponseInterface {
-    id: number;
-    name: string;
-    field: {
-        dimension: { width: number; height: number };
-        players: PlayerInterface[];
-        objects: ObjectInterface[];
-    };
-}
 export interface FieldListResponseInterface {
     id: number;
     name: string;
@@ -55,7 +37,23 @@ export interface ObjectInterface {
     dimension: { width: number; height: number };
     avoidArea: { location: { x: number; y: number }; radius: number };
 }
-
+export interface FieldResponseInterface {
+    id: number;
+    name: string;
+    field: {
+        dimension: { width: number; height: number };
+        players: PlayerInterface[];
+        objects: ObjectInterface[];
+    };
+}
+export interface FieldBodyInterface {
+    name: string;
+    field: {
+        dimension: { width: number; height: number };
+        players: PlayerInterface[];
+        objects: ObjectInterface[];
+    };
+}
 export interface OtherUsersStatusInterface {
     id: number;
     name: string;

@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class UsersService {
     private hr;
     private url;
-    constructor(private http: HttpClient, private socket:Socket) {
+    constructor(private http: HttpClient, private socket: Socket) {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);
@@ -28,7 +28,7 @@ export class UsersService {
         return this.http.post<{ message: string }>(`${this.url}/${id}/report`, { description }, { headers: this.hr });
     }
 
-	listenBanned(){
-		return this.socket.fromEvent<{message: string}>('banned');
-	}
+    listenBanned() {
+        return this.socket.fromEvent<{ message: string }>('banned');
+    }
 }

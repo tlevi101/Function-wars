@@ -1,37 +1,30 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CustomGameListItemInterface, CustomGameService} from "../../services/custom-game.service";
-import {PaginationComponent} from "../pagination/pagination.component";
-import {InfoComponent} from "../../pop-up/info/info.component";
-import {Router} from "@angular/router";
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CustomGameListItemInterface, CustomGameService } from '../../services/custom-game.service';
+import { PaginationComponent } from '../pagination/pagination.component';
+import { InfoComponent } from '../../pop-up/info/info.component';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-custom-games',
-  templateUrl: './custom-games.component.html',
-  styleUrls: ['./custom-games.component.scss']
+    selector: 'app-custom-games',
+    templateUrl: './custom-games.component.html',
+    styleUrls: ['./custom-games.component.scss'],
 })
-export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
-
+export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy {
     customGames: CustomGameListItemInterface[] = [];
     page = 1;
     pageSize = 4;
     @ViewChild('pagination') pagination!: PaginationComponent;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
 
-    constructor(
-        private customGameService: CustomGameService,
-        private router: Router
-    ) {
-        this.customGameService.getCustomGames().subscribe(({customGames}) => {
+    constructor(private customGameService: CustomGameService, private router: Router) {
+        this.customGameService.getCustomGames().subscribe(({ customGames }) => {
             this.customGames = customGames;
-        })
-
+        });
     }
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
 
-    ngAfterViewInit(): void {
-    }
+    ngAfterViewInit(): void {}
 
     ngOnDestroy(): void {
         // this.socketErrorSubscription.unsubscribe();
@@ -39,14 +32,16 @@ export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy{
 
     joinGame(roomUUID: string) {
         this.customGameService.joinCustomGame(roomUUID);
-        const subscription = this.customGameService.customGameJoined().subscribe(() => {
+        const subscription = this.customGameService.customGameJoined().subscribe(
+            () => {
                 this.router.navigate(['/wait-rooms', roomUUID]);
-        },
-        (error) => {
+            },
+            error => {
                 console.log(error);
-        },
-        () => {
+            },
+            () => {
                 subscription.unsubscribe();
-        });
+            }
+        );
     }
 }

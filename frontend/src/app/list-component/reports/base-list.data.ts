@@ -39,7 +39,7 @@ const confirmData: ConfirmData = {
     myName: 'ConfirmData',
     description: 'Are you sure you want to delete this report?',
 };
-const banHTML = `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`
+const banHTML = `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`;
 const slashedChatHTML = `
 <div class="slashedChat position-relative me-2">
 	<i class=" fs-4 bi bi-chat position-absolute" ></i>

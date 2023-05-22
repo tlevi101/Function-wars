@@ -35,17 +35,17 @@ export class GameController {
         const location = currentPlayer.Location;
         try {
             await game.submitFunction(fn);
-        } catch (e:any) {
+        } catch (e: any) {
             console.log(e);
-            return res.status(400).json({ message: e.message});
+            return res.status(400).json({ message: e.message });
         }
         const { points, damages } = await game.calculateFunctionPoints();
-		const length = await Game.getFunctionLength(points);
+        const length = await Game.getFunctionLength(points);
         if (game.GameOver) {
             res.io
                 .to(gameUUID)
                 .emit('game over', { points, message: `Game over, Winner is ${game.CurrentPlayer.Name}` });
-            game.Sockets.forEach((socket:socket) => {
+            game.Sockets.forEach((socket: socket) => {
                 socket.leave(gameUUID);
                 GroupChatController.deleteGameGroupChat('chat-' + gameUUID);
             });
@@ -72,7 +72,7 @@ export class GameController {
             return res.status(404).json({ message: 'Game not found.' });
         }
         let players = game.Players;
-        if (!players.find((player:Player) => player.ID === req.user.id)) {
+        if (!players.find((player: Player) => player.ID === req.user.id)) {
             return res.status(403).json({ message: 'You are not in this game.' });
         }
         return res.status(200).json(game.toFrontend());
@@ -123,7 +123,7 @@ export class GameController {
             field = await Field.findByPk(fieldID);
         }
         if (!field && sockets.length === 2) {
-			console.warn('No field found');
+            console.warn('No field found');
             sockets.forEach(s => {
                 s.emit('error', { message: 'There is no playable field at the moment!' });
                 s.leave('wait-list');
@@ -135,7 +135,7 @@ export class GameController {
             const player: DecodedToken = socket.decoded;
             players.push(player);
         });
-		console.log('creating game');
+        console.log('creating game');
         const game = await Game.makeGameFromField(field, players, sockets);
         RuntimeMaps.games.set(game.UUID, game);
         console.log(chalk.green('game created, uuid: ' + game.UUID));

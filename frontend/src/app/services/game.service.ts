@@ -36,9 +36,9 @@ export class GameService {
     public gameOver() {
         return this.socket.fromEvent('game over');
     }
-	public listenUserBanned(){
-		return this.socket.fromEvent<{message: string}>('user banned');
-	}
+    public listenUserBanned() {
+        return this.socket.fromEvent<{ message: string }>('user banned');
+    }
     get Socket() {
         return this.socket;
     }

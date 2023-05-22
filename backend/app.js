@@ -27,10 +27,9 @@ const io = require('socket.io')(http, {
     },
 });
 
-
 io.use(function (socket, next) {
     if (socket.handshake.query && socket.handshake.query.token) {
-        jwt.verify(socket.handshake.query.token, 'secret', function (err, decoded) {
+        jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, function (err, decoded) {
             if (err) return next(new Error('Authentication error'));
             socket.decoded = decoded;
             next();
@@ -80,7 +79,7 @@ io.use(function (socket, next) {
         });
 
         socket.on('join wait list', async () => {
-			console.debug('join wait list');
+            console.debug('join wait list');
             WaitListController.joinWaitList(socket);
         });
 
@@ -98,7 +97,7 @@ io.use(function (socket, next) {
     })
     .on('disconnect', socket => {});
 
-//use socket in routes
+//use socketIO in routes
 app.use(function (req, res, next) {
     res.io = io;
     next();
@@ -136,9 +135,8 @@ app.use(function (err, req, res, next) {
         res.status(400).json({ message: err.errors[0].message });
     } else if (err instanceof Sequelize.ValidationError) {
         res.status(400).json({ message: err.message });
-    }
-    else if (err instanceof Sequelize.DatabaseError) {
-      res.status(500).json({ error: err.message });
+    } else if (err instanceof Sequelize.DatabaseError) {
+        res.status(500).json({ error: err.message });
     }
     next(err, req, res, next);
 });

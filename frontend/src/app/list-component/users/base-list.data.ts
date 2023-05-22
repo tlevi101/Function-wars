@@ -34,7 +34,7 @@ const slashedChatHTML = `
 const singularActions: Action[] = [
     {
         type: 'banUnban',
-		HTML: `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`,
+        HTML: `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`,
         tooltip: 'Ban/Unban user',
         confirmRequired: () => false,
         confirmType: ConfirmType.WITH_INPUT,
@@ -46,22 +46,22 @@ const singularActions: Action[] = [
         tooltip: 'Add/Remove chat restriction to/from user',
         confirmRequired: () => false,
     },
-	{
-		type: 'makeAdmin',
-		HTML: `<i class="text-success fs-4 bi bi-person-fill-up"></i>`,
-		tooltip: 'Make user admin',
-		confirmRequired: () => true,
-		confirmType: ConfirmType.DEFAULT,
-		confirmData: {
-			myName: "ConfirmData",
-			description: "Are you sure you want to make the user admin?",
-		}
-	}
+    {
+        type: 'makeAdmin',
+        HTML: `<i class="text-success fs-4 bi bi-person-fill-up"></i>`,
+        tooltip: 'Make user admin',
+        confirmRequired: () => true,
+        confirmType: ConfirmType.DEFAULT,
+        confirmData: {
+            myName: 'ConfirmData',
+            description: 'Are you sure you want to make the user admin?',
+        },
+    },
 ];
 const pluralActions: Action[] = [
     {
         type: 'banUnban',
-		HTML: `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`,
+        HTML: `<i class="me-2 text-danger fs-4 bi bi-person-fill-slash"></i>`,
         tooltip: 'Ban/Unban selected users',
         confirmRequired: (user: any) => {
             return !user?.banned;
@@ -72,7 +72,7 @@ const pluralActions: Action[] = [
         HTML: slashedChatHTML,
         tooltip: 'Add/Remove chat restriction to/from selected users',
         confirmRequired: () => false,
-    }
+    },
 ];
 
 export const baseData: BaseData = {

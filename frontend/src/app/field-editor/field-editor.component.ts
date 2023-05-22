@@ -14,7 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class FieldEditorComponent implements OnInit, AfterViewInit {
     fieldParticles = new Map<number, Shape | Player>();
-	ratio = 35;
+    ratio = 35;
     mouseOnHold = false;
     fieldSubmitForm: FormGroup;
 
@@ -38,9 +38,9 @@ export class FieldEditorComponent implements OnInit, AfterViewInit {
         if (!this.jwt.isTokenValid()) {
             this.router.navigate(['/login']);
         }
-		if(this.jwt.isGuestToken()) {
+        if (this.jwt.isGuestToken()) {
             this.router.navigate(['/']);
-		}
+        }
         if (this.router.url !== '/field/new') {
             this.activeRoute.paramMap.subscribe(async params => {
                 const id = params.get('id');
@@ -54,9 +54,9 @@ export class FieldEditorComponent implements OnInit, AfterViewInit {
         }
     }
 
-	ngAfterViewInit(): void {
-		this.draw();
-	}
+    ngAfterViewInit(): void {
+        this.draw();
+    }
 
     async sendGetFieldRequest(id: number) {
         await this.fieldService
@@ -245,24 +245,24 @@ export class FieldEditorComponent implements OnInit, AfterViewInit {
         }
     }
 
-	drawLines() {
+    drawLines() {
         const ctx = this.field.nativeElement.getContext('2d');
         if (ctx) {
             const canvasWidth = this.field.nativeElement.width;
-			ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+            ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
             const canvasHeight = this.field.nativeElement.height;
             for (let i = 0; i < canvasWidth / this.ratio; i++) {
                 ctx.beginPath();
-				ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
-				ctx.moveTo(i * this.ratio, 0);
+                ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+                ctx.moveTo(i * this.ratio, 0);
                 ctx.lineTo(i * this.ratio, canvasHeight);
                 ctx.stroke();
                 ctx.closePath();
             }
             for (let i = 0; i < canvasHeight / this.ratio; i++) {
                 ctx.beginPath();
-				ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
-				ctx.moveTo(0, i * this.ratio);
+                ctx.strokeStyle = 'rgba(102, 102, 102, 0.2)';
+                ctx.moveTo(0, i * this.ratio);
                 ctx.lineTo(canvasWidth, i * this.ratio);
                 ctx.stroke();
                 ctx.closePath();
@@ -270,10 +270,10 @@ export class FieldEditorComponent implements OnInit, AfterViewInit {
         }
     }
 
-	draw(){
-		this.drawObjects();
-		this.drawLines();
-	}
+    draw() {
+        this.drawObjects();
+        this.drawLines();
+    }
 
     get playerCount() {
         const iter = this.fieldParticles.values();

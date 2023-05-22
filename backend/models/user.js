@@ -16,13 +16,13 @@ module.exports = (sequelize, DataTypes) => {
                     allowNull: true,
                 },
             });
-            this.hasOne(models.Report, {
+            this.hasMany(models.Report, {
                 foreignKey: 'reported_by',
-                as: 'mySentReport',
+                as: 'mySentReports',
             });
-            this.hasOne(models.Report, {
+            this.hasMany(models.Report, {
                 foreignKey: 'reported',
-                as: 'myReceivedReport',
+                as: 'myReceivedReports',
             });
             this.belongsToMany(models.User, {
                 through: 'Friendships',
@@ -115,6 +115,7 @@ module.exports = (sequelize, DataTypes) => {
             return friends;
         }
 
+
         async getFriendRequests() {
             const requests = await sequelize.models.Friendship.findAll({
                 where: {
@@ -139,20 +140,17 @@ module.exports = (sequelize, DataTypes) => {
             });
             return requestsArray;
         }
+
+
         async getChat(friend_id) {
-            const friendship = await sequelize.models.Friendship.findOne({
-                where: {
-                    [Op.or]: [
-                        { user_id: this.id, friend_id: friend_id },
-                        { user_id: friend_id, friend_id: this.id },
-                    ],
-                },
-            });
+            const friendship = await this.getFriendShip(friend_id);
             if (friendship) {
                 return await friendship.getChat();
             }
             return null;
         }
+
+
         async getFriendShip(friend_id) {
             const friendship = await sequelize.models.Friendship.findOne({
                 where: {
@@ -221,21 +219,21 @@ module.exports = (sequelize, DataTypes) => {
                 },
             },
             is_admin: {
-				type:DataTypes.BOOLEAN,
-				defaultValue: false,
-			},
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
             role: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 validate: {
                     isIn: [['super_admin', 'admin', 'user']],
                 },
-				defaultValue: 'user',
+                defaultValue: 'user',
             },
             banned: {
-				type:DataTypes.BOOLEAN,
-				defaultValue: false,
-			},
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
             banned_reason: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -245,13 +243,12 @@ module.exports = (sequelize, DataTypes) => {
                         msg: 'Banned reason must be less than 255 characters',
                     },
                 },
-				defaultValue: null,
+                defaultValue: null,
             },
-            chat_restriction: { 
-				type:DataTypes.BOOLEAN,
-				defaultValue: false,
-
-			},
+            chat_restriction: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
         },
         {
             sequelize,

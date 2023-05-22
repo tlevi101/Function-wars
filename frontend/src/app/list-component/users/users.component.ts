@@ -13,10 +13,10 @@ import { JwtService } from 'src/app/services/jwt.service';
 })
 export class UsersComponent implements OnInit, AfterViewInit {
     users: any[] = [];
-	user: DecodedToken | undefined;
+    user: DecodedToken | undefined;
     @ViewChild('baseList') baseList!: BaseListComponent;
-    constructor(private adminService: AdminService, private router: Router, private jwt:JwtService) {
-		this.user = jwt.getDecodedAccessToken();
+    constructor(private adminService: AdminService, private router: Router, private jwt: JwtService) {
+        this.user = jwt.getDecodedAccessToken();
     }
 
     ngOnInit(): void {
@@ -28,9 +28,9 @@ export class UsersComponent implements OnInit, AfterViewInit {
         }
     }
 
-	ngAfterViewInit(): void {
+    ngAfterViewInit(): void {
         this.sendGetUsersRequest();
-	}
+    }
 
     handleActionClicked($event: any) {
         const { action, data, confirmInput } = $event;
@@ -39,9 +39,9 @@ export class UsersComponent implements OnInit, AfterViewInit {
         } else if (action.type === 'chatRestriction') {
             this.handleChatRestrictionAction(data);
         }
-		if(action.type === 'makeAdmin'){
-			this.handleMakeAdminAction(data[0].id);
-		}
+        if (action.type === 'makeAdmin') {
+            this.handleMakeAdminAction(data[0].id);
+        }
     }
     handleBanUnbanAction(users: any[], reason: string | undefined = undefined) {
         console.log(users);
@@ -92,18 +92,17 @@ export class UsersComponent implements OnInit, AfterViewInit {
         );
     }
 
-	handleMakeAdminAction(userID:number) {
-		this.adminService.makeAdmin(userID).subscribe(
-			(res: any) => {
-				this.sendGetUsersRequest();
-			},
-			(err: any) => {
-				// TODO handle error
-				console.log(err);
-			}
-		);
-
-	}
+    handleMakeAdminAction(userID: number) {
+        this.adminService.makeAdmin(userID).subscribe(
+            (res: any) => {
+                this.sendGetUsersRequest();
+            },
+            (err: any) => {
+                // TODO handle error
+                console.log(err);
+            }
+        );
+    }
 
     handleChatRestrictionAction(users: any[]) {
         const user_ids = users.map((user: any) => user.id);

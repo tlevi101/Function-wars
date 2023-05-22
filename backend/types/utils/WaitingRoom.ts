@@ -97,17 +97,17 @@ export class WaitingRoom {
         });
     }
 
-	public kickPlayer(playerID: number | string) {
-		this.players = this.players.filter(p => p.id != playerID);
-		this.sockets = this.sockets.filter(s => {
-			if (s.decoded.id != playerID) {
-				return true;
-			}
-			s.emit('kicked from wait room');
-			s.leave(this.roomUUID);
-			return false;
-		});
-	}
+    public kickPlayer(playerID: number | string) {
+        this.players = this.players.filter(p => p.id != playerID);
+        this.sockets = this.sockets.filter(s => {
+            if (s.decoded.id != playerID) {
+                return true;
+            }
+            s.emit('kicked from wait room');
+            s.leave(this.roomUUID);
+            return false;
+        });
+    }
 
     public userIsNotInvited(playerID: number | string) {
         return !Array.from(RuntimeMaps.invites.values()).some(

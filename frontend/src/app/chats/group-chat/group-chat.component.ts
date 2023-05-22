@@ -25,7 +25,6 @@ export interface MessageInterface {
     styleUrls: ['./group-chat.component.scss'],
 })
 export class GroupChatComponent implements OnInit, AfterViewInit {
-	
     @Input() chatMessagesMaxHeight = 300;
     @Input() roomUUID = '';
     messages: MessageInterface[] = [];
@@ -54,10 +53,10 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
                 }
                 return user;
             });
-        })
-        this.groupChat.newUserJoinedGroupChat().subscribe(()=>{
+        });
+        this.groupChat.newUserJoinedGroupChat().subscribe(() => {
             this.getOtherUsersStatus();
-        })
+        });
     }
 
     ngOnInit(): void {
@@ -79,7 +78,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
             console.log('User not logged in');
             return;
         }
-        if (this.user.type==='user' && this.user.chat_restriction) {
+        if (this.user.type === 'user' && this.user.chat_restriction) {
             return;
         }
         this.messages.push({ from: { id: this.user!.id, name: this.user!.name }, message: message });
@@ -136,7 +135,7 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
 
     unblockUser(otherUserID: number) {
         this.userServices.unblockUser(otherUserID).subscribe(
-            ({message}) => {
+            ({ message }) => {
                 this.infoComponent.description = message;
                 this.otherUsersStatus = this.otherUsersStatus.map(user => {
                     if (user.id == otherUserID) {
@@ -221,27 +220,27 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     get chatRestricted() {
-        return this.user?.type==='user' && this.user?.chat_restriction;
+        return this.user?.type === 'user' && this.user?.chat_restriction;
     }
 
-	isUser() {
-		return this.user?.type==='user';
-	}
+    isUser() {
+        return this.user?.type === 'user';
+    }
 
     scrollToBottom(): void {
         try {
             setTimeout(() => {
                 this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
-            }, 100)
+            }, 100);
         } catch (err) {
             console.log(err);
         }
     }
 
-	getType(type: any) {
-		return typeof type;
-	}
-	isNumber(value: any): value is number {
-		return typeof value === 'number';
-	  }
+    getType(type: any) {
+        return typeof type;
+    }
+    isNumber(value: any): value is number {
+        return typeof value === 'number';
+    }
 }

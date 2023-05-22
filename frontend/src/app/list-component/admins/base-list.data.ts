@@ -26,23 +26,23 @@ const slashedChatHTML = `
 	</div>
 `;
 const singularActions: Action[] = [
-	{
-		type: 'removeAdmin',
-		HTML: `<i class="text-danger fs-4 bi bi-person-fill-down"></i>`,
-		tooltip: 'Remove admin permission',
-		confirmRequired: () => true,
-		confirmType: ConfirmType.DEFAULT,
-		visibleWhen(data, user?:DecodedToken) {
-			return data.role !== 'super_admin' && data.id !== user?.id;
-		},
-		confirmData: {
-			myName: "ConfirmData",
-			description: "Are you sure you want to remove admin permissions?",
-		}
-	}
+    {
+        type: 'removeAdmin',
+        HTML: `<i class="text-danger fs-4 bi bi-person-fill-down"></i>`,
+        tooltip: 'Remove admin permission',
+        confirmRequired: () => true,
+        confirmType: ConfirmType.DEFAULT,
+        visibleWhen(data, user?: DecodedToken) {
+            return data.role !== 'super_admin' && data.id !== user?.id;
+        },
+        confirmData: {
+            myName: 'ConfirmData',
+            description: 'Are you sure you want to remove admin permissions?',
+        },
+    },
 ];
 
-const pluralActions: Action[] = []
+const pluralActions: Action[] = [];
 
 export const baseData: BaseData = {
     headers: header,

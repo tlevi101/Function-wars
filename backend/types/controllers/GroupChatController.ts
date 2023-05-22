@@ -23,11 +23,11 @@ export class GroupChatController {
             return res.status(404).json({ message: 'Group chat not found.' });
         }
         if (!groupChat.userIsInChat(user.id)) {
-			console.log(user.id)
+            console.log(user.id);
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
         if (!groupChat.userIsInChat(userID)) {
-			console.log(userID);
+            console.log(userID);
             return res.status(404).json({ message: 'User not found.' });
         }
         try {

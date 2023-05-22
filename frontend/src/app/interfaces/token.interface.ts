@@ -16,7 +16,7 @@ export interface DecodedUserInterface {
 
 export interface DecodedGuestInterface {
     readonly type: 'guest';
-    readonly guest:true;
+    readonly guest: true;
     id: string;
     name: string;
     JWT_created_at: Date;

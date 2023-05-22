@@ -6,9 +6,6 @@ const { Sequelize } = require('sequelize');
 const forgotPasswordMailer = require('../../mail/forgotPasswordMail');
 
 export class AuthController {
-
-
-
     /**
      * @method post
      * @route /register-guest
@@ -24,7 +21,7 @@ export class AuthController {
         if (name.length > 20 || name.length < 3)
             return res.status(400).json({ message: 'Name is must be between 3 and 20 characters long' });
         const token = jsonwebtoken.sign(
-            { type: 'guest', name:`Guest: ${name}`, guest: true, JWT_createdAt: new Date(), id: uuidv4() },
+            { type: 'guest', name: `Guest: ${name}`, guest: true, JWT_createdAt: new Date(), id: uuidv4() },
             process.env.JWT_SECRET,
             {
                 algorithm: process.env.JWT_ALGO,
@@ -32,9 +29,6 @@ export class AuthController {
         );
         return res.status(201).json({ message: 'Guest accepted', jwt: token });
     }
-
-
-
 
     /**
      * @method post
@@ -60,9 +54,6 @@ export class AuthController {
         });
         return res.status(201).json({ message: 'User created', jwt: token });
     }
-
-
-
 
     /**
      * @method post
@@ -94,9 +85,6 @@ export class AuthController {
         });
         return res.status(200).send({ message: 'Login successful', jwt: token });
     }
-
-
-
 
     /**
      * @method post
@@ -133,9 +121,6 @@ export class AuthController {
         }
     }
 
-
-
-
     /**
      * @method put
      * @route /reset-password/:uuid
@@ -145,7 +130,7 @@ export class AuthController {
      */
     public static async resetPassword(req: MyRequest, res: MyResponse) {
         const { uuid } = req.params;
-		console.log(uuid);
+        console.log(uuid);
         const passwordReset = await PasswordReset.findOne({
             where: { uuid: uuid },
         });
@@ -171,9 +156,6 @@ export class AuthController {
         await passwordReset.destroy();
         return res.status(200).send({ message: 'Password updated' });
     }
-
-
-
 
     /**
      * @method get

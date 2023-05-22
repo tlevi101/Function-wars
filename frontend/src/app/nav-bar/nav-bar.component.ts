@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.service';
 export class NavBarComponent implements OnInit {
     public name: string | undefined = 'User';
     public user: DecodedToken | undefined;
-    constructor(private router: Router, private jwt:JwtService, private authService: AuthService) {
+    constructor(private router: Router, private jwt: JwtService, private authService: AuthService) {
         this.user = jwt.getDecodedAccessToken();
     }
 
@@ -25,17 +25,16 @@ export class NavBarComponent implements OnInit {
     get route() {
         return this.router.url;
     }
-	get isAdmin(): boolean {
-		return this.user?.type === 'user' && this.user?.is_admin;
-	}
-	get isGuest(): boolean {
-		return this.user?.type === 'guest';
-	}
+    get isAdmin(): boolean {
+        return this.user?.type === 'user' && this.user?.is_admin;
+    }
+    get isGuest(): boolean {
+        return this.user?.type === 'guest';
+    }
     logout() {
-		this.authService.disconnectSocket();
+        this.authService.disconnectSocket();
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
         this.router.navigate(['/login']);
     }
-
 }
