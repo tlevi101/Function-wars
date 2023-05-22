@@ -66,7 +66,7 @@ class FuncCalculator {
         console.log('point: ' + point);
         let distance = 0;
         const rightSidePoints = await this.calculateRightSidePoints();
-        for await (const [i, rightSidePoint] of rightSidePoints.entries()) {
+        for await (const [i, _] of rightSidePoints.entries()) {
             if (i === rightSidePoints.length - 1) {
                 break;
             }
@@ -131,12 +131,7 @@ class FuncCalculator {
         return points;
     }
 
-    public async trimRightSidePoints(
-        points: PointInterface[],
-        point: PointInterface | Point
-    ): Promise<PointInterface[]> {
-        return points.filter(p => p.x <= point.x);
-    }
+
 
     public async calculateLeftSidePoints(): Promise<PointInterface[]> {
         const points: PointInterface[] = [];
@@ -154,13 +149,11 @@ class FuncCalculator {
                 }
                 if (this.f(x) == -Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: 0 });
-                    let newPoints = line.separateToPoints().map(p => p.toJSON());
-                    points.push(...newPoints);
+                    points.push(... line.separateToPoints().map(p => p.toJSON()));
                 }
                 if (this.f(x) == Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: this.height });
-                    let newPoints = line.separateToPoints().map(p => p.toJSON());
-                    points.push(...newPoints);
+                    points.push(... line.separateToPoints().map(p => p.toJSON()));
                 }
                 return points;
             }

@@ -16,13 +16,13 @@ module.exports = (sequelize, DataTypes) => {
                     allowNull: true,
                 },
             });
-            this.hasOne(models.Report, {
+            this.hasMany(models.Report, {
                 foreignKey: 'reported_by',
-                as: 'mySentReport',
+                as: 'mySentReports',
             });
-            this.hasOne(models.Report, {
+            this.hasMany(models.Report, {
                 foreignKey: 'reported',
-                as: 'myReceivedReport',
+                as: 'myReceivedReports',
             });
             this.belongsToMany(models.User, {
                 through: 'Friendships',
@@ -115,6 +115,7 @@ module.exports = (sequelize, DataTypes) => {
             return friends;
         }
 
+
         async getFriendRequests() {
             const requests = await sequelize.models.Friendship.findAll({
                 where: {
@@ -139,20 +140,17 @@ module.exports = (sequelize, DataTypes) => {
             });
             return requestsArray;
         }
+
+
         async getChat(friend_id) {
-            const friendship = await sequelize.models.Friendship.findOne({
-                where: {
-                    [Op.or]: [
-                        { user_id: this.id, friend_id: friend_id },
-                        { user_id: friend_id, friend_id: this.id },
-                    ],
-                },
-            });
+            const friendship = await this.getFriendShip(friend_id);
             if (friendship) {
                 return await friendship.getChat();
             }
             return null;
         }
+
+
         async getFriendShip(friend_id) {
             const friendship = await sequelize.models.Friendship.findOne({
                 where: {

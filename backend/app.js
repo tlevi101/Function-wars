@@ -29,7 +29,7 @@ const io = require('socket.io')(http, {
 
 io.use(function (socket, next) {
     if (socket.handshake.query && socket.handshake.query.token) {
-        jwt.verify(socket.handshake.query.token, 'secret', function (err, decoded) {
+        jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, function (err, decoded) {
             if (err) return next(new Error('Authentication error'));
             socket.decoded = decoded;
             next();
