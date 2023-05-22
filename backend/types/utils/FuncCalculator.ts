@@ -1,5 +1,5 @@
 import { PointInterface } from './interfaces';
-import { Line, Point } from './Shape';
+import { Line, Point } from './Obstacle';
 import Player = require('./Player');
 
 class FuncCalculator {

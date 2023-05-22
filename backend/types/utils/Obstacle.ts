@@ -75,7 +75,7 @@ export interface Dimension {
     height: number;
 }
 
-export class Shape {
+export class Obstacle {
     protected location: Point;
     protected dimension: Dimension;
     protected avoidArea: Circle;
@@ -165,14 +165,14 @@ export class Shape {
     }
 }
 
-export class Ellipse extends Shape {
+export class Ellipse extends Obstacle {
     constructor(location: Point, dimension: Dimension) {
         super(location, { width: Math.round(dimension.width / 2), height: Math.round(dimension.height / 2) });
         this.changeAvoidAreaRadius();
     }
 
     public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
-        if (await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))) {
+        if (await Obstacle.pointInsideOfAnyDamage(point, await Obstacle.getDamagesFromObjects(everyShape))) {
             return false;
         }
         const x = point.x - this.Location.x;
@@ -237,7 +237,7 @@ class Vector {
     }
 }
 
-export class Rectangle extends Shape {
+export class Rectangle extends Obstacle {
     private angles: Point[] = [];
     constructor(location: Point, dimension: Dimension) {
         super(location, dimension);
@@ -303,7 +303,7 @@ export class Rectangle extends Shape {
      * @return boolean
      */
     public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
-        if (await Shape.pointInsideOfAnyDamage(point, await Shape.getDamagesFromObjects(everyShape))) {
+        if (await Obstacle.pointInsideOfAnyDamage(point, await Obstacle.getDamagesFromObjects(everyShape))) {
             return false;
         }
         const crossProducts: number[] = [];

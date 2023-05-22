@@ -8,7 +8,7 @@ import {
     UserInterface,
 } from './interfaces';
 import Player = require('./Player');
-import { Ellipse, Rectangle, Point } from './Shape';
+import { Ellipse, Rectangle, Point } from './Obstacle';
 import { socket } from '../controllers/Interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
 const MyLogger = require('../../logs/logger.js');

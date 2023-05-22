@@ -1,7 +1,6 @@
 import { DecodedToken, socket } from '../controllers/Interfaces';
 import { UserInterface } from './interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
-import { table } from 'console';
 const { faker } = require('@faker-js/faker');
 const { Field } = require('../../models');
 

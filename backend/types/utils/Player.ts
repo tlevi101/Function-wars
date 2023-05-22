@@ -1,6 +1,6 @@
-import { Shape, Circle, Ellipse } from './Shape';
-import { Point } from './Shape';
-import { Dimension } from './Shape';
+import { Obstacle, Circle, Ellipse } from './Obstacle';
+import { Point } from './Obstacle';
+import { Dimension } from './Obstacle';
 import { PlayerInterface } from './interfaces';
 
 class Player {
@@ -15,7 +15,7 @@ class Player {
         this.id = id;
         this.name = name;
     }
-    public objectTooClose(object: Shape): boolean {
+    public objectTooClose(object: Obstacle): boolean {
         return this.avoidArea.intersectsWith(object.AvoidArea);
     }
     toJSON(): PlayerInterface {
