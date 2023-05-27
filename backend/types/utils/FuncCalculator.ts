@@ -223,7 +223,7 @@ class FuncCalculator {
         this.fn = this.fn.replaceAll('|', '');
     }
     replaceSqrtOperator(): void {
-        const regex = /√\([^(|)]+\)/gi;
+        const regex = /(√\([^(|)]+\))|√X/gi;
         this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
         this.fn = this.fn.replaceAll('√', '');
     }

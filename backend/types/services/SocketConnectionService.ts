@@ -16,9 +16,11 @@ export class SocketConnectionService {
     public static async userNavigated(socket: socket, url: string) {
         const user = RuntimeMaps.onlineUsers.get(socket.decoded.id);
         if (user) {
-            console.log(`User (${socket.decoded.name}) navigated to ${url}`);
+            console.debug(`User (${socket.decoded.name}) navigated to ${url}`);
+            console.debug(user.currentURL !== url);
+            console.debug(this.userLeftFromGame(user.currentURL));
             if (user.currentURL !== url && this.userLeftFromGame(user.currentURL)) {
-                console.log('user left game');
+                console.debug('user left game');
                 await GameController.deleteGame(socket);
             }
             if (user.currentURL !== url && this.userLeftFromWaitRoom(user.currentURL)) {
@@ -48,13 +50,14 @@ export class SocketConnectionService {
         WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);
         GameController.leaveGame(socket);
-        setTimeout(async () => {
+        const timeout = setTimeout(async () => {
             if (await this.userLeftTheGame(socket)) {
-                GameController.deleteGame(socket);
+                await GameController.deleteGame(socket);
             }
             if (await this.ownerLeftWaitingRoom(socket)) {
-                CustomGameController.deleteWaitingRoom(socket);
+                await CustomGameController.deleteWaitingRoom(socket);
             }
+            timeout.unref();
         }, this.TIME_TO_RECONNECT);
     }
 

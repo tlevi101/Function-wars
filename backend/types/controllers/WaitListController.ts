@@ -19,13 +19,13 @@ export class WaitListController {
         RuntimeMaps.waitList.set(socket.decoded.id, socket);
         console.log(`User (${socket.decoded.name}) joined wait list`);
         if (RuntimeMaps.waitList.size >= 4) {
-            WaitListController.createGame(4);
+            await WaitListController.createGame(4);
         }
         if (RuntimeMaps.waitList.size >= 3) {
-            WaitListController.createGame(3);
+            await WaitListController.createGame(3);
         }
         if (RuntimeMaps.waitList.size >= 2) {
-            WaitListController.createGame(2);
+            await WaitListController.createGame(2);
         }
     }
 

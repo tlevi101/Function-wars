@@ -164,7 +164,7 @@ export class GameController {
         const chatUUID = game.ChatUUID;
         game.destroy();
         await GroupChatController.deleteGameGroupChat(chatUUID);
-        console.log(chalk.green(`Game ${gameUUID} deleted.`));
+        console.debug(chalk.green(`Game ${gameUUID} deleted.`));
     }
 
     public static async userBanned(userID: number) {

@@ -22,7 +22,6 @@ describe('stress tests', () => {
                 console.error('socket is null');
             }
             console.info('new socket connection, sockets count:', serverSockets.length);
-            stressTestCount++;
             serverSockets.push(socket);
         });
         const connectionPromises = [];
@@ -33,6 +32,8 @@ describe('stress tests', () => {
                 email: { [Op.like]: 'stress%' },
             },
         });
+        stressTestCount =  stressTestUsers.length;
+
         for (const user of stressTestUsers) {
             console.info('new client connection, clients count:', stressTestUserClients.length);
             const token = jsonwebtoken.sign(user.toJSONForJWT(), process.env.JWT_SECRET || 'secret', {

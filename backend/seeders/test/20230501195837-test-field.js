@@ -11,26 +11,26 @@ module.exports = {
                 objects: [
                     {
                         type: 'Rectangle',
-                        location: { x: 38, y: 512 },
-                        avoidArea: { radius: 105, location: { x: 93, y: 567 } },
-                        dimension: { width: 110, height: 110 },
+                        location: { x: 300, y: 512 },
+                        avoidArea: { radius: 105, location: { x: 300, y: 512 } },
+                        dimension: { width: 200, height: 200 },
                     },
                     {
                         type: 'Ellipse',
-                        location: { x: 588, y: 43 },
-                        avoidArea: { radius: 105, location: { x: 588, y: 43 } },
-                        dimension: { width: 110, height: 110 },
+                        location: { x: 500, y: 210 },
+                        avoidArea: { radius: 105, location: { x: 500, y: 210 } },
+                        dimension: { width: 200, height: 200 },
                     },
                 ],
                 players: [
                     {
-                        location: { x: 921, y: 629 },
-                        avoidArea: { radius: 130, location: { x: 921, y: 629 } },
+                        location: { x: 210, y: 210 },
+                        avoidArea: { radius: 130, location: { x: 210, y: 210 } },
                         dimension: { width: 40, height: 40 },
                     },
                     {
-                        location: { x: 54, y: 38 },
-                        avoidArea: { radius: 130, location: { x: 54, y: 38 } },
+                        location: { x: 700, y:  525},
+                        avoidArea: { radius: 130, location: { x: 700, y: 525 } },
                         dimension: { width: 40, height: 40 },
                     },
                 ],

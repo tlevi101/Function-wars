@@ -82,7 +82,7 @@ export class Game {
         this.submittedFunctions.push({ [this.currentPlayer.ID]: func });
         const funcCalculator = new FuncCalculator(func, this.currentPlayer.Location.x, this.currentPlayer.Location.y);
         if (!(await funcCalculator.isValidFunction())) {
-            throw new Error('Invalid function');
+            throw new Error(await funcCalculator.error());
         } else {
             this.lastFunction = func;
         }
