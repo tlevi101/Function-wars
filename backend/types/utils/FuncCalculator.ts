@@ -12,10 +12,8 @@ class FuncCalculator {
     private validFunctions: string[] = ['sin', 'cos', 'sqrt', 'log', 'pow', 'abs'];
     private specialValidFunctions: string[] = ['√', '|X|', 'e'];
     private validOperators: string[] = ['+', '-', '*', '/', '^'];
-    private invalidFunctions: string[] = ['tan', 'a/x', '[x]', '{x}'];
+    private invalidFunctions: string[] = ['tan', 'a/x'];
     private invalidCases: { regex: RegExp; message: string }[] = [
-        { regex: /.*\[.*x.*\].*/gi, message: 'Floor function is not allowed!' },
-        { regex: /.*\{.*x.*\}.*/gi, message: 'Ceil function is not allowed!' },
         { regex: /.*tan\(.*/gi, message: 'Tan function is not allowed!' },
         {
             regex: /(\/\(.*x.*\))|(\/x)|(\/Math\.[a-z]+\(.*x.*\))|((\||√|e\^)x)|((√|e\^)\(.*x.*\))|(\|.*x.*\|)/gi,
@@ -108,12 +106,12 @@ class FuncCalculator {
                 if (!last) {
                     last = firstValidPoint;
                 }
-                if (this.f(x) == Infinity) {
+                if (this.f(x) == -Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: 0 });
                     let newPoints = line.separateToPoints().map(p => p.toJSON());
                     points.push(...newPoints);
                 }
-                if (this.f(x) == -Infinity) {
+                if (this.f(x) == Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: this.height });
                     let newPoints = line.separateToPoints().map(p => p.toJSON());
                     points.push(...newPoints);
@@ -220,12 +218,12 @@ class FuncCalculator {
         this.fn = this.fn.replaceAll('e', 'Math.E');
     }
     replaceAbsWithMathAbs(): void {
-        const regex = /\|([^|]*x[^|]*)\|/gi;
+        const regex = /\|([^|]+)\|/gi;
         this.fn = this.fn.replaceAll(regex, 'Math.abs($&)');
         this.fn = this.fn.replaceAll('|', '');
     }
     replaceSqrtOperator(): void {
-        const regex = /(√x)|(√\([^(]*x[^)]*\))/gi;
+        const regex = /√\([^(|)]+\)/gi;
         this.fn = this.fn.replaceAll(regex, 'Math.sqrt($&)');
         this.fn = this.fn.replaceAll('√', '');
     }

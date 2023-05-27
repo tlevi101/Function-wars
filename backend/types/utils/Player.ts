@@ -46,7 +46,6 @@ class Player {
 	 * @returns {Dimension} Dimension of the player, 
 	*/
     get Dimension(): Dimension {
-        //FIXME width and height is not being multiplied bcs frontend will do this anyway
         return { width: this.object.Radius, height: this.object.Radius };
     }
     get AvoidArea(): Circle {

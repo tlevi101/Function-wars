@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const { app } = require('../app');
-const { User } = require('../../models');
 const request = supertest(app);
+const { User } = require('../../models');
 const jsonwebtoken = require('jsonwebtoken');
 const { Op } = require('sequelize');
 
@@ -81,7 +81,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 
@@ -91,7 +91,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 
@@ -101,7 +101,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
         console.log(response.body);
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
     });
 
     test('PUT /users/:id/unban - guest token', async () => {
@@ -110,7 +110,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 
@@ -120,7 +120,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 
@@ -130,7 +130,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .set('Authorization', `Bearer ${guestToken}`)
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 
@@ -141,7 +141,7 @@ describe('AdminController API tests when a guest making the request', () => {
             .send({ chat_restriction: true })
             .expect('Content-Type', /json/);
 
-        expect(response.body).toEqual({ message: 'Guest cannot make this request!' });
+        expect(response.body).toEqual({ message: 'You are not an admin!' });
         expect(response.status).toBe(403);
     });
 });

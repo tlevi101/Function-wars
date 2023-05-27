@@ -1,5 +1,6 @@
 import { MessageInterface, MutesInterface, UserInterface } from './interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
+import { socket } from '../controllers/Interfaces';
 const { User } = require('../../models');
 
 export class GroupChat {
@@ -65,7 +66,7 @@ export class GroupChat {
         return otherUsersStatus;
     }
 
-    private updatePlayerSocket(userID: number | string, socket: any) {
+    private updatePlayerSocket(userID: number | string, socket: socket) {
         this.sockets = this.sockets.map(s => {
             if (s.decoded.id === userID) {
                 s = socket;
@@ -74,12 +75,12 @@ export class GroupChat {
         });
     }
 
-    public reconnect(userID: number | string, socket: any) {
+    public reconnect(userID: number | string, socket: socket) {
         this.updatePlayerSocket(userID, socket);
         socket.join(this.roomUUID);
     }
 
-    public join(user: UserInterface, socket: any) {
+    public join(user: UserInterface, socket: socket) {
         if (this.users.find(u => u.id === user.id)) {
             this.updatePlayerSocket(user.id, socket);
             return;
@@ -89,7 +90,7 @@ export class GroupChat {
         this.users.push(user);
     }
 
-    public leave(user: UserInterface | number | string, socket: any) {
+    public leave(user: UserInterface | number | string, socket: socket) {
         this.sockets = this.sockets.filter(s => s.id !== socket.id);
         socket.leave(this.roomUUID);
         if (typeof user === 'number' || typeof user === 'string') {
@@ -113,10 +114,7 @@ export class GroupChat {
     private isMuted(mutedByID: number | string, mutedUserID: number | string): boolean {
         return this.mutes.some(m => m.mutedBy.id === mutedByID && m.mutedUser.id === mutedUserID);
     }
-    private async userBlockedOther(
-        userID: number | string,
-        otherUserID: number | string
-    ): Promise<boolean | undefined> {
+    private async userBlockedOther(userID: number | string, otherUserID: number | string): Promise<boolean | undefined> {
         if (typeof userID === 'string' || typeof otherUserID === 'string') return undefined;
         return (await User.findByPk(userID)).isBlocked(otherUserID);
     }
@@ -124,10 +122,7 @@ export class GroupChat {
         return typeof userID === 'string' || !(await User.findByPk(userID)).chat_restriction;
     }
 
-    public async userWantToReceiveMessagesFrom(
-        userID: number | string,
-        otherUserID: number | string
-    ): Promise<boolean> {
+    public async userWantToReceiveMessagesFrom(userID: number | string,otherUserID: number | string): Promise<boolean> {
         return !this.isMuted(userID, otherUserID) && !(await this.userBlockedOther(userID, otherUserID));
     }
     public getMessagesForUser(userID: number | string): MessageInterface[] {

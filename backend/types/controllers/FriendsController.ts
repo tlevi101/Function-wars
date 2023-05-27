@@ -60,7 +60,7 @@ export class FriendsController {
         const { id } = req.params;
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-            return res.status(404).json({ message: 'Bad User not found.' });
+            return res.status(404).json({ message: 'User not found.' });
         }
         const friend = await User.findOne({ where: { id: id } });
         if (!friend) {

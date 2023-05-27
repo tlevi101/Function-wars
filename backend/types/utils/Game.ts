@@ -27,14 +27,14 @@ export class Game {
     private lastFunction: string | undefined;
     private field: FieldInterface;
     private uuid: string;
-    private sockets: any[];
+    private sockets: socket[];
     private gameOver = false;
     private submittedFunctions: SubmittedFunction[] = [];
     constructor(
         players: PlayerInterface[],
         objects: ObjectInterface[],
         field: FieldInterface,
-        sockets: any[],
+        sockets: socket[],
         currentPlayer?: PlayerInterface
     ) {
         this.players = players.map(
@@ -118,9 +118,9 @@ export class Game {
                 if (await this.isGameOver(leftSide[i])) {
                     leftSide = leftSide.slice(0, i);
                     rightSide = rightSide.slice(0, i > rightSide.length ? undefined : i);
-                } else if (await this.checkObjectCollision(leftSide[i])) {
+                } else if (await this.checkObstacleCollision(leftSide[i])) {
                     leftSide = leftSide.slice(0, i + 1);
-                    damages.leftSide = await this.damageObject(
+                    damages.leftSide = await this.damageObstacle(
                         leftSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(leftSide[i].x, leftSide[i].y))
                     );
@@ -130,9 +130,9 @@ export class Game {
                 if (await this.isGameOver(rightSide[i])) {
                     leftSide = leftSide.slice(0, i > leftSide.length ? undefined : i);
                     rightSide = rightSide.slice(0, i);
-                } else if (await this.checkObjectCollision(rightSide[i])) {
+                } else if (await this.checkObstacleCollision(rightSide[i])) {
                     rightSide = rightSide.slice(0, i + 1);
-                    damages.rightSide = await this.damageObject(
+                    damages.rightSide = await this.damageObstacle(
                         rightSide[i],
                         await funcCalculator.distanceFromOrigo(new Point(rightSide[i].x, rightSide[i].y))
                     );
@@ -143,15 +143,15 @@ export class Game {
         return { points: { leftSide, rightSide }, damages };
     }
 
-    private async checkObjectCollision(point: PointInterface): Promise<boolean> {
+    private async checkObstacleCollision(point: PointInterface): Promise<boolean> {
         for await (const object of this.objects) {
-            if (await object.pointInside(new Point(point.x, point.y), this.objects)) {
+            if (await object.pointInside(new Point(point.x, point.y))) {
                 return true;
             }
         }
         return false;
     }
-    private async damageObject(
+    private async damageObstacle(
         point: PointInterface,
         distance: number
     ): Promise<{ location: PointInterface; radius: number } | null> {
@@ -159,7 +159,7 @@ export class Game {
         try {
             this.objects = await Promise.all(
                 this.objects.map(async object => {
-                    if (await object.pointInside(new Point(point.x, point.y), this.objects)) {
+                    if (await object.pointInside(new Point(point.x, point.y))) {
                         damage = object.damageMe(new Point(point.x, point.y), distance).toJSON();
                     }
                     return object;
@@ -169,12 +169,6 @@ export class Game {
             console.error(e);
         }
         return damage;
-    }
-
-    get prevPlayer(): Player {
-        const index = this.players.findIndex(player => player.ID === this.currentPlayer.ID);
-        const prevPlayer = this.players[(index - 1 + this.players.length) % this.players.length];
-        return prevPlayer;
     }
 
     public toFrontend(): GameInterface {
@@ -191,7 +185,7 @@ export class Game {
     public static async makeGameFromField(
         field: FieldInterface,
         players: UserInterface[],
-        sockets: any[]
+        sockets: socket[]
     ): Promise<Game> {
         const playerInterfaces: PlayerInterface[] = await Promise.all(
             players.map((player, index) => {
@@ -253,17 +247,13 @@ export class Game {
             }
             return player;
         });
-        this.updatePlayerSocket(playerID, socket);
-        socket.join(this.uuid);
-    }
-
-    public updatePlayerSocket(playerID: number | string, socket: any): void {
-        this.sockets = this.sockets.map(s => {
+		this.sockets = this.sockets.map(s => {
             if (s.decoded.id === playerID) {
                 s = socket;
             }
             return s;
         });
+        socket.join(this.uuid);
     }
 
     public playerIsOnline(playerID: number | string): never | boolean {

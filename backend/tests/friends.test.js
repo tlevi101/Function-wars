@@ -70,42 +70,42 @@ describe('FriendsController API tests when token is is valid, but user is not fo
         const response = await request.get('/friends/requests').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 
     test('GET /friends/:id/chat', async () => {
         const response = await request.get('/friends/1/chat').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 
     test('PUT /friends/request/:id/accept', async () => {
         const response = await request.put('/friends/requests/1/accept').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 
     test('DELETE /friends/request/:id/reject', async () => {
         const response = await request.delete('/friends/requests/1/reject').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 
     test('DELETE  /friends/:id', async () => {
         const response = await request.delete('/friends/1').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 
     test('POST /friends/:id ', async () => {
         const response = await request.post('/friends/1').set('Authorization', `Bearer ${badToken}`);
 
         expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'Bad token! User not found.' });
+        expect(response.body).toEqual({ message: 'User not found.' });
     });
 });
 
@@ -350,7 +350,7 @@ describe('FriendsController API tests on POST /friends/:id (add friend) remainin
         expect(response.status).toBe(404);
         expect(response.body).toEqual(
             expect.objectContaining({
-                message: 'User not found.',
+                message: 'Other user not found.',
             })
         );
     });

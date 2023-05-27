@@ -132,7 +132,6 @@ describe('wait list tests', () => {
         userClients[0].emit('leave wait list');
     });
 
-    //TODO try to stress with more users
     test('join wait list with 2 user', done => {
         expect(RuntimeMaps.waitList.size).toBe(0);
         const validateGetGameResponse = (response, room) => {
