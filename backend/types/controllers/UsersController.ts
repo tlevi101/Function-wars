@@ -12,7 +12,7 @@ export class UsersController {
     public static async reportUSer(req: MyRequest, res: MyResponse) {
         if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { name } = req.user;
-        const { id } = req.params;
+        const id = Number.parseInt(req.params.id);
         const { description } = req.body;
         if (!description) return res.status(400).json({ message: 'Description is required.' });
         const user = await User.findOne({ where: { name: name } });
@@ -41,7 +41,7 @@ export class UsersController {
     public static async blockUser(req: MyRequest, res: MyResponse) {
         if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
-        const { id } = req.params;
+        const id = Number.parseInt(req.params.id);
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
@@ -68,14 +68,14 @@ export class UsersController {
     public static async unblockUser(req: MyRequest, res: MyResponse) {
         if (req.user.type === 'guest') return res.status(403).json({ message: 'Guest cannot make this request!' });
         const { email } = req.user;
-        const { id } = req.params;
+        const id = Number.parseInt(req.params.id);
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
         }
         const blockedUser = await User.findByPk(id);
         if (!blockedUser) {
-            return res.status(404).json({ message: 'Blocked user not found.' });
+            return res.status(404).json({ message: 'Other user not found.' });
         }
         if (!(await user.hasBlocked(blockedUser))) {
             return res.status(404).json({ message: 'User is not blocked.' });

@@ -221,9 +221,10 @@ describe('test group chat through API', () => {
             await CustomGameController.deleteWaitingRoom(serverSockets[0]);
         })
 
-        test('should not get the message', async () => {
+        test('should not get the message', (done) => {
             setTimeout(()=>{
                 expect(Array.from(RuntimeMaps.groupChats.values())[0].messages.length).toBe(0);
+                done();
             }, 1000)
             chatRestrictedUserClient.emit('send group chat message', {message: 'msg'} )
         })
