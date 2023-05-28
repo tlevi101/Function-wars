@@ -126,7 +126,7 @@ export class CustomGameController {
         }
         socket.join(room.UUID);
         room.join(user, socket);
-        GroupChatController.joinGroupChat(socket, room.ChatUUID);
+        await GroupChatController.joinGroupChat(socket, room.ChatUUID);
         socket.to(room.UUID).emit('user joined waiting room');
         socket.emit('waiting room joined');
     }

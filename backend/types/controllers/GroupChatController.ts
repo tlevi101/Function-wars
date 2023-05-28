@@ -79,7 +79,7 @@ export class GroupChatController {
         if (!groupChat.userIsInChat(user.id)) {
             return res.status(403).json({ message: 'You are not in this group chat.' });
         }
-        return res.status(200).json({ messages: groupChat.getMessagesForUser(user.id) });
+        return res.status(200).json({ messages: await groupChat.getMessagesForUser(user.id) });
     }
 
     /**
@@ -127,14 +127,6 @@ export class GroupChatController {
         }
     }
 
-    public static async deleteGroupChat(socket: socket) {
-        const groupChat = await GroupChatController.getGroupChatByUser(socket.decoded.id);
-        if (!groupChat) {
-            console.error('groupChat not found');
-            return;
-        }
-        groupChat.destroy();
-    }
     public static async deleteGroupChatByUUID(uuid: string) {
         const groupChat = RuntimeMaps.groupChats.get(uuid);
         if (!groupChat) {

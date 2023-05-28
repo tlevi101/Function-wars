@@ -416,13 +416,14 @@ describe('test custom game through API  and socket', () =>{
         }, 15*1000)
 
 
-        test('kick user', ()=>{
+        test('kick user', (done)=>{
             userClients[1].on('waiting room joined', async ()=>{
                 const response  = await request.post(`/wait-rooms/${UUID}/${users[1].id}/kick`)
                     .set('Authorization', `Bearer ${userTokens[0]}`);
                 expect(response.status).toBe(200);
                 const waitRoom =  Array.from(RuntimeMaps.waitingRooms.values())[0]
                 expect(waitRoom.userIsInRoom(users[1].id)).toBeFalsy();
+                done();
             })
             userClients[1].emit('join custom game', {roomUUID:UUID});
         })

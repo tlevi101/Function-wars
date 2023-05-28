@@ -1,6 +1,7 @@
-import { MessageInterface, MutesInterface, UserInterface } from './interfaces';
-import { RuntimeMaps } from '../RuntimeMaps';
-import { socket } from '../controllers/Interfaces';
+import {MessageInterface, MutesInterface, UserInterface} from './interfaces';
+import {RuntimeMaps} from '../RuntimeMaps';
+import {socket} from '../controllers/Interfaces';
+
 const { User } = require('../../models');
 
 export class GroupChat {
@@ -129,8 +130,12 @@ export class GroupChat {
     public async userWantToReceiveMessagesFrom(userID: number | string,otherUserID: number | string): Promise<boolean> {
         return !this.isMuted(userID, otherUserID) && !(await this.userBlockedOther(userID, otherUserID));
     }
-    public getMessagesForUser(userID: number | string): MessageInterface[] {
-        return this.messages.filter(async m => await this.userWantToReceiveMessagesFrom(userID, m.from.id));
+    public async getMessagesForUser(userID: number | string): Promise<MessageInterface[]> {
+        const messages = await Promise.all(this.messages.map(async (m) => {
+            const cond = await this.userWantToReceiveMessagesFrom(userID, m.from.id);
+            return { message: m, condition: cond };
+        }));
+        return messages.filter(({condition}) => condition).map(({message}) => message);
     }
 
     private async usersAreFriends(user1ID: number | string, user2ID: number | string): Promise<boolean | undefined> {
