@@ -45,7 +45,7 @@ export class SocketConnectionService {
     }
 
     public static userDisconnected(socket: socket) {
-        console.log(`User (${socket.decoded.name}) disconnected`);
+        console.debug(`User (${socket.decoded.name}) disconnected`);
         RuntimeMaps.onlineUsers.delete(socket.decoded.id);
         WaitListController.leaveWaitList(socket);
         CustomGameController.leaveWaitingRoom(socket);

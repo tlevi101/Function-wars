@@ -85,9 +85,13 @@ export class GroupChat {
             this.updatePlayerSocket(user.id, socket);
             return;
         }
-        this.sockets.push(socket);
+        if(!this.sockets.some(s => s.decoded.id === s.decoded.id)) {
+            this.sockets.push(socket);
+        }
         socket.join(this.roomUUID);
-        this.users.push(user);
+        if(!this.users.some(u => u.id === user.id)) {
+            this.users.push(user);
+        }
     }
 
     public leave(user: UserInterface | number | string, socket: socket) {

@@ -9,7 +9,7 @@ const { RuntimeMaps } = require('../types/RuntimeMaps');
 const { WaitListController } = require('../types/controllers/WaitListController');
 
 describe('stress tests', () => {
-    let stressTestCount = 0;
+    let stressTestCount;
     let stressTestUsers;
     const stressTestUserTokens = [];
     const stressTestUserClients = [];
@@ -32,7 +32,12 @@ describe('stress tests', () => {
                 email: { [Op.like]: 'stress%' },
             },
         });
-        stressTestCount =  stressTestUsers.length;
+        stressTestCount = await User.count({
+            where: {
+                role: 'user',
+                email: { [Op.like]: 'stress%' },
+            },
+        });
 
         for (const user of stressTestUsers) {
             console.info('new client connection, clients count:', stressTestUserClients.length);

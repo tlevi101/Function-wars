@@ -29,7 +29,7 @@ module.exports = {
                         dimension: { width: 40, height: 40 },
                     },
                     {
-                        location: { x: 700, y:  525},
+                        location: { x: 700, y: 525 },
                         avoidArea: { radius: 130, location: { x: 700, y: 525 } },
                         dimension: { width: 40, height: 40 },
                     },
@@ -114,6 +114,41 @@ module.exports = {
                     {
                         location: { x: 721, y: 329 },
                         avoidArea: { radius: 130, location: { x: 921, y: 629 } },
+                        dimension: { width: 40, height: 40 },
+                    },
+                ],
+                dimension: { width: 1000, height: 700 },
+            },
+        });
+
+        const user = await User.findByPk(1);
+        await user.createField({
+            name: 'test field',
+            is_admin_field: false,
+            field: {
+                objects: [
+                    {
+                        type: 'Rectangle',
+                        location: { x: 300, y: 512 },
+                        avoidArea: { radius: 105, location: { x: 300, y: 512 } },
+                        dimension: { width: 200, height: 200 },
+                    },
+                    {
+                        type: 'Ellipse',
+                        location: { x: 500, y: 210 },
+                        avoidArea: { radius: 105, location: { x: 500, y: 210 } },
+                        dimension: { width: 200, height: 200 },
+                    },
+                ],
+                players: [
+                    {
+                        location: { x: 210, y: 210 },
+                        avoidArea: { radius: 130, location: { x: 210, y: 210 } },
+                        dimension: { width: 40, height: 40 },
+                    },
+                    {
+                        location: { x: 700, y: 525 },
+                        avoidArea: { radius: 130, location: { x: 700, y: 525 } },
                         dimension: { width: 40, height: 40 },
                     },
                 ],

@@ -114,22 +114,13 @@ describe('test game through API', () => {
     }, 10 * 1000);
 
     afterAll(async () => {
-        let disconnectionPromises = [];
         for await (let client of userClients) {
             client.close();
-            disconnectionPromises.push(
-                new Promise(resolve => {
-                    const timeout = setTimeout(() => resolve(), 10 * 1000);
-                })
-            );
         }
-        await Promise.all(disconnectionPromises);
         await new Promise(resolve => {
             io.close(() => {
                 console.warn('server closed');
-                setTimeout(() => {
-                    resolve();
-                }, 1000);
+                resolve();
             });
         });
     }, 20 * 1000);
@@ -370,14 +361,6 @@ describe('test game through API', () => {
 
     describe('test user left from game', () => {
         beforeEach((done) =>{
-            userClients[0]= new Client('http://localhost:3000', {
-                query: {
-                    token: userTokens[0],
-                },
-                extraHeaders: {
-                    Authorization: `Bearer ${userTokens[0]}`,
-                },
-            });
             let counter = 0;
             const checkDone = () => {
                 counter++;
@@ -409,6 +392,14 @@ describe('test game through API', () => {
         test('user disconnected', (done)=>{
             userClients[1].on('game ended', async ({message}) => {
                 expect(message).toEqual(expect.stringContaining(serverSockets[0].decoded.name));
+                userClients[0]= new Client('http://localhost:3000', {
+                    query: {
+                        token: userTokens[0],
+                    },
+                    extraHeaders: {
+                        Authorization: `Bearer ${userTokens[0]}`,
+                    },
+                });
                 done();
             })
             userClients[0].disconnect();

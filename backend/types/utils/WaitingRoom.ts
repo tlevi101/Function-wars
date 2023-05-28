@@ -52,6 +52,7 @@ export class WaitingRoom {
     public join(player: DecodedToken, socket: socket) {
         if (this.players.some(p => p.id === player.id)) return;
         this.players.push(player);
+        if (this.Sockets.some(S => S.decoded.id === socket.decoded.id)) return;
         this.sockets.push(socket);
     }
 
