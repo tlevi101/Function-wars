@@ -1,6 +1,7 @@
 import { socket } from './Interfaces';
 import { RuntimeMaps } from '../RuntimeMaps';
 import { GameController } from './GameController';
+const { Field } = require('../../models');
 
 export class WaitListController {
     //*****************//
@@ -15,6 +16,13 @@ export class WaitListController {
      * Joint to the wait list
      */
     public static async joinWaitList(socket: socket) {
+		const adminFieldCount =  await Field.count({
+			where: { is_admin_field: true, deletedAt:null},
+		});
+		if(adminFieldCount === 0){
+			socket.emit('error',{message:'There is no playable field at the moment!', code:404})
+		}
+
         socket.join('wait-list');
         RuntimeMaps.waitList.set(socket.decoded.id, socket);
         console.log(`User (${socket.decoded.name}) joined wait list`);

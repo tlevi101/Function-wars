@@ -123,12 +123,7 @@ export class GameController {
             field = await Field.findByPk(fieldID);
         }
         if (!field && sockets.length === 2) {
-            console.warn('No field found');
-            sockets.forEach(s => {
-                s.emit('error', { message: 'There is no playable field at the moment!' });
-                s.leave('wait-list');
-                WaitListController.leaveWaitList(s);
-            });
+            console.error('No field found');
             return;
         }
         sockets.forEach(async socket => {

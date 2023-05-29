@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
 import { DecodedToken } from '../../interfaces/token.interface';
 import { GroupChatService } from '../../services/group-chat.service';
@@ -24,12 +24,13 @@ export interface MessageInterface {
     templateUrl: './group-chat.component.html',
     styleUrls: ['./group-chat.component.scss'],
 })
-export class GroupChatComponent implements OnInit, AfterViewInit {
+export class GroupChatComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input() chatMessagesMaxHeight = 300;
     @Input() roomUUID = '';
     messages: MessageInterface[] = [];
     user: DecodedToken | undefined;
     otherUsersStatus: OtherUsersStatusInterface[] = [];
+	destroyed = false;
 
     @ViewChild('chatContainer') chatContainer!: ElementRef;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
@@ -67,6 +68,11 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
         });
     }
 
+	ngOnDestroy(): void {
+		this.destroyed = true;
+		
+	}
+
     ngAfterViewInit(): void {
         console.log(this.chatContainer);
         this.getAllMessages();
@@ -88,6 +94,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     getAllMessages() {
+		if(this.destroyed){
+			return;
+		}
         this.groupChat.getMessages(this.roomUUID).subscribe(async ({ messages }) => {
             this.messages = messages;
             this.scrollToBottom();
@@ -95,6 +104,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     getOtherUsersStatus() {
+		if(this.destroyed){
+			return;
+		}
         this.groupChat.getOtherUsersStatus(this.roomUUID).subscribe(async ({ users }) => {
             console.log(users);
             this.otherUsersStatus = users;
@@ -105,6 +117,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     addFriend(otherUserID: number) {
+		if(this.destroyed){
+			return;
+		}
         this.friendsService.addFriend(otherUserID).subscribe(({ message }) => {
             this.infoComponent.description = message;
             this.otherUsersStatus = this.otherUsersStatus.map(user => {
@@ -117,6 +132,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     blockUser(otherUserID: number) {
+		if(this.destroyed){
+			return;
+		}
         this.userServices.blockUser(otherUserID).subscribe(
             (res: any) => {
                 this.infoComponent.description = res.message;
@@ -134,6 +152,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     unblockUser(otherUserID: number) {
+		if(this.destroyed){
+			return;
+		}
         this.userServices.unblockUser(otherUserID).subscribe(
             ({ message }) => {
                 this.infoComponent.description = message;
@@ -151,7 +172,10 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     reportUser(otherUserID: number) {
-        const data: ConfirmWithInputData = {
+        if(this.destroyed){
+			return;
+		}
+		const data: ConfirmWithInputData = {
             myName: 'ConfirmWithInputData',
             title: `Report ${this.getUser(otherUserID)?.name}`,
             message: 'Please enter the reason for reporting this user!',
@@ -186,6 +210,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     muteUser(otherUserID: number | string) {
+		if(this.destroyed){
+			return;
+		}
         this.groupChat.muteUser(this.roomUUID, otherUserID).subscribe(
             ({ message }) => {
                 this.infoComponent.description = message;
@@ -203,6 +230,9 @@ export class GroupChatComponent implements OnInit, AfterViewInit {
     }
 
     unmuteUser(otherUserID: number | string) {
+		if(this.destroyed){
+			return;
+		}
         this.groupChat.unmuteUser(this.roomUUID, otherUserID).subscribe(
             ({ message }) => {
                 this.infoComponent.description = message;

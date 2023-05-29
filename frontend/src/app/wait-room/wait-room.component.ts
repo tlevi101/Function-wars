@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomGameService } from '../services/custom-game.service';
 import { InfoComponent } from '../pop-up/info/info.component';
@@ -11,7 +11,7 @@ import { WaitListService } from '../services/wait-list.service';
     templateUrl: './wait-room.component.html',
     styleUrls: ['./wait-room.component.scss'],
 })
-export class WaitRoomComponent implements OnInit {
+export class WaitRoomComponent implements OnInit, OnDestroy {
     roomUUID = '';
     chatRoomUUID = '';
     ownerID: number | undefined;
@@ -21,6 +21,7 @@ export class WaitRoomComponent implements OnInit {
     fieldID = 0;
     ownerLeft = false;
     otherPlayers: DecodedToken[] = [];
+	destroyed = false;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -65,6 +66,9 @@ export class WaitRoomComponent implements OnInit {
         });
     }
 
+	ngOnDestroy(): void {
+		this.destroyed=true;
+	}
 
     private listenWaitRoomJoined() {
         const subscription = this.waitRoomService.customGameJoined().subscribe(
@@ -81,6 +85,8 @@ export class WaitRoomComponent implements OnInit {
     }
 
     private sendGetWaitingRoomRequest() {
+		if(this.destroyed)
+			return;
         const subscription = this.waitRoomService.getWaitingRoom(this.roomUUID).subscribe(
             ({ waitRoom }) => {
                 this.chatRoomUUID = waitRoom.chatUUID;
