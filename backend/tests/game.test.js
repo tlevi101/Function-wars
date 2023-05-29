@@ -418,12 +418,12 @@ describe('test game through API', () => {
                 });
                 userClients[0].emit('route change', { url: `/games/${game.UUID}`})
                 timeout.unref();
-            }, 5*1000)
+            }, 2*1000)
             const timeout2 = setTimeout(()=>{
                 expect(game.playerIsOnline(serverSockets[0].decoded.id)).toBeTruthy();
                 done();
                 timeout2.unref();
-            }, 6*1000)
+            }, 4*1000)
         }, 10*1000)
     })
 });

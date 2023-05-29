@@ -115,19 +115,20 @@ module.exports = {
                 });
             }
 
-            // for (const user of users) {
-            //     const reportCount = faker.datatype.number({ min: 0, max: 3 });
-            //     otherUsers = users.filter(u => u.id !== user.id);
-            //     for (let i = 0; i < reportCount; i++) {
-            //         let reported_id = faker.helpers.arrayElement(otherUsers).id;
-            //         const newReport = await Report.create({
-            //             reported_by: user.id,
-            //             reported: reported_id,
-            //             description: faker.lorem.sentence(),
-            //             handled: faker.datatype.boolean(),
-            //         });
-            //     }
-            // }
+
+            for (const user of users) {
+                const reportCount = faker.datatype.number({ min: 0, max: 3 });
+                const otherUsers = users.filter(u => u.id !== user.id);
+                for (let i = 0; i < reportCount; i++) {
+                    let reported_id = faker.helpers.arrayElement(otherUsers).id;
+                    const newReport = await Report.create({
+                        reported_by: user.id,
+                        reported: reported_id,
+                        description: faker.lorem.sentence(),
+                        handled: false,
+                    });
+                }
+            }
         } catch (err) {
             console.log(chalk.red('Test DB Seeder could not run properly, because of this error:'));
             console.log(err);

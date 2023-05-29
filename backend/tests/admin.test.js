@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const { app } = require('../app');
 const request = supertest(app);
-const { User } = require('../../models');
+const { User, Report } = require('../../models');
 const jsonwebtoken = require('jsonwebtoken');
 const { Op } = require('sequelize');
 
@@ -469,4 +469,42 @@ describe('AdminController.addOrRemoveChatRestriction() API tests', () => {
         const user = await User.findByPk(5);
         expect(user.chat_restriction).toBe(false);
     });
+
+    test('GET /admin/reports', async ()=>{
+        const response = await request
+            .get('/admin/reports')
+            .set('Authorization', `Bearer ${adminToken}`);
+        expect(response.status).toBe(200);
+        expect(response.body.reports).not.toBe(undefined);
+    })
+
+    test('DELETE /admin/reports/:id', async ()=>{
+        let response = await request
+            .delete(`/admin/reports/${1}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Report deleted.')
+        let report = await Report.findByPk(1);
+        expect(report.deletedAt).not.toBe(null);
+        expect(report.handled).toBeTruthy();
+
+
+        response = await request
+            .delete(`/admin/reports/${1}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe('Report deleted.')
+
+        report = await Report.findByPk(1);
+        expect(report).toBe(null);
+
+    })
+
+    test('DELETE /admin/reports/:id error', async ()=>{
+        const response = await request
+            .delete(`/admin/reports/${10000}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe('Report not found.')
+    })
 });

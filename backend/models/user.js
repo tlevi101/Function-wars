@@ -180,7 +180,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 unique: {
                     args: true,
-                    msg: 'Username already exists',
+                    msg: 'users_name must be unique',
                 },
                 validate: {
                     len: {
@@ -194,7 +194,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 unique: {
                     args: true,
-                    msg: 'Email already exists',
+                    msg: 'users_email must be unique',
                 },
                 validate: {
                     isEmail: {

@@ -81,13 +81,18 @@ describe('test users controller', () => {
     });
 
     describe('block tests', ()=>{
-        const testCases = [
+        const blockTestCases = [
             {title:'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
             {title:'self block', targetID: 1, code: 403, message: "You can't block yourself." },
-            {title:'success', targetID: 2, code: 200, message: undefined },
+            {title:'success', targetID: 2, code: 200, message: 'User blocked.' },
         ];
 
-        test.each(testCases)('test block: $title', async ({targetID,code,message })=>{
+        const unblockTestCases = [
+            {title:'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
+            {title:'success', targetID: 2, code: 200, message: 'User unblocked.' },
+        ];
+
+        test.each(blockTestCases)('test block: $title', async ({targetID,code,message })=>{
             const response = await request
                 .post(`/users/${targetID}/block`)
                 .set('Authorization', `Bearer ${userTokens[0]}`);
@@ -97,7 +102,7 @@ describe('test users controller', () => {
             }
         })
 
-        test.each(testCases)('test unblock: $title', async ({targetID,code,message })=>{
+        test.each(unblockTestCases)('test unblock: $title', async ({targetID,code,message })=>{
             const response = await request
                 .delete(`/users/${targetID}/unblock`)
                 .set('Authorization', `Bearer ${userTokens[0]}`);
