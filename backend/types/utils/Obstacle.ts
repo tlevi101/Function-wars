@@ -41,15 +41,15 @@ export class Line {
         points.push(this.start);
         const numberOfPoints = Math.round(len / maxLenBetweenPoints);
         if (this.isParallelWithYAxis()) {
-			const direction =  this.start.y < this.end.y ? 1 : -1;
-			for (let i = 1; i < numberOfPoints - 1; i++) {
+            const direction = this.start.y < this.end.y ? 1 : -1;
+            for (let i = 1; i < numberOfPoints - 1; i++) {
                 points.push(new Point(this.start.x, this.start.y + direction * i * maxLenBetweenPoints));
             }
             points.push(this.end);
             return points;
         }
         if (this.isParallelWithXAxis()) {
-			const direction =  this.start.x < this.end.x ? 1 : -1;
+            const direction = this.start.x < this.end.x ? 1 : -1;
             for (let i = 1; i < numberOfPoints - 1; i++) {
                 points.push(new Point(this.start.x + direction * i * maxLenBetweenPoints, this.start.y));
             }

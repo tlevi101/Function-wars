@@ -7,7 +7,7 @@ const jsonwebtoken = require('jsonwebtoken');
 const Client = require('socket.io-client');
 const { RuntimeMaps } = require('../types/RuntimeMaps');
 const { WaitListController } = require('../types/controllers/WaitListController');
-const chalk = require("chalk");
+const chalk = require('chalk');
 
 const expectedValue = (coordX, origo, fn) => {
     const ratio = 35;
@@ -127,7 +127,7 @@ describe('test game through API', () => {
 
     beforeEach(async () => {
         game = Array.from(RuntimeMaps.games.values())[0];
-        if(game){
+        if (game) {
             currentPlayer = game.CurrentPlayer;
         }
         fn = null;
@@ -294,21 +294,20 @@ describe('test game through API', () => {
             { fnString: 'sin(√X)', fnCallback: x => Math.abs(Math.sin(Math.sqrt(x))) },
             { fnString: 'sin(√(-X))', fnCallback: x => Math.abs(Math.sin(Math.sqrt(-x))) },
             { fnString: 'e^(2X)', fnCallback: x => Math.exp(2 * x) },
-            { fnString: 'X(2-X)', fnCallback: x => x*(2-x) },
-
+            { fnString: 'X(2-X)', fnCallback: x => x * (2 - x) },
         ];
         test.each(testCases)('valid function, $fnString', async ({ fnString, fnCallback }) => {
             fn = fnCallback;
             const receiveFnPromise = new Promise(resolve => {
                 let counter = 0;
-                const checkDone =  () => {
+                const checkDone = () => {
                     counter++;
-                    if(counter === 2){
+                    if (counter === 2) {
                         resolve();
                     }
-                }
-                for ( let i = 0; i < 2; i++) {
-                    userClients[i].on('receive function', async ({points, damages, length}) => {
+                };
+                for (let i = 0; i < 2; i++) {
+                    userClients[i].on('receive function', async ({ points, damages, length }) => {
                         for (let x = currentPlayer.Location.x; x < 1000; x += 35) {
                             const point = points.rightSide.find(p => p.x === x);
                             if (point) {
@@ -355,75 +354,83 @@ describe('test game through API', () => {
             })
             .set('Authorization', `Bearer ${await findToken(currentPlayer.ID)}`);
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({message: 'Game over.'});
+        expect(response.body).toEqual({ message: 'Game over.' });
         await receiveGameOverPromise;
     });
 
     describe('test user left from game', () => {
-        beforeEach((done) =>{
+        beforeEach(done => {
             let counter = 0;
             const checkDone = () => {
                 counter++;
-                if(counter===2){
-                    game = Array.from(RuntimeMaps.games.values())[0]
+                if (counter === 2) {
+                    game = Array.from(RuntimeMaps.games.values())[0];
                     done();
                 }
-            }
+            };
             for (let i = 0; i < 2; i++) {
-                userClients[i].on('joined game', async ({room}) => {
-                    userClients[i].emit('route change', {url: '/games/' + room});
+                userClients[i].on('joined game', async ({ room }) => {
+                    userClients[i].emit('route change', { url: '/games/' + room });
                     checkDone();
                 });
-                userClients[i].emit('join wait list')
+                userClients[i].emit('join wait list');
             }
-        })
+        });
 
-        test('user navigated', (done) =>{
-            userClients[1].on('game ended', ({message}) => {
-                console.debug(chalk.red("game ended test"));
+        test('user navigated', done => {
+            userClients[1].on('game ended', ({ message }) => {
+                console.debug(chalk.red('game ended test'));
                 done();
-            })
+            });
             const timeout = setTimeout(() => {
-                userClients[0].emit('route change', {url:'/'})
+                userClients[0].emit('route change', { url: '/' });
                 timeout.unref();
-            }, 500)
-        })
+            }, 500);
+        });
 
-        test('user disconnected', (done)=>{
-            userClients[1].on('game ended', async ({message}) => {
-                expect(message).toEqual(expect.stringContaining(serverSockets[0].decoded.name));
-                userClients[0]= new Client('http://localhost:3000', {
-                    query: {
-                        token: userTokens[0],
-                    },
-                    extraHeaders: {
-                        Authorization: `Bearer ${userTokens[0]}`,
-                    },
+        test(
+            'user disconnected',
+            done => {
+                userClients[1].on('game ended', async ({ message }) => {
+                    expect(message).toEqual(expect.stringContaining(serverSockets[0].decoded.name));
+                    userClients[0] = new Client('http://localhost:3000', {
+                        query: {
+                            token: userTokens[0],
+                        },
+                        extraHeaders: {
+                            Authorization: `Bearer ${userTokens[0]}`,
+                        },
+                    });
+                    done();
                 });
-                done();
-            })
-            userClients[0].disconnect();
-        }, 15*1000);
+                userClients[0].disconnect();
+            },
+            15 * 1000
+        );
 
-        test('user disconnected, and reconnected in time', (done)=>{
-            userClients[0].disconnect();
-            const timeout = setTimeout(()=>{
-                userClients[0]= new Client('http://localhost:3000', {
-                    query: {
-                        token: userTokens[0],
-                    },
-                    extraHeaders: {
-                        Authorization: `Bearer ${userTokens[0]}`,
-                    },
-                });
-                userClients[0].emit('route change', { url: `/games/${game.UUID}`})
-                timeout.unref();
-            }, 2*1000)
-            const timeout2 = setTimeout(()=>{
-                expect(game.playerIsOnline(serverSockets[0].decoded.id)).toBeTruthy();
-                done();
-                timeout2.unref();
-            }, 4*1000)
-        }, 10*1000)
-    })
+        test(
+            'user disconnected, and reconnected in time',
+            done => {
+                userClients[0].disconnect();
+                const timeout = setTimeout(() => {
+                    userClients[0] = new Client('http://localhost:3000', {
+                        query: {
+                            token: userTokens[0],
+                        },
+                        extraHeaders: {
+                            Authorization: `Bearer ${userTokens[0]}`,
+                        },
+                    });
+                    userClients[0].emit('route change', { url: `/games/${game.UUID}` });
+                    timeout.unref();
+                }, 2 * 1000);
+                const timeout2 = setTimeout(() => {
+                    expect(game.playerIsOnline(serverSockets[0].decoded.id)).toBeTruthy();
+                    done();
+                    timeout2.unref();
+                }, 4 * 1000);
+            },
+            10 * 1000
+        );
+    });
 });

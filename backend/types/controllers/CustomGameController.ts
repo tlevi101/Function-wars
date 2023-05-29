@@ -4,7 +4,7 @@ import { GroupChat } from '../utils/GroupChat';
 import { RuntimeMaps } from '../RuntimeMaps';
 import { GroupChatController } from './GroupChatController';
 import { GameController } from './GameController';
-import chalk = require("chalk");
+import chalk = require('chalk');
 const { User } = require('../../models');
 export class CustomGameController {
     //*****************//
@@ -96,7 +96,7 @@ export class CustomGameController {
             await CustomGameController.sendInvites(socket, friendIDs);
         }
         socket.emit('waiting room created', { roomUUID: room.UUID, groupChatUUID: room.ChatUUID });
-        console.debug(chalk.red('waiting room created'))
+        console.debug(chalk.red('waiting room created'));
     }
 
     /**

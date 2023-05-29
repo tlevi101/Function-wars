@@ -115,7 +115,6 @@ module.exports = {
                 });
             }
 
-
             for (const user of users) {
                 const reportCount = faker.datatype.number({ min: 0, max: 3 });
                 const otherUsers = users.filter(u => u.id !== user.id);

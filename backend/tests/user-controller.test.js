@@ -68,68 +68,68 @@ describe('test users controller', () => {
             expect(response.body.message).toBe(msg);
         });
 
-        test('test guest user',async () =>{
+        test('test guest user', async () => {
             const response = await request
                 .post(`/users/${1}/report`)
                 .send({
-                    description:'fail'
+                    description: 'fail',
                 })
                 .set('Authorization', `Bearer ${guestToken}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Guest cannot make this request!');
-        })
+        });
     });
 
-    describe('block tests', ()=>{
+    describe('block tests', () => {
         const blockTestCases = [
-            {title:'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
-            {title:'self block', targetID: 1, code: 403, message: "You can't block yourself." },
-            {title:'success', targetID: 2, code: 200, message: 'User blocked.' },
+            { title: 'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
+            { title: 'self block', targetID: 1, code: 403, message: "You can't block yourself." },
+            { title: 'success', targetID: 2, code: 200, message: 'User blocked.' },
         ];
 
         const unblockTestCases = [
-            {title:'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
-            {title:'success', targetID: 2, code: 200, message: 'User unblocked.' },
+            { title: 'target user not found', targetID: 10000, code: 404, message: 'Other user not found.' },
+            { title: 'success', targetID: 2, code: 200, message: 'User unblocked.' },
         ];
 
-        test.each(blockTestCases)('test block: $title', async ({targetID,code,message })=>{
+        test.each(blockTestCases)('test block: $title', async ({ targetID, code, message }) => {
             const response = await request
                 .post(`/users/${targetID}/block`)
                 .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(code);
-            if(message){
+            if (message) {
                 expect(response.body.message).toBe(message);
             }
-        })
+        });
 
-        test.each(unblockTestCases)('test unblock: $title', async ({targetID,code,message })=>{
+        test.each(unblockTestCases)('test unblock: $title', async ({ targetID, code, message }) => {
             const response = await request
                 .delete(`/users/${targetID}/unblock`)
                 .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(code);
-            if(message){
+            if (message) {
                 expect(response.body.message).toBe(message);
             }
-        })
-        test('test block: guest user', async ()=>{
+        });
+        test('test block: guest user', async () => {
             const response = await request
                 .post(`/users/${1}/block`)
                 .send({
-                    description:'fail'
+                    description: 'fail',
                 })
                 .set('Authorization', `Bearer ${guestToken}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Guest cannot make this request!');
-        })
-        test('test unblock: guest user', async ()=>{
+        });
+        test('test unblock: guest user', async () => {
             const response = await request
                 .delete(`/users/${1}/unblock`)
                 .send({
-                    description:'fail'
+                    description: 'fail',
                 })
                 .set('Authorization', `Bearer ${guestToken}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Guest cannot make this request!');
-        })
-    })
+        });
+    });
 });

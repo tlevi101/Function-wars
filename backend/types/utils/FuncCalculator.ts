@@ -129,8 +129,6 @@ class FuncCalculator {
         return points;
     }
 
-
-
     public async calculateLeftSidePoints(): Promise<PointInterface[]> {
         const points: PointInterface[] = [];
         const firstValidPoint = await this.firstValidPoint();
@@ -147,11 +145,11 @@ class FuncCalculator {
                 }
                 if (this.f(x) == -Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: 0 });
-                    points.push(... line.separateToPoints().map(p => p.toJSON()));
+                    points.push(...line.separateToPoints().map(p => p.toJSON()));
                 }
                 if (this.f(x) == Infinity) {
                     const line = Line.initFromPointInterface(last, { x: x, y: this.height });
-                    points.push(... line.separateToPoints().map(p => p.toJSON()));
+                    points.push(...line.separateToPoints().map(p => p.toJSON()));
                 }
                 return points;
             }

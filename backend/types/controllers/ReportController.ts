@@ -11,9 +11,9 @@ export class ReportController {
      * @returns
      */
     public static async getReports(req: MyRequest, res: MyResponse) {
-		if(req.user.type === 'guest' || !req.user.is_admin){
-			return res.status(403).json({ message: 'Guest cannot make this request!' });
-		}
+        if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'Guest cannot make this request!' });
+        }
         const reports = await Report.findAll({
             attributes: { exclude: ['reported_by', 'reported'] },
             include: [
@@ -45,9 +45,9 @@ export class ReportController {
      * @returns
      */
     public static async deleteReport(req: MyRequest, res: MyResponse) {
-		if(req.user.type === 'guest' || !req.user.is_admin){
-			return res.status(403).json({ message: 'Guest cannot make this request!' });
-		}
+        if (req.user.type === 'guest' || !req.user.is_admin) {
+            return res.status(403).json({ message: 'Guest cannot make this request!' });
+        }
         const report = await Report.findByPk(req.params.id);
         if (!report) return res.status(404).json({ message: 'Report not found.' });
         if (!report.deletedAt) await report.update({ handled: true, deletedAt: new Date() });

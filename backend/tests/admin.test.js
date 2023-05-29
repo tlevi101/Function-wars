@@ -470,41 +470,31 @@ describe('AdminController.addOrRemoveChatRestriction() API tests', () => {
         expect(user.chat_restriction).toBe(false);
     });
 
-    test('GET /admin/reports', async ()=>{
-        const response = await request
-            .get('/admin/reports')
-            .set('Authorization', `Bearer ${adminToken}`);
+    test('GET /admin/reports', async () => {
+        const response = await request.get('/admin/reports').set('Authorization', `Bearer ${adminToken}`);
         expect(response.status).toBe(200);
         expect(response.body.reports).not.toBe(undefined);
-    })
+    });
 
-    test('DELETE /admin/reports/:id', async ()=>{
-        let response = await request
-            .delete(`/admin/reports/${1}`)
-            .set('Authorization', `Bearer ${adminToken}`);
+    test('DELETE /admin/reports/:id', async () => {
+        let response = await request.delete(`/admin/reports/${1}`).set('Authorization', `Bearer ${adminToken}`);
         expect(response.status).toBe(200);
-        expect(response.body.message).toBe('Report deleted.')
+        expect(response.body.message).toBe('Report deleted.');
         let report = await Report.findByPk(1);
         expect(report.deletedAt).not.toBe(null);
         expect(report.handled).toBeTruthy();
 
-
-        response = await request
-            .delete(`/admin/reports/${1}`)
-            .set('Authorization', `Bearer ${adminToken}`);
+        response = await request.delete(`/admin/reports/${1}`).set('Authorization', `Bearer ${adminToken}`);
         expect(response.status).toBe(200);
-        expect(response.body.message).toBe('Report deleted.')
+        expect(response.body.message).toBe('Report deleted.');
 
         report = await Report.findByPk(1);
         expect(report).toBe(null);
+    });
 
-    })
-
-    test('DELETE /admin/reports/:id error', async ()=>{
-        const response = await request
-            .delete(`/admin/reports/${10000}`)
-            .set('Authorization', `Bearer ${adminToken}`);
+    test('DELETE /admin/reports/:id error', async () => {
+        const response = await request.delete(`/admin/reports/${10000}`).set('Authorization', `Bearer ${adminToken}`);
         expect(response.status).toBe(404);
-        expect(response.body.message).toBe('Report not found.')
-    })
+        expect(response.body.message).toBe('Report not found.');
+    });
 });

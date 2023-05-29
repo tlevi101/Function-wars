@@ -51,7 +51,7 @@ export class CustomGameService {
         return this.socket.fromEvent('waiting room joined');
     }
 
-	//this event is unnecessary bcs route change and disconnect event will handle this
+    //this event is unnecessary bcs route change and disconnect event will handle this
     // public leaveCustomGame(roomUUID: string) {
     //     this.socket.emit('leave custom game', { roomUUID });
     // }

@@ -21,7 +21,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy {
     fieldID = 0;
     ownerLeft = false;
     otherPlayers: DecodedToken[] = [];
-	destroyed = false;
+    destroyed = false;
     @ViewChild('infoComponent') infoComponent!: InfoComponent;
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -66,9 +66,9 @@ export class WaitRoomComponent implements OnInit, OnDestroy {
         });
     }
 
-	ngOnDestroy(): void {
-		this.destroyed=true;
-	}
+    ngOnDestroy(): void {
+        this.destroyed = true;
+    }
 
     private listenWaitRoomJoined() {
         const subscription = this.waitRoomService.customGameJoined().subscribe(
@@ -85,8 +85,7 @@ export class WaitRoomComponent implements OnInit, OnDestroy {
     }
 
     private sendGetWaitingRoomRequest() {
-		if(this.destroyed)
-			return;
+        if (this.destroyed) return;
         const subscription = this.waitRoomService.getWaitingRoom(this.roomUUID).subscribe(
             ({ waitRoom }) => {
                 this.chatRoomUUID = waitRoom.chatUUID;

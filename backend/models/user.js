@@ -115,7 +115,6 @@ module.exports = (sequelize, DataTypes) => {
             return friends;
         }
 
-
         async getFriendRequests() {
             const requests = await sequelize.models.Friendship.findAll({
                 where: {
@@ -141,7 +140,6 @@ module.exports = (sequelize, DataTypes) => {
             return requestsArray;
         }
 
-
         async getChat(friend_id) {
             const friendship = await this.getFriendShip(friend_id);
             if (friendship) {
@@ -149,7 +147,6 @@ module.exports = (sequelize, DataTypes) => {
             }
             return null;
         }
-
 
         async getFriendShip(friend_id) {
             const friendship = await sequelize.models.Friendship.findOne({

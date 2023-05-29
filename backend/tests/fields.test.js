@@ -70,207 +70,206 @@ describe('test fields controller', () => {
 
     describe('get requests test', () => {
         let field;
-        beforeAll(async ()=>{
+        beforeAll(async () => {
             let fields = await users[0].getFields();
             field = fields[0];
-        })
-
-        test('GET /fields', async () => {
-          const response = await request.get('/fields').set('Authorization', `Bearer ${userTokens[0]}`);
-          expect(response.status).toBe(200);
-          const usersFields = await users[0].getFields();
-          expect(response.body.fields.length).toBe(usersFields.length);
-          response.body.fields.forEach((receivedField, index) => {
-              console.debug(receivedField);
-            compareObjectRecursively(receivedField, usersFields[index])
-          })
         });
 
-        test('GET /fields/1 ERROR',async ()=>{
+        test('GET /fields', async () => {
+            const response = await request.get('/fields').set('Authorization', `Bearer ${userTokens[0]}`);
+            expect(response.status).toBe(200);
+            const usersFields = await users[0].getFields();
+            expect(response.body.fields.length).toBe(usersFields.length);
+            response.body.fields.forEach((receivedField, index) => {
+                console.debug(receivedField);
+                compareObjectRecursively(receivedField, usersFields[index]);
+            });
+        });
+
+        test('GET /fields/1 ERROR', async () => {
             const response = await request.get('/fields/1').set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Access denied.');
-        })
-        test('GET /fields/1000 ERROR',async ()=>{
+        });
+        test('GET /fields/1000 ERROR', async () => {
             const response = await request.get('/fields/1000').set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(404);
             expect(response.body.message).toBe('Field not found.');
-        })
+        });
 
-        test(`GET /fields/:id user's first field`, async ()=>{
+        test(`GET /fields/:id user's first field`, async () => {
             const response = await request.get(`/fields/${field.id}`).set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(200);
             compareObjectRecursively(response.body.field, field);
-        })
+        });
 
-        test('GET /fields/1/show',async ()=>{
+        test('GET /fields/1/show', async () => {
             const response = await request.get('/fields/1/show').set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(200);
             const adminField = await Field.findByPk(1);
-            compareObjectRecursively(response.body.field, adminField)
-        })
+            compareObjectRecursively(response.body.field, adminField);
+        });
     });
 
-    describe('post requests', ()=>{
+    describe('post requests', () => {
         let field;
-        beforeAll(async ()=>{
+        beforeAll(async () => {
             let fields = await users[0].getFields();
             field = fields[0];
-        })
+        });
 
-        test('invalid field', async () =>{
+        test('invalid field', async () => {
             let newFieldJSON = newField();
             newFieldJSON.name = undefined;
-            const response = await request.post('/fields')
-              .send(newFieldJSON)
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .post('/fields')
+                .send(newFieldJSON)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid field.');
-        })
+        });
 
-        test('valid field', async ()=>{
+        test('valid field', async () => {
             let newFieldJSON = newField();
-            const response = await request.post('/fields')
-              .send(newFieldJSON)
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .post('/fields')
+                .send(newFieldJSON)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(201);
             const createdField = await Field.findByPk(response.body.field.id);
             compareObjectRecursively(newFieldJSON, createdField);
-        })
-    })
-    describe('delete request', ()=>{
+        });
+    });
+    describe('delete request', () => {
         let field;
-        beforeAll(async ()=>{
+        beforeAll(async () => {
             let fields = await users[0].getFields();
             field = fields[1];
-        })
+        });
 
-        test('field not found', async () =>{
-            const response = await request.delete('/fields/1000')
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+        test('field not found', async () => {
+            const response = await request.delete('/fields/1000').set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(404);
             expect(response.body.message).toBe('Field not found.');
-        })
+        });
 
-        test('access denied', async () =>{
-            const response = await request.delete('/fields/1')
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+        test('access denied', async () => {
+            const response = await request.delete('/fields/1').set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Access denied.');
-        })
-        test('soft delete', async ()=>{
-            const response = await request.delete(`/fields/${field.id}`)
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+        });
+        test('soft delete', async () => {
+            const response = await request
+                .delete(`/fields/${field.id}`)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(200);
             expect(response.body.message).toBe('Field deleted.');
-            const deletedField =  await Field.findByPk(field.id);
+            const deletedField = await Field.findByPk(field.id);
             expect(deletedField.deletedAt).not.toBe(null);
-        })
+        });
 
-        test('hard delete', async ()=>{
-            const response = await request.delete(`/fields/${field.id}`)
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+        test('hard delete', async () => {
+            const response = await request
+                .delete(`/fields/${field.id}`)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(200);
             expect(response.body.message).toBe('Field deleted.');
-            const deletedField =  await Field.findByPk(field.id);
+            const deletedField = await Field.findByPk(field.id);
             expect(deletedField).toBe(null);
-        })
-    })
+        });
+    });
 
-    describe('update field', ()=>{
+    describe('update field', () => {
         let field;
-        beforeAll(async ()=>{
+        beforeAll(async () => {
             let fields = await users[0].getFields();
             field = fields[0];
-        })
+        });
 
-        test('PUT /fields/1000', async () =>{
+        test('PUT /fields/1000', async () => {
             const edited = editedField();
-            const response = await request.put(`/fields/1000`).send(
-                edited
-            )
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .put(`/fields/1000`)
+                .send(edited)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(404);
             expect(response.body.message).toBe('Field not found.');
-        })
+        });
 
-        test('PUT /fields/:id ERROR', async () =>{
+        test('PUT /fields/:id ERROR', async () => {
             let edited = editedField();
             edited.name = undefined;
-            const response = await request.put(`/fields/${field.id}`).send(
-              edited
-            )
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .put(`/fields/${field.id}`)
+                .send(edited)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid field.');
-        })
+        });
 
-        test('PUT /fields/1 access denied', async () =>{
+        test('PUT /fields/1 access denied', async () => {
             let edited = editedField();
-            const response = await request.put(`/fields/1`).send(
-              edited
-            )
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .put(`/fields/1`)
+                .send(edited)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(403);
             expect(response.body.message).toBe('Access denied.');
-        })
+        });
 
-        test('PUT /fields/:id success', async () =>{
+        test('PUT /fields/:id success', async () => {
             let edited = editedField();
-            const response = await request.put(`/fields/${field.id}`).send(
-              edited
-            )
-              .set('Authorization', `Bearer ${userTokens[0]}`);
+            const response = await request
+                .put(`/fields/${field.id}`)
+                .send(edited)
+                .set('Authorization', `Bearer ${userTokens[0]}`);
             expect(response.status).toBe(200);
             compareObjectRecursively(edited, response.body.field);
             const afterEdit = await Field.findByPk(field.id);
             compareObjectRecursively(edited, afterEdit);
-        })
+        });
 
-        describe('restore field', ()=>{
-            beforeAll(async ()=>{
-                await field.update({deletedAt: new Date()});
-            })
-            test('PUT /fields/1000/restore', async () =>{
-                const response = await request.put(`/fields/1000/restore`)
-                  .set('Authorization', `Bearer ${userTokens[0]}`);
+        describe('restore field', () => {
+            beforeAll(async () => {
+                await field.update({ deletedAt: new Date() });
+            });
+            test('PUT /fields/1000/restore', async () => {
+                const response = await request
+                    .put(`/fields/1000/restore`)
+                    .set('Authorization', `Bearer ${userTokens[0]}`);
                 expect(response.status).toBe(404);
                 expect(response.body.message).toBe('Field not found.');
-            })
+            });
 
-            test('PUT /fields/1/restore', async () =>{
-                const response = await request.put(`/fields/1/restore`)
-                  .set('Authorization', `Bearer ${userTokens[0]}`);
+            test('PUT /fields/1/restore', async () => {
+                const response = await request.put(`/fields/1/restore`).set('Authorization', `Bearer ${userTokens[0]}`);
                 expect(response.status).toBe(403);
                 expect(response.body.message).toBe('Access denied.');
-            })
+            });
 
-            test('PUT /fields/:id/restore', async () =>{
-                const response = await request.put(`/fields/${field.id}/restore`)
-                  .set('Authorization', `Bearer ${userTokens[0]}`);
+            test('PUT /fields/:id/restore', async () => {
+                const response = await request
+                    .put(`/fields/${field.id}/restore`)
+                    .set('Authorization', `Bearer ${userTokens[0]}`);
                 expect(response.status).toBe(200);
                 expect(response.body.message).toBe('Field restored.');
                 const restored = await Field.findByPk(field.id);
                 expect(restored.deletedAt).toBe(null);
-            })
-        })
-
-    })
+            });
+        });
+    });
 });
 
 function compareObjectRecursively(receivedObject, expectedObject) {
-    for(let key of Object.keys(receivedObject)){
-        if(typeof receivedObject[key] === 'object' && receivedObject[key] !==null){
+    for (let key of Object.keys(receivedObject)) {
+        if (typeof receivedObject[key] === 'object' && receivedObject[key] !== null) {
             compareObjectRecursively(receivedObject[key], expectedObject[key]);
-        }
-        else{
-            if(expectedObject[key] instanceof Date){
-                expect((new Date(receivedObject[key])).toString()).toBe(expectedObject[key].toString());
-            }
-            else{
+        } else {
+            if (expectedObject[key] instanceof Date) {
+                expect(new Date(receivedObject[key]).toString()).toBe(expectedObject[key].toString());
+            } else {
                 expect(receivedObject[key]).toBe(expectedObject[key]);
             }
-
         }
     }
 }
@@ -331,7 +330,7 @@ function editedField() {
                     location: { x: 500, y: 500 },
                     avoidArea: { radius: 105, location: { x: 500, y: 500 } },
                     dimension: { width: 100, height: 100 },
-                }
+                },
             ],
             players: [
                 {
@@ -349,5 +348,3 @@ function editedField() {
         },
     };
 }
-
-

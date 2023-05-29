@@ -21,92 +21,90 @@ const { WaitListController } = require('./types/controllers/WaitListController')
 //Socket
 
 const io = require('socket.io')(http, {
-	cors: {
-		origin: ['*', 'https://admin.socket.io', 'http://localhost:4200'],
-		credentials: true,
-	},
+    cors: {
+        origin: ['*', 'https://admin.socket.io', 'http://localhost:4200'],
+        credentials: true,
+    },
 });
 
 io.use(function (socket, next) {
-	if (socket.handshake.query && socket.handshake.query.token) {
-		jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, function (err, decoded) {
-			if (err) return next(new Error('Authentication error'));
-			socket.decoded = decoded;
-			next();
-		});
-	} else {
-		next(new Error('Authentication error'));
-	}
+    if (socket.handshake.query && socket.handshake.query.token) {
+        jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, function (err, decoded) {
+            if (err) return next(new Error('Authentication error'));
+            socket.decoded = decoded;
+            next();
+        });
+    } else {
+        next(new Error('Authentication error'));
+    }
 })
-	.on('connection', async socket => {
-		try {
+    .on('connection', async socket => {
+        try {
+            SocketConnectionService.userConnected(socket);
 
-			SocketConnectionService.userConnected(socket);
+            socket.on('route change', async ({ url }) => {
+                SocketConnectionService.userNavigated(socket, url);
+            });
+            socket.on('create custom game', async ({ fieldID, isPrivate, friendIDs }) => {
+                await CustomGameController.createCustomGame(socket, fieldID, isPrivate, friendIDs);
+            });
 
-			socket.on('route change', async ({ url }) => {
-				SocketConnectionService.userNavigated(socket, url);
-			});
-			socket.on('create custom game', async ({ fieldID, isPrivate, friendIDs }) => {
-				await CustomGameController.createCustomGame(socket, fieldID, isPrivate, friendIDs);
-			});
+            socket.on('join custom game', async ({ roomUUID }) => {
+                console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
+                await CustomGameController.joinWaitingRoom(socket, roomUUID);
+            });
 
-			socket.on('join custom game', async ({ roomUUID }) => {
-				console.log(`User (${socket.decoded.name}) is joining room (${roomUUID})`);
-				await CustomGameController.joinWaitingRoom(socket, roomUUID);
-			});
+            socket.on('start custom game', async () => {
+                CustomGameController.startGame(socket);
+            });
 
-			socket.on('start custom game', async () => {
-				CustomGameController.startGame(socket);
-			});
+            socket.on('reject invite', async ({ invite }) => {
+                RuntimeMaps.invites.delete(invite);
+            });
 
-			socket.on('reject invite', async ({ invite }) => {
-				RuntimeMaps.invites.delete(invite);
-			});
+            socket.on('send chat message', async ({ message, friend_id }) => {
+                FriendChatController.sendMessage(socket, message, friend_id);
+            });
 
-			socket.on('send chat message', async ({ message, friend_id }) => {
-				FriendChatController.sendMessage(socket, message, friend_id);
-			});
+            socket.on('set seen', async ({ friend_id }) => {
+                FriendChatController.setSeen(socket, friend_id);
+            });
 
-			socket.on('set seen', async ({ friend_id }) => {
-				FriendChatController.setSeen(socket, friend_id);
-			});
+            socket.on('join wait list', async () => {
+                console.debug('join wait list');
+                WaitListController.joinWaitList(socket);
+            });
 
-			socket.on('join wait list', async () => {
-				console.debug('join wait list');
-				WaitListController.joinWaitList(socket);
-			});
+            socket.on('leave wait list', async () => {
+                WaitListController.leaveWaitList(socket);
+            });
 
-			socket.on('leave wait list', async () => {
-				WaitListController.leaveWaitList(socket);
-			});
+            socket.on('send group chat message', async ({ message }) => {
+                GroupChatController.sendMessage(socket, message);
+            });
 
-			socket.on('send group chat message', async ({ message }) => {
-				GroupChatController.sendMessage(socket, message);
-			});
-
-			socket.on('disconnect', async () => {
-				SocketConnectionService.userDisconnected(socket);
-			});
-		}
-		catch (e) {
-			console.error(e);
-		}
-	})
-	.on('disconnect', socket => { });
+            socket.on('disconnect', async () => {
+                SocketConnectionService.userDisconnected(socket);
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    })
+    .on('disconnect', socket => {});
 
 //use socketIO in routes
 app.use(function (req, res, next) {
-	res.io = io;
-	next();
+    res.io = io;
+    next();
 });
 //use socket maps in routes
 app.use(function (req, res, next) {
-	req.onlineUsers = RuntimeMaps.onlineUsers;
-	req.waitList = RuntimeMaps.waitList;
-	req.games = RuntimeMaps.games;
-	req.groupChats = RuntimeMaps.groupChats;
-	req.waitingRooms = RuntimeMaps.waitingRooms;
-	next();
+    req.onlineUsers = RuntimeMaps.onlineUsers;
+    req.waitList = RuntimeMaps.waitList;
+    req.games = RuntimeMaps.games;
+    req.groupChats = RuntimeMaps.groupChats;
+    req.waitingRooms = RuntimeMaps.waitingRooms;
+    next();
 });
 
 // parse requests of content-type - application/json
@@ -123,46 +121,46 @@ app.use('/', require('./routes/user'));
 app.use('/games', require('./routes/games'));
 
 app.use('*', (req, res) => {
-	res.status(404).json({ message: 'Route not found' });
+    res.status(404).json({ message: 'Route not found' });
 });
 
 // catch any sequelize validation errors
 app.use(function (err, req, res, next) {
-	if (err instanceof Sequelize.UniqueConstraintError) {
-		res.status(400).json({ message: err.errors[0].message });
-	} else if (err instanceof Sequelize.ValidationError) {
-		res.status(400).json({ message: err.message });
-	} else if (err instanceof Sequelize.DatabaseError) {
-		res.status(500).json({ error: err.message });
-	}
-	next(err, req, res, next);
+    if (err instanceof Sequelize.UniqueConstraintError) {
+        res.status(400).json({ message: err.errors[0].message });
+    } else if (err instanceof Sequelize.ValidationError) {
+        res.status(400).json({ message: err.message });
+    } else if (err instanceof Sequelize.DatabaseError) {
+        res.status(500).json({ error: err.message });
+    }
+    next(err, req, res, next);
 });
 
 // error logger
 app.use(async function (err, req, res, next) {
-	if (res.headersSent) {
-		return next(err);
-	}
-	const time = date.format(new Date(), 'HH:mm:ss');
-	console.error(err.stack);
-	const error = {
-		[time.toString()]: {
-			name: err.name,
-			message: err.message,
-			stack: err.stack.split('\n'),
-			req: {
-				body: req.body,
-				params: req.params,
-				headers: req.headers,
-				url: req.url,
-			},
-		},
-	};
-	MyLogger('errors/', error);
-	res.status(err.status || 500).json({ error: err.message });
+    if (res.headersSent) {
+        return next(err);
+    }
+    const time = date.format(new Date(), 'HH:mm:ss');
+    console.error(err.stack);
+    const error = {
+        [time.toString()]: {
+            name: err.name,
+            message: err.message,
+            stack: err.stack.split('\n'),
+            req: {
+                body: req.body,
+                params: req.params,
+                headers: req.headers,
+                url: req.url,
+            },
+        },
+    };
+    MyLogger('errors/', error);
+    res.status(err.status || 500).json({ error: err.message });
 });
 
 module.exports = {
-	app,
-	io,
+    app,
+    io,
 };

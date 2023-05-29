@@ -11,7 +11,7 @@ module.exports = {
                 objects: [
                     {
                         type: 'Rectangle',
-                        location: { x:300, y: 512 },
+                        location: { x: 300, y: 512 },
                         avoidArea: { radius: 105, location: { x: 300, y: 512 } },
                         dimension: { width: 200, height: 200 },
                     },
@@ -29,7 +29,7 @@ module.exports = {
                         dimension: { width: 40, height: 40 },
                     },
                     {
-                        location: { x: 700, y:  525},
+                        location: { x: 700, y: 525 },
                         avoidArea: { radius: 130, location: { x: 700, y: 525 } },
                         dimension: { width: 40, height: 40 },
                     },

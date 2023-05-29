@@ -89,10 +89,10 @@ export class Game {
     }
 
     public async calculateFunctionPoints(): Promise<{
-        points: { 
-			leftSide: PointInterface[]; 
-			rightSide: PointInterface[] 
-		};
+        points: {
+            leftSide: PointInterface[];
+            rightSide: PointInterface[];
+        };
         damages: {
             leftSide?: { location: PointInterface; radius: number } | null;
             rightSide?: { location: PointInterface; radius: number } | null;
@@ -247,7 +247,7 @@ export class Game {
             }
             return player;
         });
-		this.sockets = this.sockets.map(s => {
+        this.sockets = this.sockets.map(s => {
             if (s.decoded.id === playerID) {
                 s = socket;
             }

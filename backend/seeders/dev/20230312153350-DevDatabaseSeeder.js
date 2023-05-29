@@ -42,7 +42,7 @@ module.exports = {
                 }
                 const admin = await User.create({
                     name: userName,
-                    email: `admin${i+1}@functionWars.com`,
+                    email: `admin${i + 1}@functionWars.com`,
                     password: 'password',
                     is_admin: true,
                     role: 'admin',
