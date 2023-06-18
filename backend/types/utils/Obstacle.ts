@@ -79,7 +79,7 @@ export class Obstacle {
     protected location: Point;
     protected dimension: Dimension;
     protected avoidArea: Circle;
-    protected static damages: DamageCircle[] = [];
+    protected damages: DamageCircle[] = [];
     constructor(location: Point, dimension: Dimension) {
         this.location = location;
         this.dimension = dimension;
@@ -93,24 +93,32 @@ export class Obstacle {
      */
     public damageMe(point: Point, distance: number): DamageCircle {
         const damage = new DamageCircle(point, distance);
-        Obstacle.damages.push(damage);
+        this.damages.push(damage);
         return damage;
     }
     public toJSON(): ObjectInterface {
         throw new Error('Method not implemented.');
     }
 
-    public async pointInside(point: Point): Promise<boolean> {
+    public async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
         throw new Error('Method not implemented.');
     }
 
-    protected async pointInsideOfAnyDamage(point: Point): Promise<boolean> {
-        for await (const damage of Obstacle.damages) {
+    protected async pointInsideOfAnyDamage(point: Point, damages: DamageCircle[]): Promise<boolean> {
+        for await (const damage of damages) {
             if (damage.pointIsInside(point)) {
                 return true;
             }
         }
         return false;
+    }
+
+	public static async getDamagesFromObjects(objects: (Ellipse | Rectangle)[]): Promise<DamageCircle[]> {
+        const damages: DamageCircle[] = [];
+        for await (const object of objects) {
+            damages.push(...object.Damages);
+        }
+        return damages;
     }
 
     get Dimension(): Dimension {
@@ -153,7 +161,7 @@ export class Obstacle {
         return this.avoidArea;
     }
     get Damages(): DamageCircle[] {
-        return Obstacle.damages;
+        return this.damages;
     }
 }
 
@@ -163,8 +171,8 @@ export class Ellipse extends Obstacle {
         this.changeAvoidAreaRadius();
     }
 
-    public override async pointInside(point: Point): Promise<boolean> {
-        if (await this.pointInsideOfAnyDamage(point)) {
+    public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
+        if (await this.pointInsideOfAnyDamage(point, await Obstacle.getDamagesFromObjects(everyShape))) {
             return false;
         }
         const x = point.x - this.Location.x;
@@ -180,7 +188,7 @@ export class Ellipse extends Obstacle {
             location: this.location.toJSON(),
             dimension: this.dimension,
             avoidArea: this.avoidArea.toJSON(),
-            damages: Obstacle.damages.map(damage => damage.toJSON()),
+            damages: this.damages.map(damage => damage.toJSON()),
         };
     }
     override get Dimension(): Dimension {
@@ -241,7 +249,7 @@ export class Rectangle extends Obstacle {
             location: this.location.toJSON(),
             dimension: this.dimension,
             avoidArea: this.avoidArea.toJSON(),
-            damages: Obstacle.damages.map(damage => damage.toJSON()),
+            damages: this.damages.map(damage => damage.toJSON()),
             type: 'Rectangle',
         };
     }
@@ -294,8 +302,8 @@ export class Rectangle extends Obstacle {
      * @param point
      * @return boolean
      */
-    public override async pointInside(point: Point): Promise<boolean> {
-        if (await this.pointInsideOfAnyDamage(point)) {
+    public override async pointInside(point: Point, everyShape: (Ellipse | Rectangle)[]): Promise<boolean> {
+        if (await this.pointInsideOfAnyDamage(point, await Obstacle.getDamagesFromObjects(everyShape))) {
             return false;
         }
         const crossProducts: number[] = [];

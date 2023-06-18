@@ -18,7 +18,7 @@
         "log:clear": "rm -rf logs/*.json",
         "prettier": "npx prettier --write \"**/*.{js,ts,json}\"",
         "test": "npm run build & STRESS_USERS=10 npm run db:test && npx jest --verbose --detectOpenHandles --runInBand",
-        "win:test": "set STRESS_USERS=0&& npm run build && npm run win:db:test && npx jest --verbose --detectOpenHandles --runInBand",
+        "win:test": "set STRESS_USERS=10&& npm run build && npm run win:db:test && npx jest --verbose --detectOpenHandles",
         "test:stress": "npm run build & STRESS_USERS=1000 npm run db:test && npx jest -t \"stress\" --verbose",
         "win:test:stress": "set STRESS_USERS=5000&& npm run build && npm run win:db:test && npx jest -t \"stress\" --verbose",
         "coverage": "npm run build && STRESS_USERS=50 npm test -- --coverage",

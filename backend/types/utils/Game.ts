@@ -145,7 +145,7 @@ export class Game {
 
     private async checkObstacleCollision(point: PointInterface): Promise<boolean> {
         for await (const object of this.objects) {
-            if (await object.pointInside(new Point(point.x, point.y))) {
+            if (await object.pointInside(new Point(point.x, point.y), this.objects)) {
                 return true;
             }
         }
@@ -159,7 +159,7 @@ export class Game {
         try {
             this.objects = await Promise.all(
                 this.objects.map(async object => {
-                    if (await object.pointInside(new Point(point.x, point.y))) {
+                    if (await object.pointInside(new Point(point.x, point.y), this.objects)) {
                         damage = object.damageMe(new Point(point.x, point.y), distance).toJSON();
                     }
                     return object;
