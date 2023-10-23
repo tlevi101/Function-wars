@@ -1,6 +1,5 @@
 version: '3'
 services:
-  
   mysql:
     image: mysql
     container_name: mysql
@@ -18,10 +17,9 @@ services:
       - mysql:/var/lib/mysql
     networks:
       - app-network
-
   nodejs:
     build: ./backend
-    image: nodejs
+    image: backend-node
     container_name: nodejs
     restart: unless-stopped
     env_file: ./backend/.env
@@ -41,7 +39,21 @@ services:
       - mysql
     volumes:
       - .:/usr/src/app
-      - node_modules:/usr/src/app/backend/node_modules
+      - backend_node_modules:/usr/src/app/backend/node_modules
+    networks:
+      - app-network
+  angular:
+    build: ./frontend
+    image: frontend-node
+    container_name: angular
+    restart: unless-stopped
+    ports:
+      - 4200:4200
+    expose:
+      - 4200
+    volumes:
+      - .:/usr/src/app
+      - frontend_node_modules:/usr/src/app/frontend/node_modules
     networks:
       - app-network
 
@@ -51,4 +63,5 @@ networks:
 
 volumes:
   mysql:
-  node_modules:  
+  frontend_node_modules:
+  backend_node_modules:

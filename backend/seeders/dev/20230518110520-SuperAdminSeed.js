@@ -26,7 +26,7 @@ module.exports = {
             console.info(chalk.blue('Password: ' + password));
         } catch (error) {
             console.error(chalk.red('DevDatabaseSeeder could not run properly, because of this error:'));
-            console.log(err);
+            console.log(error);
         }
     },
 
