@@ -1,0 +1,54 @@
+version: '3'
+services:
+  
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: unless-stopped
+    ports:
+        - "3306:3306"
+    environment:
+        MYSQL_ROOT_PASSWORD: rootpw
+        MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        MYSQL_ROOT_HOST: localhost
+        MYSQL_DATABASE: function_wars
+        MYSQL_USER: docker_user
+        MYSQL_PASSWORD: docker_pw
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - app-network
+
+  nodejs:
+    build: ./backend
+    image: nodejs
+    container_name: nodejs
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      - DB_USERNAME=docker_user
+      - DB_PASSWORD=docker_pw
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=function_wars
+    ports:
+      - 4000:4000
+      - 3000:3000
+    expose:
+      - 4000
+      - 3000
+    depends_on:
+      - mysql
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/backend/node_modules
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql:
+  node_modules:  
