@@ -48,9 +48,9 @@ services:
     container_name: angular
     restart: unless-stopped
     ports:
-      - 4200:4200
+      - 80:8080
     expose:
-      - 4200
+      - 8080
     volumes:
       - .:/usr/src/app
       - frontend_node_modules:/usr/src/app/frontend/node_modules
