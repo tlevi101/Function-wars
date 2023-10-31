@@ -112,6 +112,10 @@ app.use(express.json());
 app.use(cors());
 
 //routers
+app.route('/works').get((req, res) => {
+	res.status(200).json({ message: 'Welcome to the backend' });
+});
+
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/fields'));
 app.use('/', require('./routes/customGame'));
