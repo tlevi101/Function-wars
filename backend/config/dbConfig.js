@@ -18,7 +18,7 @@ const dbConfig = {
         dialect: 'mysql',
         logging: process.env.DB_LOGGING === 'true',
 		ssl: {
-			ca: fs.readFileSync(__dirname + '../certs/DigiCertGlobalRootCA.crt.pem')
+			ca: fs.readFileSync(__dirname + '/../certs/DigiCertGlobalRootCA.crt.pem')
 		}
     },
     test: {
