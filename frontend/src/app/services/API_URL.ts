@@ -1,0 +1,1 @@
+export default 'https://functionwars-api.azurewebsites.net';

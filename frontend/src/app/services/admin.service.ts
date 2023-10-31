@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { retry } from 'rxjs';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +13,7 @@ export class AdminService {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);
-        this.url = 'http://localhost:4000/admin';
+        this.url = API_URL || 'http://localhost:4000';
     }
 
     getUsers() {

@@ -5,13 +5,14 @@ import { Socket } from 'ngx-socket-io';
 import { MessageInterface } from '../chats/group-chat/group-chat.component';
 import { Observable } from 'rxjs';
 import { OtherUsersStatusInterface } from '../interfaces/backend-body.interfaces';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GroupChatService {
     private hr: HttpHeaders;
-    private url = 'http://localhost:4000/group-chats';
+    private url = API_URL + '/group-chats' + 'http://localhost:4000/group-chats';
     constructor(private http: HttpClient, private jwt: JwtService, private socket: Socket) {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')

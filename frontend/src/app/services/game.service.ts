@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { JwtService } from './jwt.service';
 import { catchError, retry, timeout } from 'rxjs';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +13,8 @@ export class GameService {
     private url: string;
     private token: string;
     constructor(private socket: Socket, private jwt: JwtService, private http: HttpClient) {
-        this.url = 'http://localhost:4000/games';
+		this.url = API_URL + '/games' || 'http://localhost:4000/games';
+
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);

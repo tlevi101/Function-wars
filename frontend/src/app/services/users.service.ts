@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -13,7 +14,7 @@ export class UsersService {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);
-        this.url = 'http://localhost:4000/users';
+        this.url = API_URL + '/users' || 'http://localhost:4000/users';
     }
 
     blockUser(id: number) {

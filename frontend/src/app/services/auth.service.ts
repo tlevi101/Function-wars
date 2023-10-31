@@ -8,13 +8,14 @@ import {
 } from '../interfaces/backend-body.interfaces';
 import { JwtService } from './jwt.service';
 import { Socket } from 'ngx-socket-io';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
     private hr = new HttpHeaders().set('Content-Type', 'application/json');
-    private url = 'http://localhost:4000';
+    private url = API_URL || 'http://localhost:4000';
     constructor(private http: HttpClient, private jwt: JwtService, private socket: Socket) {
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')

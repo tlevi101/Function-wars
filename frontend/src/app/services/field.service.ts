@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { JwtService } from './jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FieldBodyInterface } from '../interfaces/backend-body.interfaces';
+import API_URL from './API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -10,7 +11,7 @@ export class FieldService {
     private hr;
     private url;
     constructor(private jwt: JwtService, private http: HttpClient) {
-        this.url = 'http://localhost:4000/fields';
+        this.url = API_URL + '/fields' || 'http://localhost:4000/fields';
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${this.jwt.getToken()}`);
