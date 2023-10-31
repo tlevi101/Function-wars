@@ -1,0 +1,72 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - functions-wars-api
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+        run:
+          working-directory: ./backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: .\backend\package-lock.json
+
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm install -g typescript
+          npm run build --if-present
+          npm install -g sequelize-cli
+          Copy-Item -Path certs -Destination .\dist\certs -Recurse
+          Copy-Item -Path .\.env.example -Destination .\.env
+      
+      - name: Create compressed archive
+        run: Compress-Archive -Path * -DestinationPath ..\node-app.zip
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: node-app
+          path: node-app.zip
+
+  deploy:
+    permissions:
+        contents: none
+    runs-on: windows-latest
+    needs: build
+    environment:
+        name: 'Development'
+        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+            name: node-app
+        
+      - name: Extract compressed archive
+        run: Expand-Archive -Path node-app.zip -DestinationPath .
+
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        with:
+          app-name: 'functions-wars-api'
+          slot-name: 'Production'
+          publish-profile: <publishData><publishProfile profileName="function-wars-api - Web Deploy" publishMethod="MSDeploy" publishUrl="function-wars-api.scm.azurewebsites.net:443" msdeploySite="function-wars-api" userName="$function-wars-api" userPWD="YvacDpfDqw0ETxsgR4Q1clQc7wG9cT7Xicm3pvjEd5GwgxH5YdpSeEEPBMbo" destinationAppUrl="https://function-wars-api.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="function-wars-api - FTP" publishMethod="FTP" publishUrl="ftps://waws-prod-am2-473.ftp.azurewebsites.windows.net/site/wwwroot" ftpPassiveMode="True" userName="function-wars-api\$function-wars-api" userPWD="YvacDpfDqw0ETxsgR4Q1clQc7wG9cT7Xicm3pvjEd5GwgxH5YdpSeEEPBMbo" destinationAppUrl="https://function-wars-api.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="function-wars-api - Zip Deploy" publishMethod="ZipDeploy" publishUrl="function-wars-api.scm.azurewebsites.net:443" userName="$function-wars-api" userPWD="YvacDpfDqw0ETxsgR4Q1clQc7wG9cT7Xicm3pvjEd5GwgxH5YdpSeEEPBMbo" destinationAppUrl="https://function-wars-api.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="http://windows.azure.com" webSystem="WebSites"><databases /></publishProfile></publishData>
+          package: .
