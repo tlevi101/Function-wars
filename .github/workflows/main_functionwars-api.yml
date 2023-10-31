@@ -51,14 +51,12 @@ jobs:
 
     - name: npm install, build, and test
       run: |
-        pwd
-        ls -la
         npm install
         npm install -g typescript
         npm run build --if-present
         npm install -g sequelize-cli
         cp -r ./certs ./dist/certs
-        cp ./.env.example .\.env
+        cp ./.env.example ./.env
 
     - name: Create compressed archive
       run: zip -r ../node-app.zip ./* .[!.]*
