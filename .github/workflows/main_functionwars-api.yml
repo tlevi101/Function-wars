@@ -42,11 +42,11 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
+        working-directory: ./backend
         node-version: '18.x'
         cache: 'npm'
 
     - name: npm install, build, and test
-      working-directory: ./backend
       run: |
         pwd
         ls -la
