@@ -48,6 +48,8 @@ jobs:
     - name: npm install, build, and test
       working-directory: ./backend
       run: |
+        pwd
+        ls -la
         npm install
         npm install -g typescript
         npm run build --if-present
