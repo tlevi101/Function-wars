@@ -1,7 +1,0 @@
-nodeProcessCommandLine: "%programfiles%\\nodejs\\%WEBSITE_NODE_DEFAULT_VERSION%\\node.exe" --harmony-generators # Path to your Node.js executable
-loggingEnabled: true
-devErrorsEnabled: true
-debuggingEnabled: false
-node_env: "prod" # Set your desired Node.js environment (e.g., "production", "development")
-maxLogFileSizeInKB: 10048
-maxLogFiles: 10
