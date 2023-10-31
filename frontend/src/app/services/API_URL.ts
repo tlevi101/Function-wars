@@ -1,1 +1,1 @@
-export default 'https://functionwars-api.azurewebsites.net';
+export default 'https://function-wars-api.azurewebsites.net';
