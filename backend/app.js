@@ -8,7 +8,7 @@ const fs = require('fs').promises;
 const { User } = require('./models');
 const app = express();
 const cors = require('cors');
-const http = require('http').createServer();
+const server = require('http').createServer(app);
 const jwt = require('jsonwebtoken');
 const MyLogger = require('./logs/logger');
 const chalk = require('chalk');
@@ -20,7 +20,9 @@ const { FriendChatController } = require('./types/controllers/FriendChatControll
 const { WaitListController } = require('./types/controllers/WaitListController');
 //Socket
 
-const io = require('socket.io')(http, {
+const { Server } = require('socket.io');
+
+const io = new Server(server, {
     cors: {
         origin: ['*', 'https://admin.socket.io', 'http://localhost:4200'],
         credentials: true,
@@ -167,4 +169,5 @@ app.use(async function (err, req, res, next) {
 module.exports = {
     app,
     io,
+	server
 };

@@ -1,1 +1,1 @@
-export default 'https://function-wars-api.azurewebsites.net';
+export default 'http://localhost:4000';
