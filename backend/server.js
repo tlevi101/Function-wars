@@ -12,12 +12,12 @@ if(process.env.NODE_ENV === 'development') {
 }
 //Then redefine the old console
 
-io.listen(3000);
+io.listen(4000);
 
 console.log('Socket listening on port 3000');
 // start server
 (async () => {
-    const port = process.env.PORT || 4000;
+    const port = process.env.PORT || 3000;
     app.listen(port, () => {
         console.log(`Server is running on port ${port}.`);
     });
