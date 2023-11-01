@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "function-wars": {
+      "hosting": {
+        "frontend": [
+          "function-wars"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "function-wars"
+  }
+}

@@ -43,3 +43,7 @@ Thumbs.db
 
 /dist
 ./node_modules
+# Firebase
+.firebase
+*-debug.log
+.runtimeconfig.json
