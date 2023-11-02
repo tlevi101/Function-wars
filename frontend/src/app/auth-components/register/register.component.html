@@ -34,7 +34,13 @@
 		</div>
 		<div class="d-flex mb-1">
 			<a class="me-auto" routerLink="/login"><button class="btn btn-primary">Login</button></a>
-			<button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid" >Register</button>
+			<button type="submit" class="d-flex gap-2 btn btn-primary" [disabled]="registerForm.invalid" >
+				<span *ngIf="!pendingRequest">Register</span>
+				<div class="clearfix" *ngIf="pendingRequest">
+					<div class="spinner-border spinner-border-sm align-self-center" role="status">
+					</div>
+				  </div>
+			</button>
 		</div>
 	</form>
 </div>

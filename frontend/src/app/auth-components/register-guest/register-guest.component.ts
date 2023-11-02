@@ -10,6 +10,10 @@ import { AuthService } from '../../services/auth.service';
 })
 export class RegisterGuestComponent implements OnInit {
     public guestForm: FormGroup;
+
+	pendingRequest: boolean = false;
+
+
     constructor(private router: Router, private authService: AuthService) {
         this.guestForm = new FormGroup({
             name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -21,14 +25,17 @@ export class RegisterGuestComponent implements OnInit {
     }
 
     public submit() {
+		this.pendingRequest = true;
         this.authService.registerGuest(this.guestForm.value).subscribe(
             (res: any) => {
+				this.pendingRequest = false;
                 console.log(res);
                 sessionStorage.setItem('token', res.jwt);
                 this.authService.connectSocket(res.jwt);
                 this.router.navigate(['/']);
             },
             err => {
+				this.pendingRequest = false;
                 if (err.status === 404) this.guestForm.setErrors({ notFound: true });
             }
         );

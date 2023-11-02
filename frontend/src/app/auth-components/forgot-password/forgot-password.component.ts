@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class ForgotPasswordComponent implements OnInit {
     public forgotPasswordForm: FormGroup;
     public componentRef: ComponentRef<InfoComponent>;
+	pendingRequest: boolean = false;
     constructor(
         private router: Router,
         private authService: AuthService,
@@ -28,15 +29,18 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     public submit() {
+		this.pendingRequest = true;
         const body: ForgotPasswordBodyInterface = {
             email: this.email?.value,
         };
         this.authService.forgotPassword(body).subscribe(
             res => {
+				this.pendingRequest = false;
                 this.componentRef.instance.description = 'Email sent';
                 this.componentRef.instance.buttonLink = '/login';
             },
             err => {
+				this.pendingRequest = false;
                 if (err.status === 404) this.forgotPasswordForm.setErrors({ notFound: true });
             }
         );

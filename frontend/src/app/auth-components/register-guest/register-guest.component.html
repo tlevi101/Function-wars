@@ -8,7 +8,13 @@
 			</div>
 		</div>
 		<div class="d-flex mb-1 justify-content-end">
-			<button type="submit" class="btn btn-primary">Login as guest</button>
+			<button type="submit" class="d-flex gap-2 btn btn-primary" >
+				<span *ngIf="!pendingRequest">Login as guest</span>
+				<div class="clearfix" *ngIf="pendingRequest">
+					<div class="spinner-border spinner-border-sm align-self-center" role="status">
+					</div>
+				  </div>
+			</button>
 		</div>
 	</form>
 </div>

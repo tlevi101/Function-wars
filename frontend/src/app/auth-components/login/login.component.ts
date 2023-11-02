@@ -10,6 +10,7 @@ import { LoginBodyInterface } from '../../interfaces/backend-body.interfaces';
 })
 export class LoginComponent implements OnInit {
     loginForm: FormGroup;
+	pendingRequest: boolean = false;
 
     constructor(private authService: AuthService, private router: Router) {
         this.loginForm = new FormGroup({
@@ -33,14 +34,17 @@ export class LoginComponent implements OnInit {
             email: this.email?.value,
             password: this.password?.value,
         };
+		this.pendingRequest = true;
         this.authService.login(body).subscribe(
             (res: any) => {
+				this.pendingRequest = false;
                 if (this.rememberMe?.value) localStorage.setItem('token', res.jwt);
                 else sessionStorage.setItem('token', res.jwt);
                 this.router.navigate(['/']);
                 this.authService.connectSocket(res.jwt);
             },
             err => {
+				this.pendingRequest = false;
                 if (err.status === 400 || err.status === 404) this.loginForm.setErrors({ invalidCredentials: true });
                 if (err.status === 403) this.loginForm.setErrors({ userBanned: true });
                 console.log(err);

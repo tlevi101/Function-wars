@@ -15,6 +15,8 @@ export class ResetPasswordComponent implements OnInit {
     public resetPasswordForm: FormGroup;
     public componentRef: ComponentRef<InfoComponent>;
 
+	pendingRequest: boolean = false;
+
     constructor(
         private router: Router,
         private authService: AuthService,
@@ -44,6 +46,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     public submit() {
+		this.pendingRequest = true;
         const uuid = this.currentRoute.snapshot.paramMap.get('uuid') || '';
         console.log(uuid);
         const body: ResetPasswordBodyInterface = {
@@ -52,11 +55,13 @@ export class ResetPasswordComponent implements OnInit {
         };
         this.authService.resetPassword(uuid, body).subscribe(
             res => {
+				this.pendingRequest = false;
                 this.componentRef.instance.description = 'Password reset was successful. <br> You can now log in.';
                 this.componentRef.instance.buttonLink = '/login';
                 this.componentRef.instance.buttonText = 'Login';
             },
             err => {
+				this.pendingRequest = false;
                 console.log(err);
                 if (err.status === 404) this.resetPasswordForm.setErrors({ incorrectLink: true });
                 if (err.error.message === 'Link expired') this.resetPasswordForm.setErrors({ expiredLink: true });

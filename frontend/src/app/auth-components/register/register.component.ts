@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
     registerForm: FormGroup;
+	pendingRequest: boolean = false;
 
     constructor(
         private authService: AuthService,
@@ -40,6 +41,7 @@ export class RegisterComponent implements OnInit {
     }
 
     public submit() {
+		this.pendingRequest = true;
         const body: RegisterBodyInterface = {
             name: this.name?.value,
             email: this.email?.value,
@@ -49,12 +51,14 @@ export class RegisterComponent implements OnInit {
         this.authService.register(body).subscribe(
             (res: any) => {
                 console.log(res);
+				this.pendingRequest = false;
                 if (this.rememberMe?.value) localStorage.setItem('token', res.jwt);
                 else sessionStorage.setItem('token', res.jwt);
                 this.authService.connectSocket(res.jwt);
                 this.router.navigate(['/']);
             },
             err => {
+				this.pendingRequest = false;
                 const { msg } = err.error;
                 if (msg.includes('email') && msg.includes('unique')) this.email?.setErrors({ unique: true });
                 if (msg.includes('name') && msg.includes('unique')) this.name?.setErrors({ unique: true });

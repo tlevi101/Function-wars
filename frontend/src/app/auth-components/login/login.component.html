@@ -35,7 +35,13 @@
 
 			</div>
 			<div>
-				<button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid" >Login</button>
+				<button type="submit" class="d-flex gap-2 btn btn-primary" [disabled]="loginForm.invalid" >
+					<span *ngIf="!pendingRequest">Login</span>
+					<div class="clearfix" *ngIf="pendingRequest">
+						<div class="spinner-border spinner-border-sm align-self-center" role="status">
+						</div>
+					  </div>
+				</button>
 			</div>
 		</div>
 	</form>
