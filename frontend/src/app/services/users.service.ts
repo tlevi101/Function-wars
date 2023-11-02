@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
-import API_URL from './API_URL';
+import API_URL from '../env/API_URL';
 
 @Injectable({
     providedIn: 'root',

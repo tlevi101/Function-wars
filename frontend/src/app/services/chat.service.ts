@@ -3,7 +3,7 @@ import { Socket } from 'ngx-socket-io';
 import { DecodedToken } from '../interfaces/token.interface';
 import jwt_decode from 'jwt-decode';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import API_URL from './API_URL';
+import API_URL from '../env/API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class ChatService {
     private hr: HttpHeaders;
     private url: string;
     constructor(private socket: Socket, private http: HttpClient) {
-        this.url = API_URL + '/friends'  || 'http://localhost:4000/friends';
+        this.url = API_URL + '/friends';
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);

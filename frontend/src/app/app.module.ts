@@ -34,10 +34,10 @@ import { WaitRoomComponent } from './wait-room/wait-room.component';
 import { CustomGamesComponent } from './list-component/custom-games/custom-games.component';
 import { PaginationComponent } from './list-component/pagination/pagination.component';
 import { AdminsComponent } from './list-component/admins/admins.component';
-import API_URL from './services/API_URL';
+import API_URL from './env/API_URL';
 
 const config: SocketIoConfig = {
-    url: API_URL ? API_URL  : 'http://localhost:3000',
+    url: API_URL,
     options: {
         transports: ['websocket'],
         query: { token: sessionStorage.getItem('token') || localStorage.getItem('token') },

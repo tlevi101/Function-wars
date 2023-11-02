@@ -3,7 +3,7 @@ import { JwtService } from './jwt.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Socket } from 'ngx-socket-io';
 import { DecodedToken } from '../interfaces/token.interface';
-import API_URL from './API_URL';
+import API_URL from '../env/API_URL';
 
 export interface WaitRoomResponseInterface {
     roomUUID: string;
@@ -29,7 +29,7 @@ export class CustomGameService {
     private url: string;
     private token: string;
     constructor(private jwt: JwtService, private http: HttpClient, private socket: Socket) {
-        this.url = API_URL || 'http://localhost:4000';
+        this.url = API_URL;
         this.token = jwt.getToken();
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')

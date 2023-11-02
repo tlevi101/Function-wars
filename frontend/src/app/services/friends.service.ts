@@ -3,7 +3,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DecodedToken } from '../interfaces/token.interface';
 import { Socket } from 'ngx-socket-io';
-import API_URL from './API_URL';
+import API_URL from '../env/API_URL';
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class FriendsService {
     public friendDeleted: EventEmitter<number>;
     constructor(private http: HttpClient, private socket: Socket) {
         this.friendDeleted = new EventEmitter();
-        this.url = API_URL + '/friends' || 'http://localhost:4000/friends';
+        this.url = API_URL + '/friends';
         this.hr = new HttpHeaders()
             .set('Content-Type', 'application/json')
             .append('Authorization', `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`);
