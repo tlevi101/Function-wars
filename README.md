@@ -23,3 +23,10 @@ ben íródott NodeJS-t használva, a TypeScript kódok (JavaScript kódokkal egy
 külön mappába fordulnak le futtatás előtt. A kéréseket a kliens felől express szerver
 segítségével kezelem. MySQL adatbázist futtatok ennek kezelésére Sequelize ORM
 keretrendszert használok.
+
+Backend szerver Azure szerveren fut melynek címe [function-wars-api.azurewebsites.net](https://function-wars-api.azurewebsites.net)
+
+Frontend pedig firebase szerveren fut melynek címe [function-wars.web.app](https://function-wars.web.app)
+
+## Dokumentáció
+Szakdolgozatomhoz beadott részletes *Felhasználói* és *Fejlesztői* dokumentációk megtalálhatóak a `documentation` mappában.
