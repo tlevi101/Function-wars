@@ -1,5 +1,15 @@
 # Frontend Angular Upgrade Plan
 
+> ✅ **DONE (executed 2026-06-06).** Angular 15 → 19, `npm audit` = 0 vulnerabilities,
+> production build passes. See the `build(frontend): upgrade Angular …` commits.
+> The notes below are kept as a record of the path taken. Deviations from the
+> original plan: `@angular/fire` was *removed* (unused — app uses the raw firebase
+> SDK), `skipLibCheck` was enabled (ngx-socket-io .d.ts), `@babel/runtime` added as a
+> direct devDependency (top-level hoist), and `ngx-socket-io` pinned to 4.8.2.
+
+---
+
+
 This document is the "plan it later" half of the frontend vulnerability work.
 The **overrides** applied in `package.json` already neutralise the build-time
 criticals/highs and the runtime `firebase` / `ws` / `socket.io` issues **without**
