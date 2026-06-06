@@ -20,6 +20,7 @@ interface Field {
     selector: 'app-create-custom-game',
     templateUrl: './create-custom-game.component.html',
     styleUrls: ['./create-custom-game.component.scss'],
+    standalone: false
 })
 export class CreateCustomGameComponent implements AfterViewInit {
     @ViewChild('infoComponent') infoComponent!: InfoComponent;

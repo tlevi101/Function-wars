@@ -60,6 +60,7 @@ export interface BaseData {
     selector: 'app-base-list',
     templateUrl: './base-list.component.html',
     styleUrls: ['./base-list.component.scss'],
+    standalone: false
 })
 export class BaseListComponent {
     selectedDataForAction: any = null;

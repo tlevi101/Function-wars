@@ -8,6 +8,7 @@ export interface ConfirmData {
     selector: 'app-confirm',
     templateUrl: './confirm.component.html',
     styleUrls: ['./confirm.component.scss'],
+    standalone: false
 })
 export class ConfirmComponent {
     @Input() description: string;

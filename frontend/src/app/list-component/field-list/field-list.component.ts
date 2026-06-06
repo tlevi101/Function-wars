@@ -11,6 +11,7 @@ import { InfoComponent } from 'src/app/pop-up/info/info.component';
     selector: 'app-field-list',
     templateUrl: './field-list.component.html',
     styleUrls: ['./field-list.component.scss'],
+    standalone: false
 })
 export class FieldListComponent implements OnInit {
     fields: any[] = [];

@@ -10,6 +10,7 @@ import { WaitListService } from '../services/wait-list.service';
     selector: 'app-wait-room',
     templateUrl: './wait-room.component.html',
     styleUrls: ['./wait-room.component.scss'],
+    standalone: false
 })
 export class WaitRoomComponent implements OnInit, OnDestroy {
     roomUUID = '';
