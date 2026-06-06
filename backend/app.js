@@ -22,9 +22,13 @@ const { WaitListController } = require('./types/controllers/WaitListController')
 
 const { Server } = require('socket.io');
 
+const ALLOWED_ORIGINS = (process.env.FRONTEND_ORIGIN || 'http://localhost:4200')
+    .split(',')
+    .map(s => s.trim());
+
 const io = new Server(server, {
     cors: {
-        origin: ['*', 'https://admin.socket.io', 'http://localhost:4200'],
+        origin: ALLOWED_ORIGINS,
         credentials: true,
     },
 });
@@ -111,7 +115,7 @@ app.use(function (req, res, next) {
 
 // parse requests of content-type - application/json
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 
 //routers
 app.route('/works').get((req, res) => {

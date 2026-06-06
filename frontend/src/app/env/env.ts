@@ -2,7 +2,7 @@ import { isDevMode } from '@angular/core';
 
 const variables = {
 	production:{
-		API_URL: 'https://function-wars-api.azurewebsites.net',
+		API_URL: 'https://functionwars-api.tensura101.com',
 	},
 	development:{
 		API_URL: 'http://localhost:3000',
