@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
     selector: 'app-custom-games',
     templateUrl: './custom-games.component.html',
     styleUrls: ['./custom-games.component.scss'],
+    standalone: false
 })
 export class CustomGamesComponent implements OnInit, AfterViewInit, OnDestroy {
     customGames: CustomGameListItemInterface[] = [];

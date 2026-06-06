@@ -9,6 +9,7 @@ import { baseData } from './base-list.data';
     selector: 'app-reports',
     templateUrl: './reports.component.html',
     styleUrls: ['./reports.component.scss'],
+    standalone: false
 })
 export class ReportsComponent implements OnInit {
     reports: any[] = [];

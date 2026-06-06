@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     selector: 'app-field-editor',
     templateUrl: './field-editor.component.html',
     styleUrls: ['./field-editor.component.scss'],
+    standalone: false
 })
 export class FieldEditorComponent implements OnInit, AfterViewInit {
     fieldParticles = new Map<number, Shape | Player>();
@@ -437,8 +438,9 @@ export class FieldEditorComponent implements OnInit, AfterViewInit {
         const iter = this.fieldParticles.values();
         let index = 0;
         do {
-            const particle = iter.next().value;
+            const particle: Shape | Player | undefined = iter.next().value;
             index++;
+            if (!particle) break;
             if (await particle.pointInside(point)) return { index: index, particle };
         } while (index < this.fieldParticles.size);
         return null;

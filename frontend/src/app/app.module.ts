@@ -10,7 +10,7 @@ import { RegisterComponent } from './auth-components/register/register.component
 import { ForgotPasswordComponent } from './auth-components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './auth-components/reset-password/reset-password.component';
 import { RegisterGuestComponent } from './auth-components/register-guest/register-guest.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { InfoComponent } from './pop-up/info/info.component';
 import { ConfirmComponent } from './pop-up/confirm/confirm.component';
@@ -74,9 +74,9 @@ const config: SocketIoConfig = {
         PaginationComponent,
         AdminsComponent,
     ],
+    bootstrap: [AppComponent],
     imports: [
         BrowserModule,
-        HttpClientModule,
         AppRoutingModule,
         NgbModule,
         NgbTooltipModule,
@@ -85,7 +85,6 @@ const config: SocketIoConfig = {
         BrowserAnimationsModule,
         SocketIoModule.forRoot(config),
     ],
-    providers: [],
-    bootstrap: [AppComponent],
+    providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class AppModule {}

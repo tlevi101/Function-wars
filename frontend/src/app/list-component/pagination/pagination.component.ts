@@ -5,6 +5,7 @@ import { Pagination } from '../pagination';
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
+    standalone: false
 })
 export class PaginationComponent implements OnInit {
     pagination: Pagination;

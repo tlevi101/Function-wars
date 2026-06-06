@@ -8,6 +8,7 @@ import { baseData } from './base-list.data';
     selector: 'app-admins',
     templateUrl: './admins.component.html',
     styleUrls: ['./admins.component.scss'],
+    standalone: false
 })
 export class AdminsComponent implements AfterViewInit, OnInit {
     admins: any[] = [];

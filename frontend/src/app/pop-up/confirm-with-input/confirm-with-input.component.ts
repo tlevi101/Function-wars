@@ -15,6 +15,7 @@ export interface ConfirmWithInputData {
     selector: 'app-confirm-with-input',
     templateUrl: './confirm-with-input.component.html',
     styleUrls: ['./confirm-with-input.component.scss'],
+    standalone: false
 })
 export class ConfirmWithInputComponent {
     @Input() showME = false;
