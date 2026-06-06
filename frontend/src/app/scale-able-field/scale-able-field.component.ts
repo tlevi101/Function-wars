@@ -6,6 +6,7 @@ import { FieldResponseInterface } from '../interfaces/backend-body.interfaces';
     selector: 'app-scale-able-field',
     templateUrl: './scale-able-field.component.html',
     styleUrls: ['./scale-able-field.component.scss'],
+    standalone: false
 })
 export class ScaleAbleFieldComponent implements OnInit, AfterViewInit {
     @Input() scale = 0.5;

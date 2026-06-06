@@ -24,9 +24,9 @@ külön mappába fordulnak le futtatás előtt. A kéréseket a kliens felől ex
 segítségével kezelem. MySQL adatbázist futtatok ennek kezelésére Sequelize ORM
 keretrendszert használok.
 
-Backend szerver Azure szerveren fut melynek címe [function-wars-api.azurewebsites.net](https://function-wars-api.azurewebsites.net)
+Backend szerver saját otthoni szerveren fut (Cloudflare-en keresztül elérhető), melynek címe [functionwars-api.tensura101.com](https://functionwars-api.tensura101.com)
 
-Frontend pedig firebase szerveren fut melynek címe [function-wars.web.app](https://function-wars.web.app)
+Frontend szintén a saját otthoni szerveren fut (Cloudflare-en keresztül elérhető), melynek címe [functionwars.tensura101.com](https://functionwars.tensura101.com)
 
 ## Dokumentáció
 Szakdolgozatomhoz beadott részletes *Felhasználói* és *Fejlesztői* dokumentációk megtalálhatóak a `documentation` mappában.

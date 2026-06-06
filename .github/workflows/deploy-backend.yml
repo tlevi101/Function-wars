@@ -1,0 +1,109 @@
+# Function Wars — BACKEND (Express + Socket.IO) deploy to LXC 104.
+# Place at: .github/workflows/deploy-backend.yml
+# Runs as systemd unit functionwars-api.service (single process — in-memory game state).
+# nginx 127.0.0.1:8082 -> node 127.0.0.1:3001.  Public: https://functionwars-api.tensura101.com
+# Secrets (Environment "prod" or repo-level): SSH_HOST, SSH_PRIVATE_KEY,
+#   TS_OAUTH_CLIENT_ID, TS_OAUTH_CLIENT_SECRET — same values as the personal-site repo.
+#
+# Prereqs already done on the host: DB+user, .env (JWT/CORS/DB creds), systemd unit,
+# sudoers (deploy may `systemctl restart functionwars-api`), nginx vhost, CF route.
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', '.github/workflows/deploy-backend.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-functionwars-api
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install deps (incl. sequelize-cli + pinned typescript for the build)
+        run: npm ci
+      - name: Build
+        run: npm run build      # npx tsc -> dist/  (needs typescript@~5.6 pinned, see §3.3)
+      # Ship the built server + the FULL node_modules (so the runtime deps AND
+      # sequelize-cli are present on the box) + the migration/seed sources + config.
+      # Do NOT `npm prune --production` — that would drop sequelize-cli.
+      - name: Package release tarball
+        run: |
+          tar --exclude='./.git' --exclude='./.github' --exclude='./.env' \
+              -czf /tmp/release.tar.gz \
+              dist node_modules package.json package-lock.json \
+              config migrations seeders .sequelizerc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: /tmp/release.tar.gz
+          retention-days: 3
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+      - name: Bring up Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci
+          version: latest
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+      - name: Ship release
+        run: scp release.tar.gz deploy@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
+      - name: Deploy on server
+        run: |
+          ssh deploy@${{ secrets.SSH_HOST }} 'bash -se' <<'REMOTE'
+            set -euo pipefail
+            umask 0002
+            SITE=/var/www/functionwars-api
+            DATA=/var/www/functionwars-api-data
+
+            # Replace the app tree, preserving the persistent .env symlink.
+            tar -xzf /tmp/release.tar.gz -C "$SITE" --overwrite
+            rm /tmp/release.tar.gz
+            ln -sfn "$DATA/.env" "$SITE/.env"
+
+            if [ ! -s "$DATA/.env" ]; then
+              echo "ERROR: $DATA/.env is empty. Bootstrap it before deploying." >&2
+              exit 1
+            fi
+
+            # Load env so sequelize-cli (NODE_ENV=prod) can read DB creds, then migrate.
+            cd "$SITE"
+            set -a; . "$DATA/.env"; set +a
+            NODE_ENV=prod node_modules/.bin/sequelize db:migrate
+
+            # Seeding (SuperAdmin + default fields) is a ONE-TIME step, NOT run here
+            # (re-running would duplicate rows). See docs/functionwars/README.md.
+
+            sudo /bin/systemctl restart functionwars-api
+          REMOTE
+      - name: Show service log on failure
+        if: failure()
+        run: ssh deploy@${{ secrets.SSH_HOST }} 'journalctl -u functionwars-api -n 120 --no-pager || true'

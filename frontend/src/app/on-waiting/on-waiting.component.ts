@@ -4,6 +4,7 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
     selector: 'app-on-waiting',
     templateUrl: './on-waiting.component.html',
     styleUrls: ['./on-waiting.component.scss'],
+    standalone: false
 })
 export class OnWaitingComponent implements OnInit, OnDestroy {
     loadingText = 'Waiting for others...';

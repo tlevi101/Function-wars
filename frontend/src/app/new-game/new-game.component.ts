@@ -10,6 +10,7 @@ import { DecodedToken } from '../interfaces/token.interface';
     selector: 'app-new-game',
     templateUrl: './new-game.component.html',
     styleUrls: ['./new-game.component.scss'],
+    standalone: false
 })
 export class NewGameComponent implements OnInit {
     canCreateGame = false;

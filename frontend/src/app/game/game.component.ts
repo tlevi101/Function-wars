@@ -11,6 +11,7 @@ import { GameInterface, ObjectInterface, PlayerInterface } from './utils/Interfa
     selector: 'app-game',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
+    standalone: false
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     players: PlayerInterface[] = [];

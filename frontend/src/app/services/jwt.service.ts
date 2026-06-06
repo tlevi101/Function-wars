@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import jwt_decode from 'jwt-decode';
 import { DecodedToken } from '../interfaces/token.interface';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
     providedIn: 'root',
 })
 export class JwtService {
-    constructor() {}
+    constructor(private socket: Socket) {}
 
     public getToken(): string {
         return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
@@ -39,6 +40,7 @@ export class JwtService {
     public removeToken() {
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
+		this.socket.disconnect();
     }
 
     public isGuestToken(): boolean {

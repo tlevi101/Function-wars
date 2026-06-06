@@ -1,0 +1,69 @@
+# Function Wars — FRONTEND (Angular SPA) deploy to LXC 104.
+# Place at: .github/workflows/deploy-frontend.yml
+# Serves static build at /var/www/functionwars-web  (nginx 127.0.0.1:8081)
+# Public: https://functionwars.tensura101.com
+# Secrets (Environment "prod" or repo-level): SSH_HOST, SSH_PRIVATE_KEY,
+#   TS_OAUTH_CLIENT_ID, TS_OAUTH_CLIENT_SECRET  — same values as the personal-site repo.
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths: ['frontend/**', '.github/workflows/deploy-frontend.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-functionwars-web
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build
+        run: |
+          npm ci
+          npm run build        # ng build (production by default) -> dist/frontend/
+      # NOTE: confirm the output dir. Angular <=16 -> dist/frontend/ ;
+      # Angular >=17 (application builder) -> dist/frontend/browser/.
+      # Point the tar at whichever contains index.html.
+      - name: Package release tarball
+        run: tar -C dist/frontend -czf /tmp/release.tar.gz .
+      - name: Bring up Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci
+          version: latest
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+      - name: Ship release
+        run: scp /tmp/release.tar.gz deploy@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
+      - name: Deploy on server
+        run: |
+          ssh deploy@${{ secrets.SSH_HOST }} 'bash -se' <<'REMOTE'
+            set -euo pipefail
+            umask 0002
+            SITE=/var/www/functionwars-web
+            TMP="$(mktemp -d /var/www/.functionwars-web.XXXX)"
+            tar -xzf /tmp/release.tar.gz -C "$TMP"
+            rm /tmp/release.tar.gz
+            rsync -a --delete "$TMP/" "$SITE/"
+            rm -rf "$TMP"
+          REMOTE

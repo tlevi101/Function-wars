@@ -15,6 +15,7 @@ import { ChatService } from 'src/app/services/chat.service';
     selector: 'app-friend-chat',
     templateUrl: './friend-chat.component.html',
     styleUrls: ['./friend-chat.component.scss'],
+    standalone: false
 })
 export class FriendChatComponent implements AfterContentChecked, AfterContentInit {
     math = Math;

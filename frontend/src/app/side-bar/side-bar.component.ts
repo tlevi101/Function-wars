@@ -35,6 +35,7 @@ interface FriendRequest {
     animations: myAnimations,
     templateUrl: './side-bar.component.html',
     styleUrls: ['./side-bar.component.scss'],
+    standalone: false
 })
 export class SideBarComponent {
     @ViewChild('confirm', { static: true }) confirm!: ConfirmComponent;

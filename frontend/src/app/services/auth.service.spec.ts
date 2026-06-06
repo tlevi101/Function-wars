@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -8,8 +8,8 @@ describe('AuthService', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [AuthService],
+            imports: [],
+            providers: [AuthService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
         }).compileComponents();
         TestBed.configureTestingModule({});
         service = TestBed.inject(AuthService);
