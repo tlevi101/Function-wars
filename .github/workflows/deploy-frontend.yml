@@ -61,7 +61,7 @@ jobs:
             set -euo pipefail
             umask 0002
             SITE=/var/www/functionwars-web
-            TMP="$(mktemp -d /var/www/.functionwars-web.XXXX)"
+            TMP="$(mktemp -d /tmp/functionwars-web.XXXX)"
             tar -xzf /tmp/release.tar.gz -C "$TMP"
             rm /tmp/release.tar.gz
             rsync -a --delete "$TMP/" "$SITE/"

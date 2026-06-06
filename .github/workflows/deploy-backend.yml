@@ -19,14 +19,13 @@ concurrency:
   group: deploy-functionwars-api
   cancel-in-progress: false
 
-defaults:
-  run:
-    working-directory: backend
-
 jobs:
   build:
     runs-on: ubuntu-latest
     environment: prod
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
