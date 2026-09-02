@@ -1,0 +1,12 @@
+address: 'joined game'
+title: Joined game
+description: >-
+  Sent to every participant the instant a game starts — either from a custom-game owner calling
+  `start custom game`, or from the quick-match queue filling up. Join the Socket.IO room named
+  by `room` to continue receiving this game's events.
+messages:
+  joinedGame:
+    name: joinedGame
+    title: Joined game
+    payload:
+      $ref: '../../components/schemas/game-events.yaml#/JoinedGamePayload'

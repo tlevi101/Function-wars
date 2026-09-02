@@ -1,0 +1,12 @@
+address: 'banned'
+title: You have been banned
+description: >-
+  Pushed to a user's own socket the moment an admin bans them (`PUT /admin/users/{id}/ban`), so
+  the client can immediately log them out / show the ban reason. Distinct from `user banned`,
+  which notifies the *other* player in that user's active game.
+messages:
+  banned:
+    name: banned
+    title: You have been banned
+    payload:
+      $ref: '../../../openapi/components/schemas/common.yaml#/MessageResponse'

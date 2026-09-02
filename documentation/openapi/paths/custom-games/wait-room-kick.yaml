@@ -1,0 +1,33 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+  - $ref: '../../components/parameters/common.yaml#/ParticipantId'
+
+post:
+  tags:
+    - CustomGames
+  summary: Kick a player from a waiting room
+  description: Only the room owner may kick.
+  operationId: kickWaitingRoomPlayer
+  responses:
+    '200':
+      description: Player kicked.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Player kicked
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or is not the owner of this room.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Room not found, or the target user is not in this room.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

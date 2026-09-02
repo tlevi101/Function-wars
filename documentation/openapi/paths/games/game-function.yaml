@@ -1,0 +1,51 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/GameUUID'
+
+post:
+  tags:
+    - Games
+  summary: Submit the current player's turn
+  description: >-
+    Submits a function for the caller's turn. The computed trajectory points, obstacle damage,
+    and resulting turn change are broadcast to both players over the game's Socket.IO room
+    (`receive function` / `game over` events) — the HTTP response itself only confirms
+    acceptance and never repeats those computed values.
+  operationId: submitFunction
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/game.yaml#/SubmitFunctionRequest'
+  responses:
+    '200':
+      description: >-
+        Function accepted. `message` is `"Function submitted."` when the game continues, or
+        `"Game over."` when this turn ended the game (in which case the game is also removed
+        from the server's live game list).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+    '400':
+      description: >-
+        No function submitted, the same function was already submitted this game, or the
+        function failed validation (e.g. not a valid expression in `x`).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: It is not the caller's turn.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No in-progress game with this id.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

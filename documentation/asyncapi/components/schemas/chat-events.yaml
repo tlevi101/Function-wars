@@ -1,0 +1,48 @@
+SendChatMessagePayload:
+  type: object
+  description: Sends a 1:1 message to a friend. Delivered live via `receive message` if the friend is online.
+  required:
+    - message
+    - friend_id
+  properties:
+    message:
+      type: string
+    friend_id:
+      type: integer
+      format: int32
+    token:
+      type: string
+      description: >-
+        Sent by the current frontend but redundant: the connection is already authenticated via
+        the handshake `token` query parameter, and the server ignores this field. Safe to omit
+        in a new implementation.
+  additionalProperties: false
+
+SetSeenPayload:
+  type: object
+  description: Marks every message from this friend as seen.
+  required:
+    - friend_id
+  properties:
+    friend_id:
+      type: integer
+      format: int32
+    token:
+      type: string
+      description: Sent by the current frontend but ignored by the server (see `SendChatMessagePayload.token`).
+  additionalProperties: false
+
+SendGroupChatMessagePayload:
+  type: object
+  description: >-
+    Sends a message to the caller's current group chat (waiting room or in-game chat — resolved
+    server-side from the caller's socket, not passed explicitly).
+  required:
+    - message
+  properties:
+    message:
+      type: string
+    token:
+      type: string
+      description: Sent by the current frontend but ignored by the server (see `SendChatMessagePayload.token`).
+  additionalProperties: false

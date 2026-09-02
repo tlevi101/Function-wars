@@ -1,0 +1,31 @@
+post:
+  tags:
+    - Auth
+  summary: Start a guest session
+  description: >-
+    Issues a short-lived guest identity with no password and no persisted account. Guests can
+    play games and use waiting rooms/group chat, but are rejected by most other endpoints.
+  operationId: registerGuest
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/auth.yaml#/RegisterGuestRequest'
+  responses:
+    '201':
+      description: Guest session created.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/auth.yaml#/AuthTokenResponse'
+          example:
+            message: Guest accepted
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    '400':
+      description: Name missing or not 3-20 characters.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

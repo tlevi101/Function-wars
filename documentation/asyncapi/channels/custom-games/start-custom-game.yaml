@@ -1,0 +1,10 @@
+address: 'start custom game'
+title: Start custom game
+description: >-
+  Starts the game for the caller's owned waiting room. All current room members receive
+  `joined game`. Silently does nothing if the caller does not own a waiting room.
+messages:
+  startCustomGame:
+    name: startCustomGame
+    title: Start custom game
+    description: No payload.

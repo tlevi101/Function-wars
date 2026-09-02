@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/matchmaking/leave-wait-list.yaml'
+summary: Client leaves the quick-match queue.
+tags:
+  - name: Matchmaking

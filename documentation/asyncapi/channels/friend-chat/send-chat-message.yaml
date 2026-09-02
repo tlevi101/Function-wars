@@ -1,0 +1,13 @@
+address: 'send chat message'
+title: Send friend chat message
+description: >-
+  Sends a message to a friend, persisting it to their shared `Chat` row (creating the chat if
+  this is the first message). If the friend is currently online, they receive it live via
+  `receive message`; otherwise it is simply waiting for them next time they fetch
+  `GET /friends/{id}/chat`.
+messages:
+  sendChatMessage:
+    name: sendChatMessage
+    title: Send friend chat message
+    payload:
+      $ref: '../../components/schemas/chat-events.yaml#/SendChatMessagePayload'

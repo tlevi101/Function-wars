@@ -1,0 +1,12 @@
+address: 'route change'
+title: Route change
+description: >-
+  Client reports its current Angular route on every navigation. The server uses this purely as
+  presence/lifecycle signal (see `RouteChangePayload`) — it has no direct effect other than
+  triggering game/wait-room cleanup or reconnect.
+messages:
+  routeChange:
+    name: routeChange
+    title: Route change
+    payload:
+      $ref: '../../components/schemas/misc-events.yaml#/RouteChangePayload'

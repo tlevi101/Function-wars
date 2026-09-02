@@ -1,0 +1,105 @@
+MessageResponse:
+  type: object
+  description: Generic acknowledgement envelope returned by most write endpoints.
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Human readable, English result message. Not intended to be parsed by clients.
+      example: Operation successful.
+  additionalProperties: false
+
+ErrorResponse:
+  type: object
+  description: Generic error envelope returned for 4xx/5xx responses that are not field-validation failures.
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      description: Human readable error message.
+      example: Resource not found.
+  additionalProperties: false
+
+DatabaseErrorResponse:
+  type: object
+  description: >-
+    Returned when the database rejects an otherwise well-formed request (e.g. a Sequelize
+    DatabaseError). Note the field is `error`, not `message`, unlike the controller-produced
+    error shapes in this API. Same shape as `AuthErrorResponse`, which is what every 401
+    actually looks like — both come from the same generic Express error handler.
+  required:
+    - error
+  properties:
+    error:
+      type: string
+      description: Raw database driver error message.
+  additionalProperties: false
+
+AuthErrorResponse:
+  type: object
+  description: >-
+    Returned for every 401. The JWT check is `express-jwt` middleware, so its
+    `UnauthorizedError` never reaches a controller and is serialized by the generic Express
+    error handler as `{ "error": err.message }` — the field is `error`, not `message` like
+    the 4xx responses the controllers produce themselves.
+  required:
+    - error
+  properties:
+    error:
+      type: string
+      description: Reason the token was rejected.
+      example: No authorization token was found
+  additionalProperties: false
+
+ValidationErrorDetail:
+  type: object
+  description: A single Joi validation failure for one field of the submitted payload.
+  properties:
+    message:
+      type: string
+      description: Human readable description of why the field failed validation.
+      example: '"name" is required'
+    path:
+      type: array
+      description: >-
+        Property path (as segments) to the field that failed validation. Segments are strings
+        for object keys and **integers** for array indices — the field layout is mostly arrays
+        (`players`, `objects`), so mixed-type paths are the common case, not an edge case.
+        Model as `object`/`JsonElement` rather than `string`.
+      items:
+        oneOf:
+          - type: string
+            title: PropertyName
+          - type: integer
+            format: int32
+            title: ArrayIndex
+      example:
+        - field
+        - players
+        - 0
+        - location
+        - y
+    type:
+      type: string
+      description: Joi validation rule identifier that failed.
+      example: any.required
+  additionalProperties: true
+
+ValidationErrorResponse:
+  type: object
+  description: Returned when a request payload fails schema validation (Joi).
+  required:
+    - message
+    - detail
+  properties:
+    message:
+      type: string
+      example: Invalid field.
+    detail:
+      type: array
+      description: List of individual validation failures.
+      items:
+        $ref: '#/ValidationErrorDetail'
+  additionalProperties: false

@@ -1,0 +1,62 @@
+Point:
+  type: object
+  description: A 2D coordinate on the game field, in field-space pixels.
+  required:
+    - x
+    - y
+  properties:
+    x:
+      type: number
+      format: double
+      description: Horizontal coordinate.
+    y:
+      type: number
+      format: double
+      description: Vertical coordinate.
+  additionalProperties: false
+
+Dimension:
+  type: object
+  description: Width and height of a rectangular bounding box, in field-space pixels.
+  required:
+    - width
+    - height
+  properties:
+    width:
+      type: number
+      format: double
+    height:
+      type: number
+      format: double
+  additionalProperties: false
+
+Circle:
+  type: object
+  description: A circular area defined by its center and radius.
+  required:
+    - location
+    - radius
+  properties:
+    location:
+      $ref: './geometry.yaml#/Point'
+    radius:
+      type: number
+      format: double
+  additionalProperties: false
+
+DamageCircle:
+  type: object
+  description: >-
+    A circular scorch mark left on an obstacle where a player's function collided with it.
+    Its radius grows with the travelled distance of the function at the moment of impact.
+  required:
+    - location
+    - radius
+  properties:
+    location:
+      $ref: './geometry.yaml#/Point'
+    radius:
+      type: number
+      format: double
+      description: Radius of the damaged area. Base radius is 20, plus 0.1 per unit of travelled distance.
+  additionalProperties: false

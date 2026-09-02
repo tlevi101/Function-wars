@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Admin
+  summary: List reports
+  description: Ordered unhandled-first, then by soft-delete state, then oldest first.
+  operationId: listReports
+  responses:
+    '200':
+      description: Report list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - reports
+            properties:
+              reports:
+                type: array
+                items:
+                  $ref: '../../components/schemas/report.yaml#/Report'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/AdminForbidden'

@@ -1,0 +1,26 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/UserId'
+
+put:
+  tags:
+    - Admin
+  summary: Toggle a user's chat restriction
+  description: >-
+    Flips `chat_restriction`. Also marks every open report against this user as handled,
+    regardless of which direction the toggle went.
+  operationId: toggleChatRestriction
+  responses:
+    '200':
+      description: >-
+        Restriction toggled. `message` reflects the resulting state (`"User's chat restriction
+        removed"` or `"User is now chat restricted."`).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/AdminForbidden'
+    '404':
+      $ref: '../../components/responses/common.yaml#/NotFound'

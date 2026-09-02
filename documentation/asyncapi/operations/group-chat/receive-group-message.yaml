@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/group-chat/receive-group-message.yaml'
+summary: Server pushes a live group chat message.
+tags:
+  - name: GroupChat

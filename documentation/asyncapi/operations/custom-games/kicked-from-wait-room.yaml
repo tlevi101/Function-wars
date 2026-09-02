@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/custom-games/kicked-from-wait-room.yaml'
+summary: Server notifies a player they were kicked.
+tags:
+  - name: CustomGames

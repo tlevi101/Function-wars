@@ -1,0 +1,9 @@
+address: 'reject invite'
+title: Reject invite
+description: Withdraws a pending custom-game invite record so it can no longer be used to join the private room.
+messages:
+  rejectInvite:
+    name: rejectInvite
+    title: Reject invite
+    payload:
+      $ref: '../../components/schemas/invite-events.yaml#/RejectInvitePayload'

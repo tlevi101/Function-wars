@@ -1,0 +1,32 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/GameUUID'
+
+get:
+  tags:
+    - Games
+  summary: Get live game state
+  description: >-
+    Note the response body is the `GameState` object directly (not wrapped in an envelope
+    property), unlike most other endpoints in this API.
+  operationId: getGame
+  responses:
+    '200':
+      description: Game state.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/game.yaml#/GameState'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: The caller is not a player in this game.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No in-progress game with this id (it may have already ended).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

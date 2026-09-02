@@ -1,0 +1,24 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/UserId'
+
+put:
+  tags:
+    - Admin
+  summary: Unban a user
+  description: Clears both `banned` and `banned_reason`.
+  operationId: unbanUser
+  responses:
+    '200':
+      description: User unbanned.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: User unbanned.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/AdminForbidden'
+    '404':
+      $ref: '../../components/responses/common.yaml#/NotFound'

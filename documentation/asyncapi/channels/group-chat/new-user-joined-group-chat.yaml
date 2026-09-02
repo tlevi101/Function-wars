@@ -1,0 +1,8 @@
+address: 'new user joined group chat'
+title: New user joined group chat
+description: Broadcast to existing group chat members when a new participant joins (a side effect of `join custom game`).
+messages:
+  newUserJoinedGroupChat:
+    name: newUserJoinedGroupChat
+    title: New user joined group chat
+    description: No payload.

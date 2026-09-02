@@ -1,0 +1,13 @@
+address: 'error'
+title: Socket error
+description: >-
+  Generic error channel used by several socket handlers in place of an HTTP-style error response
+  (there being no HTTP response to return from a socket event). Seen from: `join wait list` (no
+  playable field), `join custom game` (room not found / full / not invited to a private room),
+  and friend-chat handlers (guest sender, friendship not found).
+messages:
+  error:
+    name: error
+    title: Socket error
+    payload:
+      $ref: '../../components/schemas/misc-events.yaml#/ErrorPayload'

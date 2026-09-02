@@ -1,0 +1,38 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+
+get:
+  tags:
+    - GroupChats
+  summary: Get group chat messages
+  description: Messages from participants the caller has muted or blocked are filtered out.
+  operationId: getGroupChatMessages
+  responses:
+    '200':
+      description: Message list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - messages
+            properties:
+              messages:
+                type: array
+                items:
+                  $ref: '../../components/schemas/group-chat.yaml#/GroupChatMessage'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: The caller is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Group chat not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

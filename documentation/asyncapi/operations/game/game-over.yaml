@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/game/game-over.yaml'
+summary: Server broadcasts that a submitted turn ended the game.
+tags:
+  - name: Game

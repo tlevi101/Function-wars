@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/custom-games/waiting-room-joined.yaml'
+summary: Server confirms room join to the joining client.
+tags:
+  - name: CustomGames

@@ -1,0 +1,9 @@
+address: 'receive message'
+title: Receive friend chat message
+description: Pushed to a friend, live, when the caller sends them a message via `send chat message`.
+messages:
+  receiveMessage:
+    name: receiveMessage
+    title: Receive friend chat message
+    payload:
+      $ref: '../../../openapi/components/schemas/chat.yaml#/ChatMessage'

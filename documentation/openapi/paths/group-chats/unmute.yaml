@@ -1,0 +1,38 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+  - $ref: '../../components/parameters/common.yaml#/ParticipantId'
+
+post:
+  tags:
+    - GroupChats
+  summary: Unmute a participant
+  operationId: unmuteGroupChatUser
+  responses:
+    '200':
+      description: User unmuted.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: User unmuted.
+    '400':
+      description: Unmute failed.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: The caller is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Group chat not found, or the target user is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

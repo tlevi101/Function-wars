@@ -1,0 +1,155 @@
+ObjectType:
+  type: string
+  description: Shape of a field obstacle.
+  enum:
+    - Rectangle
+    - Ellipse
+
+PlayerSpawn:
+  type: object
+  description: A player's starting position and blast-avoidance area on a field layout.
+  required:
+    - location
+    - dimension
+    - avoidArea
+  properties:
+    location:
+      $ref: './geometry.yaml#/Point'
+    dimension:
+      $ref: './geometry.yaml#/Dimension'
+    avoidArea:
+      $ref: './geometry.yaml#/Circle'
+  additionalProperties: false
+
+FieldObjectInput:
+  type: object
+  description: An obstacle placed on a field layout, as submitted when creating/updating a field.
+  required:
+    - type
+    - location
+    - dimension
+    - avoidArea
+  properties:
+    type:
+      $ref: './field.yaml#/ObjectType'
+    location:
+      $ref: './geometry.yaml#/Point'
+    dimension:
+      $ref: './geometry.yaml#/Dimension'
+    avoidArea:
+      $ref: './geometry.yaml#/Circle'
+  additionalProperties: false
+
+FieldLayout:
+  type: object
+  description: The full geometric definition of a game field.
+  required:
+    - dimension
+    - players
+    - objects
+  properties:
+    dimension:
+      $ref: './geometry.yaml#/Dimension'
+    players:
+      type: array
+      description: Spawn slots, in turn order. The number of slots determines the field's player capacity.
+      items:
+        $ref: './field.yaml#/PlayerSpawn'
+    objects:
+      type: array
+      description: Obstacles placed on the field.
+      items:
+        $ref: './field.yaml#/FieldObjectInput'
+  additionalProperties: false
+
+Field:
+  type: object
+  description: A saved field layout, owned either by a regular user or (if `is_admin_field`) shared by an admin.
+  required:
+    - id
+    - name
+    - user_id
+    - is_admin_field
+    - field
+    - deletedAt
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+    user_id:
+      type: integer
+      format: int32
+      description: Id of the owning user.
+    is_admin_field:
+      type: boolean
+      description: When true, this field was created by an admin and is visible to every admin.
+    field:
+      $ref: './field.yaml#/FieldLayout'
+    deletedAt:
+      type: string
+      format: date-time
+      nullable: true
+      description: Soft-delete timestamp. Non-null while the field is in the trash and can still be restored.
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+  additionalProperties: false
+
+FieldSummary:
+  type: object
+  description: >-
+    A field listed via `GET /fields`. The heavy `field` layout column is omitted from list
+    responses for payload size; fetch `GET /fields/{id}` for the full layout.
+  required:
+    - id
+    - name
+    - user_id
+    - is_admin_field
+    - deletedAt
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+    user_id:
+      type: integer
+      format: int32
+    is_admin_field:
+      type: boolean
+    deletedAt:
+      type: string
+      format: date-time
+      nullable: true
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+    user:
+      description: Only present in the admin field listing (`GET /fields` as an admin).
+      allOf:
+        - $ref: './user.yaml#/UserContact'
+  additionalProperties: false
+
+CreateOrUpdateFieldRequest:
+  type: object
+  required:
+    - name
+    - field
+  properties:
+    name:
+      type: string
+    field:
+      $ref: './field.yaml#/FieldLayout'
+  additionalProperties: false

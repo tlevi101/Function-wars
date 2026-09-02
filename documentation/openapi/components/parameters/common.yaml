@@ -1,0 +1,79 @@
+FieldId:
+  name: id
+  in: path
+  required: true
+  description: Numeric id of the field.
+  schema:
+    type: integer
+    format: int32
+
+UserId:
+  name: id
+  in: path
+  required: true
+  description: Numeric id of the target user.
+  schema:
+    type: integer
+    format: int32
+
+UserIdCamel:
+  name: userID
+  in: path
+  required: true
+  description: Numeric id of the target user.
+  schema:
+    type: integer
+    format: int32
+
+FriendshipId:
+  name: id
+  in: path
+  required: true
+  description: Numeric id of the friendship (for a pending request) or of the other user (for an accepted friend), depending on the endpoint.
+  schema:
+    type: integer
+    format: int32
+
+ReportId:
+  name: id
+  in: path
+  required: true
+  description: Numeric id of the report.
+  schema:
+    type: integer
+    format: int32
+
+ResetUuid:
+  name: uuid
+  in: path
+  required: true
+  description: Password-reset token, issued via `POST /forgot-password`.
+  schema:
+    type: string
+    format: uuid
+
+RoomUUID:
+  name: roomUUID
+  in: path
+  required: true
+  description: Unique id of the custom-game waiting room / group chat room.
+  schema:
+    type: string
+
+GameUUID:
+  name: gameUUID
+  in: path
+  required: true
+  description: Unique id of the in-progress game.
+  schema:
+    type: string
+
+ParticipantId:
+  name: userID
+  in: path
+  required: true
+  description: >-
+    Id of a game/room participant, as a path segment. Registered users pass their numeric
+    database id (as a string); guests pass their generated UUID.
+  schema:
+    type: string

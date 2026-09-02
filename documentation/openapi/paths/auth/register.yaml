@@ -1,0 +1,30 @@
+post:
+  tags:
+    - Auth
+  summary: Register a new account
+  operationId: register
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/auth.yaml#/RegisterRequest'
+  responses:
+    '201':
+      description: Account created.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/auth.yaml#/AuthTokenResponse'
+          example:
+            message: User created
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    '400':
+      description: >-
+        Missing password/passwordAgain, passwords do not match, or a Sequelize validation
+        failure (duplicate name/email, invalid email, name/password length).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

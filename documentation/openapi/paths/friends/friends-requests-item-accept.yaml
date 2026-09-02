@@ -1,0 +1,32 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FriendshipId'
+
+put:
+  tags:
+    - Friends
+  summary: Accept a friend request
+  description: '`{id}` here is the friendship record id, not a user id.'
+  operationId: acceptFriendRequest
+  responses:
+    '200':
+      description: Request accepted.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Friend request accepted.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or is not the recipient of this friendship request.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Caller not found, or no such friend request.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

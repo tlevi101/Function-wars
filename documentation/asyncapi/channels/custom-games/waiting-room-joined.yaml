@@ -1,0 +1,8 @@
+address: 'waiting room joined'
+title: Waiting room joined
+description: Confirms `join custom game` back to the joining caller.
+messages:
+  waitingRoomJoined:
+    name: waitingRoomJoined
+    title: Waiting room joined
+    description: No payload.

@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Friends
+  summary: List online friends
+  description: Same shape as `GET /friends`, filtered to friends who currently have an active socket connection.
+  operationId: listOnlineFriends
+  responses:
+    '200':
+      description: Online friend list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - friends
+            properties:
+              friends:
+                type: array
+                items:
+                  $ref: '../../components/schemas/friendship.yaml#/Friend'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'

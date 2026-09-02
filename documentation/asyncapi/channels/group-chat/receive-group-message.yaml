@@ -1,0 +1,9 @@
+address: 'receive group message'
+title: Receive group chat message
+description: Pushed to every other eligible group chat member when `send group chat message` succeeds. Muted/blocked recipients are skipped server-side.
+messages:
+  receiveGroupMessage:
+    name: receiveGroupMessage
+    title: Receive group chat message
+    payload:
+      $ref: '../../../openapi/components/schemas/group-chat.yaml#/GroupChatMessage'

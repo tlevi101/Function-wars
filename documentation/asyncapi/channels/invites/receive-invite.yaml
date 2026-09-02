@@ -1,0 +1,9 @@
+address: 'receive invite'
+title: Receive custom game invite
+description: Pushed to an online friend when the caller invites them while creating a private custom game.
+messages:
+  receiveInvite:
+    name: receiveInvite
+    title: Receive custom game invite
+    payload:
+      $ref: '../../components/schemas/invite-events.yaml#/ReceiveInvitePayload'

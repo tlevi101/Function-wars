@@ -1,0 +1,36 @@
+InviteRef:
+  type: object
+  description: Identifies one pending custom-game invite.
+  required:
+    - inviterID
+    - invitedID
+  properties:
+    inviterID:
+      type: integer
+      format: int32
+    invitedID:
+      type: integer
+      format: int32
+  additionalProperties: false
+
+RejectInvitePayload:
+  type: object
+  required:
+    - invite
+  properties:
+    invite:
+      $ref: '#/InviteRef'
+  additionalProperties: false
+
+ReceiveInvitePayload:
+  type: object
+  description: Pushed to a friend when the caller invites them to a private custom game.
+  required:
+    - inviter
+    - customGameUUID
+  properties:
+    inviter:
+      $ref: './session-user.yaml#/SessionUser'
+    customGameUUID:
+      type: string
+  additionalProperties: false

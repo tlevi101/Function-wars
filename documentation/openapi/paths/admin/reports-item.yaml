@@ -1,0 +1,27 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/ReportId'
+
+delete:
+  tags:
+    - Admin
+  summary: Dismiss or permanently delete a report
+  description: >-
+    The first call marks the report handled and soft-deletes it. Calling delete again on an
+    already soft-deleted report permanently destroys it. Either way, every other report against
+    the same reported user is also marked handled.
+  operationId: deleteReport
+  responses:
+    '200':
+      description: Report dismissed or destroyed.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Report deleted.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/AdminForbidden'
+    '404':
+      $ref: '../../components/responses/common.yaml#/NotFound'

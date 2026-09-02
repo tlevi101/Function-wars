@@ -1,0 +1,53 @@
+ParticipantRef:
+  type: object
+  description: Reference to a group chat / waiting room participant, who may be a guest.
+  required:
+    - id
+    - name
+  properties:
+    id:
+      $ref: './game.yaml#/ParticipantId'
+    name:
+      type: string
+  additionalProperties: false
+
+GroupChatMessage:
+  type: object
+  description: >-
+    A message in a waiting-room / in-game group chat. Only messages from users the caller has
+    not muted or blocked are included in `GET /group-chats/{roomUUID}/messages`.
+  required:
+    - from
+    - message
+  properties:
+    from:
+      $ref: './group-chat.yaml#/ParticipantRef'
+    message:
+      type: string
+  additionalProperties: false
+
+GroupChatUserStatus:
+  type: object
+  description: >-
+    Moderation status of one other participant in a group chat, relative to the requesting
+    user. `blocked` and `isFriend` are omitted entirely when either party is a guest, since
+    guests cannot have friends or block lists.
+  required:
+    - id
+    - name
+    - muted
+  properties:
+    id:
+      $ref: './game.yaml#/ParticipantId'
+    name:
+      type: string
+    blocked:
+      type: boolean
+      description: Whether the requesting user has blocked this participant. Absent for guest participants.
+    muted:
+      type: boolean
+      description: Whether the requesting user has muted this participant in this chat.
+    isFriend:
+      type: boolean
+      description: Whether the requesting user and this participant are friends. Absent for guest participants.
+  additionalProperties: false

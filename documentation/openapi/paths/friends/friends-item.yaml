@@ -1,0 +1,64 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FriendshipId'
+
+post:
+  tags:
+    - Friends
+  summary: Send a friend request
+  description: '`{id}` here is the target user id. Creates a pending friendship from the caller to that user.'
+  operationId: sendFriendRequest
+  responses:
+    '200':
+      description: Request sent.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Friend request sent.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or is attempting to friend themselves.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Caller not found, or target user not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+
+delete:
+  tags:
+    - Friends
+  summary: Remove a friend
+  description: >-
+    `{id}` here is the target user id. Removes the accepted friendship in either direction and
+    deletes the associated 1:1 chat, if any.
+  operationId: deleteFriend
+  responses:
+    '200':
+      description: Friend removed.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Friend deleted.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or the friendship with this user is still a pending request.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Caller not found, or no friendship with this user.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

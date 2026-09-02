@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/group-chat/new-user-joined-group-chat.yaml'
+summary: Server notifies group chat members of a new participant.
+tags:
+  - name: GroupChat

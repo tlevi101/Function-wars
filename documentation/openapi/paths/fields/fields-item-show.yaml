@@ -1,0 +1,29 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FieldId'
+
+get:
+  tags:
+    - Fields
+  summary: Get a field, ownership unchecked
+  description: >-
+    Same payload as `GET /fields/{id}`, but with no ownership/admin check — used so any signed-in
+    player (including guests, in practice — the auth middleware still requires a valid JWT) can
+    preview a field before/while a game on it is in progress.
+  operationId: showFieldForAnyone
+  responses:
+    '200':
+      description: Field found.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - field
+            properties:
+              field:
+                $ref: '../../components/schemas/field.yaml#/Field'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '404':
+      $ref: '../../components/responses/common.yaml#/NotFound'

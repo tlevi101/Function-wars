@@ -1,0 +1,23 @@
+get:
+  tags:
+    - CustomGames
+  summary: List joinable custom games
+  description: Public (non-private), not-yet-full waiting rooms, as a matchmaking lobby list.
+  operationId: listCustomGames
+  responses:
+    '200':
+      description: List of joinable rooms.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - customGames
+            properties:
+              customGames:
+                type: array
+                items:
+                  $ref: '../../components/schemas/waiting-room.yaml#/CustomGameSummary'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'

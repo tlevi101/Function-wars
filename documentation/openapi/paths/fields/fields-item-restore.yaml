@@ -1,0 +1,32 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FieldId'
+
+put:
+  tags:
+    - Fields
+  summary: Restore a soft-deleted field
+  description: Clears `deletedAt`. A no-op (still 200) if the field was not deleted.
+  operationId: restoreField
+  responses:
+    '200':
+      description: Field restored.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Field restored.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or does not own/administer this field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No such user (token) or no such field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

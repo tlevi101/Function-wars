@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/friend-chat/send-chat-message.yaml'
+summary: Client sends a 1:1 friend chat message.
+tags:
+  - name: FriendChat

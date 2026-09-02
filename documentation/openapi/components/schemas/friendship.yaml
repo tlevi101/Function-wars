@@ -1,0 +1,34 @@
+Friend:
+  type: object
+  description: An accepted friend, as listed for the current user. List is sorted by unread messages descending.
+  required:
+    - id
+    - name
+    - unreadMessages
+  properties:
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+    unreadMessages:
+      type: integer
+      format: int32
+      minimum: 0
+      description: Count of unseen chat messages sent by this friend to the current user.
+  additionalProperties: false
+
+FriendRequest:
+  type: object
+  description: An incoming, not-yet-accepted friendship request.
+  required:
+    - id
+    - from
+  properties:
+    id:
+      type: integer
+      format: int32
+      description: Id of the underlying friendship record (used to accept/reject).
+    from:
+      $ref: './user.yaml#/UserRef'
+  additionalProperties: false

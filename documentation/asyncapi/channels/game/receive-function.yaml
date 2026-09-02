@@ -1,0 +1,12 @@
+address: 'receive function'
+title: Receive function
+description: >-
+  Broadcast to both players in a game whenever `POST /games/{gameUUID}/function` is accepted and
+  does *not* end the game. Carries the computed trajectory/damage that the HTTP response itself
+  omits — see `documentation/openapi`'s note on `POST /games/{gameUUID}/function`.
+messages:
+  receiveFunction:
+    name: receiveFunction
+    title: Receive function
+    payload:
+      $ref: '../../components/schemas/game-events.yaml#/ReceiveFunctionPayload'

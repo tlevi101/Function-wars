@@ -1,0 +1,52 @@
+Unauthorized:
+  description: >-
+    Missing, malformed, or expired JWT. Note the body uses the `error` field, not `message`
+    like every other 4xx in this API: the JWT check is `express-jwt` middleware, so its
+    `UnauthorizedError` is never handled by a controller and falls through to the generic
+    error handler, which responds `{ "error": err.message }`. Typical messages are
+    `"No authorization token was found"` and `"jwt malformed"`.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/AuthErrorResponse'
+      example:
+        error: No authorization token was found
+
+GuestForbidden:
+  description: The endpoint requires a registered account; the caller is authenticated as a guest.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/ErrorResponse'
+      example:
+        message: Guest cannot make this request!
+
+AdminForbidden:
+  description: The endpoint requires an admin account.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/ErrorResponse'
+      example:
+        message: You are not an admin!
+
+NotFound:
+  description: The requested resource does not exist.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/ErrorResponse'
+
+BadRequest:
+  description: The request is missing required fields or otherwise malformed.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/ErrorResponse'
+
+ValidationFailed:
+  description: The request payload failed schema validation.
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/common.yaml#/ValidationErrorResponse'

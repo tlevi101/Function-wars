@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/navigation/route-change.yaml'
+summary: Client reports its current route.
+tags:
+  - name: Navigation

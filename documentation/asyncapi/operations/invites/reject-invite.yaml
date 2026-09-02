@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/invites/reject-invite.yaml'
+summary: Client withdraws a pending invite.
+tags:
+  - name: Invites

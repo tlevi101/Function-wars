@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/invites/receive-invite.yaml'
+summary: Server pushes a custom-game invite to a friend.
+tags:
+  - name: Invites

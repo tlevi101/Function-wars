@@ -1,0 +1,7 @@
+action: send
+channel:
+  $ref: '../../channels/matchmaking/joined-game.yaml'
+summary: Server notifies all participants a game has started.
+tags:
+  - name: Matchmaking
+  - name: Game

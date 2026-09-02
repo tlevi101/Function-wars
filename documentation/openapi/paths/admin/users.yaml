@@ -1,0 +1,24 @@
+get:
+  tags:
+    - Admin
+  summary: List non-admin users
+  operationId: listManagedUsers
+  responses:
+    '200':
+      description: "Every user with `is_admin: false`."
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - users
+            properties:
+              users:
+                type: array
+                items:
+                  $ref: '../../components/schemas/user.yaml#/User'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/AdminForbidden'

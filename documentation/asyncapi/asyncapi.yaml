@@ -1,0 +1,230 @@
+asyncapi: 3.0.0
+info:
+  title: Function Wars Realtime API
+  version: '1.0.0'
+  description: |
+    Socket.IO event contract for the Function Wars backend, describing the realtime layer that
+    sits alongside the REST API in `documentation/openapi`. Every message here travels over a
+    single Socket.IO connection on the default namespace (`/`) — there is one physical WebSocket
+    per client, and every event below is multiplexed over it by Socket.IO's own framing, not by
+    separate URLs or namespaces.
+
+    This document describes the **server application**. `action: receive` means the server
+    receives that message (the client sends it); `action: send` means the server sends it (the
+    client receives it).
+
+    ### Connecting
+    The client opens the Socket.IO connection with the same JWT used for the REST API, passed as
+    a `token` query parameter on the handshake (not an `Authorization` header — Socket.IO's
+    handshake happens before any per-message headers exist). The server verifies it with the
+    same secret/algorithm as the HTTP `bearerAuth` scheme and rejects the connection outright
+    (`Authentication error`) if it's missing or invalid; there is no unauthenticated access,
+    including for guests, who still need a guest JWT from `POST /register-guest` first.
+
+    ### Presence & lifecycle (not modeled as messages below)
+    - `route change` (below) is how the server tracks which screen a client is on; it drives
+      automatic game/wait-room cleanup and rejoin, not just analytics.
+    - Socket.IO's built-in `disconnect` triggers the same wait-list/wait-room/game cleanup as
+      navigating away, but on a 10 second grace timer (`SocketConnectionService.TIME_TO_RECONNECT`)
+      to tolerate brief network drops — a client reconnecting and re-sending `route change` with
+      a `/games/{uuid}` URL within that window resumes the game instead of forfeiting it.
+    - Reconnecting into a game additionally re-joins the game's group chat automatically.
+  contact:
+    name: Function Wars
+defaultContentType: application/json
+servers:
+  production:
+    host: functionwars-api.tensura101.com
+    protocol: wss
+    description: Production Socket.IO endpoint (self-hosted, behind Cloudflare).
+    security:
+      - $ref: '#/components/securitySchemes/handshakeToken'
+  development:
+    host: localhost:3000
+    protocol: ws
+    description: Local development.
+    security:
+      - $ref: '#/components/securitySchemes/handshakeToken'
+
+channels:
+  routeChange:
+    $ref: './channels/navigation/route-change.yaml'
+  joinWaitList:
+    $ref: './channels/matchmaking/join-wait-list.yaml'
+  leaveWaitList:
+    $ref: './channels/matchmaking/leave-wait-list.yaml'
+  joinedGame:
+    $ref: './channels/matchmaking/joined-game.yaml'
+  createCustomGame:
+    $ref: './channels/custom-games/create-custom-game.yaml'
+  joinCustomGame:
+    $ref: './channels/custom-games/join-custom-game.yaml'
+  startCustomGame:
+    $ref: './channels/custom-games/start-custom-game.yaml'
+  waitingRoomCreated:
+    $ref: './channels/custom-games/waiting-room-created.yaml'
+  waitingRoomJoined:
+    $ref: './channels/custom-games/waiting-room-joined.yaml'
+  userJoinedWaitingRoom:
+    $ref: './channels/custom-games/user-joined-waiting-room.yaml'
+  userLeftWaitRoom:
+    $ref: './channels/custom-games/user-left-wait-room.yaml'
+  kickedFromWaitRoom:
+    $ref: './channels/custom-games/kicked-from-wait-room.yaml'
+  ownerLeft:
+    $ref: './channels/custom-games/owner-left.yaml'
+  waitRoomOwnerLeft:
+    $ref: './channels/custom-games/wait-room-owner-left.yaml'
+  rejectInvite:
+    $ref: './channels/invites/reject-invite.yaml'
+  receiveInvite:
+    $ref: './channels/invites/receive-invite.yaml'
+  sendChatMessage:
+    $ref: './channels/friend-chat/send-chat-message.yaml'
+  setSeen:
+    $ref: './channels/friend-chat/set-seen.yaml'
+  receiveMessage:
+    $ref: './channels/friend-chat/receive-message.yaml'
+  sendGroupChatMessage:
+    $ref: './channels/group-chat/send-group-chat-message.yaml'
+  newUserJoinedGroupChat:
+    $ref: './channels/group-chat/new-user-joined-group-chat.yaml'
+  receiveGroupMessage:
+    $ref: './channels/group-chat/receive-group-message.yaml'
+  receiveFunction:
+    $ref: './channels/game/receive-function.yaml'
+  gameOver:
+    $ref: './channels/game/game-over.yaml'
+  gameEnded:
+    $ref: './channels/game/game-ended.yaml'
+  userBanned:
+    $ref: './channels/game/user-banned.yaml'
+  banned:
+    $ref: './channels/moderation/banned.yaml'
+  error:
+    $ref: './channels/errors/error.yaml'
+
+operations:
+  routeChange:
+    $ref: './operations/navigation/route-change.yaml'
+  joinWaitList:
+    $ref: './operations/matchmaking/join-wait-list.yaml'
+  leaveWaitList:
+    $ref: './operations/matchmaking/leave-wait-list.yaml'
+  joinedGame:
+    $ref: './operations/matchmaking/joined-game.yaml'
+  createCustomGame:
+    $ref: './operations/custom-games/create-custom-game.yaml'
+  joinCustomGame:
+    $ref: './operations/custom-games/join-custom-game.yaml'
+  startCustomGame:
+    $ref: './operations/custom-games/start-custom-game.yaml'
+  waitingRoomCreated:
+    $ref: './operations/custom-games/waiting-room-created.yaml'
+  waitingRoomJoined:
+    $ref: './operations/custom-games/waiting-room-joined.yaml'
+  userJoinedWaitingRoom:
+    $ref: './operations/custom-games/user-joined-waiting-room.yaml'
+  userLeftWaitRoom:
+    $ref: './operations/custom-games/user-left-wait-room.yaml'
+  kickedFromWaitRoom:
+    $ref: './operations/custom-games/kicked-from-wait-room.yaml'
+  ownerLeft:
+    $ref: './operations/custom-games/owner-left.yaml'
+  waitRoomOwnerLeft:
+    $ref: './operations/custom-games/wait-room-owner-left.yaml'
+  rejectInvite:
+    $ref: './operations/invites/reject-invite.yaml'
+  receiveInvite:
+    $ref: './operations/invites/receive-invite.yaml'
+  sendChatMessage:
+    $ref: './operations/friend-chat/send-chat-message.yaml'
+  setSeen:
+    $ref: './operations/friend-chat/set-seen.yaml'
+  receiveMessage:
+    $ref: './operations/friend-chat/receive-message.yaml'
+  sendGroupChatMessage:
+    $ref: './operations/group-chat/send-group-chat-message.yaml'
+  newUserJoinedGroupChat:
+    $ref: './operations/group-chat/new-user-joined-group-chat.yaml'
+  receiveGroupMessage:
+    $ref: './operations/group-chat/receive-group-message.yaml'
+  receiveFunction:
+    $ref: './operations/game/receive-function.yaml'
+  gameOver:
+    $ref: './operations/game/game-over.yaml'
+  gameEnded:
+    $ref: './operations/game/game-ended.yaml'
+  userBanned:
+    $ref: './operations/game/user-banned.yaml'
+  banned:
+    $ref: './operations/moderation/banned.yaml'
+  error:
+    $ref: './operations/errors/error.yaml'
+
+components:
+  securitySchemes:
+    handshakeToken:
+      type: httpApiKey
+      name: token
+      in: query
+      description: >-
+        The same JWT issued by the REST API's `/register-guest`, `/register`, or `/login`
+        (see `documentation/openapi`), passed as a query parameter on the Socket.IO handshake
+        request rather than as a header.
+
+  # Central registry of every payload schema, for tools that resolve components.schemas by name.
+  # Shared domain types are the same physical files the OpenAPI spec uses (documentation/openapi
+  # /components/schemas) — there is deliberately one definition of e.g. GamePlayer or
+  # SessionUser for both documents to reference, not a duplicate.
+  schemas:
+    RouteChangePayload:
+      $ref: './components/schemas/misc-events.yaml#/RouteChangePayload'
+    ErrorPayload:
+      $ref: './components/schemas/misc-events.yaml#/ErrorPayload'
+    CreateCustomGamePayload:
+      $ref: './components/schemas/custom-game-events.yaml#/CreateCustomGamePayload'
+    RoomUUIDPayload:
+      $ref: './components/schemas/custom-game-events.yaml#/RoomUUIDPayload'
+    WaitingRoomCreatedPayload:
+      $ref: './components/schemas/custom-game-events.yaml#/WaitingRoomCreatedPayload'
+    InviteRef:
+      $ref: './components/schemas/invite-events.yaml#/InviteRef'
+    RejectInvitePayload:
+      $ref: './components/schemas/invite-events.yaml#/RejectInvitePayload'
+    ReceiveInvitePayload:
+      $ref: './components/schemas/invite-events.yaml#/ReceiveInvitePayload'
+    SendChatMessagePayload:
+      $ref: './components/schemas/chat-events.yaml#/SendChatMessagePayload'
+    SetSeenPayload:
+      $ref: './components/schemas/chat-events.yaml#/SetSeenPayload'
+    SendGroupChatMessagePayload:
+      $ref: './components/schemas/chat-events.yaml#/SendGroupChatMessagePayload'
+    FunctionPoints:
+      $ref: './components/schemas/game-events.yaml#/FunctionPoints'
+    FunctionDamages:
+      $ref: './components/schemas/game-events.yaml#/FunctionDamages'
+    JoinedGamePayload:
+      $ref: './components/schemas/game-events.yaml#/JoinedGamePayload'
+    ReceiveFunctionPayload:
+      $ref: './components/schemas/game-events.yaml#/ReceiveFunctionPayload'
+    GameOverPayload:
+      $ref: './components/schemas/game-events.yaml#/GameOverPayload'
+
+    # Shared with documentation/openapi — see note above.
+    Point:
+      $ref: '../openapi/components/schemas/geometry.yaml#/Point'
+    DamageCircle:
+      $ref: '../openapi/components/schemas/geometry.yaml#/DamageCircle'
+    SessionUser:
+      $ref: './components/schemas/session-user.yaml#/SessionUser'
+    GamePlayer:
+      $ref: '../openapi/components/schemas/game.yaml#/GamePlayer'
+    GameField:
+      $ref: '../openapi/components/schemas/game.yaml#/GameField'
+    ChatMessage:
+      $ref: '../openapi/components/schemas/chat.yaml#/ChatMessage'
+    GroupChatMessage:
+      $ref: '../openapi/components/schemas/group-chat.yaml#/GroupChatMessage'
+    MessageResponse:
+      $ref: '../openapi/components/schemas/common.yaml#/MessageResponse'

@@ -1,0 +1,40 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+
+get:
+  tags:
+    - GroupChats
+  summary: Get other participants' moderation status
+  description: >-
+    Moderation status (blocked/muted/friend), relative to the caller, of every other
+    participant who is either currently in the room or has sent a message in it.
+  operationId: getGroupChatUsersStatus
+  responses:
+    '200':
+      description: Status list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - users
+            properties:
+              users:
+                type: array
+                items:
+                  $ref: '../../components/schemas/group-chat.yaml#/GroupChatUserStatus'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: The caller is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Group chat not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

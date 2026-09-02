@@ -1,0 +1,28 @@
+RouteChangePayload:
+  type: object
+  description: >-
+    Tells the server which frontend route the client is now on. Drives server-side presence
+    logic: leaving a `/games/{uuid}` or `/wait-rooms/{uuid}` route triggers game/room cleanup,
+    and navigating back into one attempts a reconnect/rejoin.
+  required:
+    - url
+  properties:
+    url:
+      type: string
+      description: The Angular route path the client just navigated to, e.g. `/games/game-12-34`.
+  additionalProperties: false
+
+ErrorPayload:
+  type: object
+  description: Generic socket-level error, pushed in place of (or in addition to) the requested action failing silently.
+  required:
+    - message
+    - code
+  properties:
+    message:
+      type: string
+    code:
+      type: integer
+      format: int32
+      description: HTTP-style status code describing the error class (404, 403, ...).
+  additionalProperties: false

@@ -1,0 +1,80 @@
+get:
+  tags:
+    - Fields
+  summary: List fields
+  description: >-
+    Admins get every admin-shared field (each including its `user` owner reference); everyone
+    else gets only their own fields. In both cases the heavy `field` layout column is omitted —
+    fetch `GET /fields/{id}` for it.
+
+    Ordered by `deletedAt ASC, updatedAt DESC`. Since `deletedAt` is null for live fields and
+    the backing databases (SQLite/MySQL) sort nulls first, this means **live fields first**,
+    most recently updated first within them, followed by soft-deleted fields ordered
+    oldest-deletion-first. Note the null ordering is dialect-defined — PostgreSQL would sort
+    nulls last and invert these two groups.
+  operationId: listFields
+  responses:
+    '200':
+      description: Field list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - fields
+            properties:
+              fields:
+                type: array
+                items:
+                  $ref: '../../components/schemas/field.yaml#/FieldSummary'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'
+    '404':
+      description: The user backing this token no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+
+post:
+  tags:
+    - Fields
+  summary: Create a field
+  description: >-
+    Creates a field owned by the caller. If the caller is an admin, the field is created as an
+    admin field (`is_admin_field: true`), visible to every admin via `GET /fields`.
+  operationId: createField
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/field.yaml#/CreateOrUpdateFieldRequest'
+  responses:
+    '201':
+      description: Field created.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - field
+            properties:
+              field:
+                $ref: '../../components/schemas/field.yaml#/Field'
+            additionalProperties: false
+    '400':
+      $ref: '../../components/responses/common.yaml#/ValidationFailed'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'
+    '404':
+      description: The user backing this token no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

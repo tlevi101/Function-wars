@@ -1,0 +1,40 @@
+post:
+  tags:
+    - Auth
+  summary: Log in
+  operationId: login
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/auth.yaml#/LoginRequest'
+  responses:
+    '200':
+      description: Login successful.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/auth.yaml#/AuthTokenResponse'
+          example:
+            message: Login successful
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    '400':
+      description: Email or password missing, or password incorrect.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '403':
+      description: The account is banned.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/auth.yaml#/BannedResponse'
+    '404':
+      description: No account with that email.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/moderation/banned.yaml'
+summary: Server notifies a user they were just banned.
+tags:
+  - name: Moderation

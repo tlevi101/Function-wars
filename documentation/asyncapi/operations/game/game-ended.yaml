@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/game/game-ended.yaml'
+summary: Server notifies the remaining player their opponent left.
+tags:
+  - name: Game

@@ -1,0 +1,8 @@
+address: 'kicked from wait room'
+title: Kicked from waiting room
+description: Sent only to the kicked player, as a result of the room owner calling `POST /wait-rooms/{roomUUID}/{userID}/kick`.
+messages:
+  kickedFromWaitRoom:
+    name: kickedFromWaitRoom
+    title: Kicked from waiting room
+    description: No payload.

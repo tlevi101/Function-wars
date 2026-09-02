@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/custom-games/start-custom-game.yaml'
+summary: Room owner starts the game.
+tags:
+  - name: CustomGames

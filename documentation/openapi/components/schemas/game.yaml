@@ -1,0 +1,124 @@
+ParticipantId:
+  description: >-
+    Identifier of a game/chat participant. Registered users are identified by their numeric
+    database id; guests are identified by a generated UUID string. Consumers that need a single
+    concrete type (e.g. C#) should model this as a discriminated union or a string, coercing
+    integer ids to string.
+  oneOf:
+    - type: integer
+      format: int32
+      title: RegisteredUserId
+    - type: string
+      format: uuid
+      title: GuestUserId
+
+GamePlayer:
+  type: object
+  description: A player's live state within an in-progress game.
+  required:
+    - id
+    - name
+    - location
+    - dimension
+    - avoidArea
+  properties:
+    id:
+      $ref: './game.yaml#/ParticipantId'
+    name:
+      type: string
+    location:
+      $ref: './geometry.yaml#/Point'
+    dimension:
+      description: Player hitbox size; both `width` and `height` equal the player's circle radius (40).
+      allOf:
+        - $ref: './geometry.yaml#/Dimension'
+    avoidArea:
+      description: Circle around the player's spawn (radius 130) that obstacles must not intersect.
+      allOf:
+        - $ref: './geometry.yaml#/Circle'
+  additionalProperties: false
+
+GameObjectState:
+  type: object
+  description: Live state of one obstacle on the field, including any accumulated blast damage.
+  required:
+    - type
+    - location
+    - dimension
+    - avoidArea
+    - damages
+  properties:
+    type:
+      $ref: './field.yaml#/ObjectType'
+    location:
+      $ref: './geometry.yaml#/Point'
+    dimension:
+      $ref: './geometry.yaml#/Dimension'
+    avoidArea:
+      $ref: './geometry.yaml#/Circle'
+    damages:
+      type: array
+      description: Scorch marks accumulated so far from function collisions.
+      items:
+        $ref: './geometry.yaml#/DamageCircle'
+  additionalProperties: false
+
+GameField:
+  description: >-
+    The field a game was started from, as embedded in game state and in the `joined game`
+    socket event.
+
+    This is the **whole `Field` database row**, not a trimmed projection: `Game` stores the
+    Sequelize model instance it was constructed with (`GameController.createGame` passes the
+    result of `Field.findByPk()` / `Field.randomField()` straight through), and `Field` has no
+    custom `toJSON()`, so `res.json()` serializes every column — including `user_id`,
+    `is_admin_field`, `deletedAt`, `createdAt` and `updatedAt` alongside `id`, `name` and the
+    `field` layout. Defined as an alias of `Field` so the two cannot drift apart.
+  allOf:
+    - $ref: './field.yaml#/Field'
+
+GameState:
+  type: object
+  description: Full state of an in-progress game, as returned by `GET /games/{gameUUID}`.
+  required:
+    - players
+    - objects
+    - currentPlayer
+    - field
+    - uuid
+  properties:
+    players:
+      type: array
+      items:
+        $ref: './game.yaml#/GamePlayer'
+    objects:
+      type: array
+      items:
+        $ref: './game.yaml#/GameObjectState'
+    currentPlayer:
+      allOf:
+        - $ref: './game.yaml#/GamePlayer'
+      description: The player whose turn it currently is.
+    lastFunction:
+      type: string
+      nullable: true
+      description: Mathematical expression last submitted by any player. Null before the first turn.
+    field:
+      $ref: './game.yaml#/GameField'
+    uuid:
+      type: string
+      description: Unique id of the game, also used as the Socket.IO room name.
+  additionalProperties: false
+
+SubmitFunctionRequest:
+  type: object
+  required:
+    - fn
+  properties:
+    fn:
+      type: string
+      description: >-
+        A single-variable mathematical expression in `x` (e.g. `"2*x+3"`) that the current
+        player fires from their position. Evaluated and broadcast to both players over
+        Socket.IO; only the outcome message is returned over HTTP.
+  additionalProperties: false

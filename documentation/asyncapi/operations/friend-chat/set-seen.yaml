@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/friend-chat/set-seen.yaml'
+summary: Client marks a friend chat as read.
+tags:
+  - name: FriendChat

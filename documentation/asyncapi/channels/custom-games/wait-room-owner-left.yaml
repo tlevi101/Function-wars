@@ -1,0 +1,12 @@
+address: 'wait room owner left'
+title: Waiting room closed by owner
+description: >-
+  Broadcast to the other members of a waiting room (not the owner) when the owner leaves and the
+  room is about to be destroyed. This is the event the current frontend actually listens for to
+  detect room closure; `owner left` follows immediately afterwards, during teardown itself, and
+  reaches the same recipients.
+messages:
+  waitRoomOwnerLeft:
+    name: waitRoomOwnerLeft
+    title: Waiting room closed by owner
+    description: No payload.

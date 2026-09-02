@@ -1,0 +1,279 @@
+openapi: 3.0.3
+info:
+  title: Function Wars API
+  version: '1.0.0'
+  description: |
+    REST contract for the Function Wars backend (Node/Express/Sequelize).
+
+    Function Wars is a turn-based artillery game where players hit each other by submitting
+    mathematical functions instead of aiming a weapon directly. This document covers the
+    **HTTP API only**. Real-time gameplay, chat delivery, and matchmaking notifications are
+    carried over a parallel Socket.IO connection (authenticated with the same JWT via the
+    `token` query parameter) that is out of scope for OpenAPI and is not described here — see
+    `README.md` in this directory for a summary of the socket events a client also needs to
+    implement.
+
+    ### Authentication
+    Almost every endpoint requires a JWT obtained from `/register-guest`, `/register`, or
+    `/login`, sent as `Authorization: Bearer <jwt>`. Guest tokens (from `/register-guest`) are
+    accepted by the same middleware as registered-user tokens but are rejected by most
+    endpoints with a 403 — look for the "Guest cannot make this request" behavior called out on
+    each operation.
+
+    ### Error shape
+    Errors come back in one of two envelopes, depending on **where** they are produced:
+
+    - Errors a controller returns itself are `{ "message": string }` (`ErrorResponse`). This
+      covers every 400/403/404 in this document. Field-validation failures (currently only
+      field/create and field/update) extend it to
+      `{ "message": string, "detail": ValidationErrorDetail[] }`.
+    - Errors raised by middleware or infrastructure never reach a controller and are
+      serialized by the generic Express error handler as `{ "error": string }`. **Every 401
+      is in this group** (`AuthErrorResponse`), because the JWT check is `express-jwt`
+      middleware — as are Sequelize `DatabaseError` 500s (`DatabaseErrorResponse`).
+
+    In other words, do not assume `message` is present on an auth failure; a client that
+    reads `message` unconditionally will show an empty error for every expired token.
+  contact:
+    name: Function Wars
+servers:
+  - url: https://functionwars-api.tensura101.com
+    description: Production (self-hosted, behind Cloudflare)
+  - url: http://localhost:3000
+    description: Local development
+tags:
+  - name: Auth
+    description: Registration, login, guest sessions, and password reset.
+  - name: Fields
+    description: Field (map) layout CRUD.
+  - name: CustomGames
+    description: Custom-game waiting rooms / matchmaking lobby lookups.
+  - name: Games
+    description: Live game state and turn submission.
+  - name: GroupChats
+    description: Waiting-room / in-game group chat.
+  - name: Friends
+    description: Friend list, requests, and 1:1 chat.
+  - name: Users
+    description: Reporting and blocking other users.
+  - name: Admin
+    description: Moderation and role management. Requires an admin account.
+  - name: Meta
+    description: Miscellaneous non-resource endpoints.
+security:
+  - bearerAuth: []
+paths:
+  /works:
+    $ref: './paths/meta/health.yaml'
+
+  /register-guest:
+    $ref: './paths/auth/register-guest.yaml'
+  /register:
+    $ref: './paths/auth/register.yaml'
+  /login:
+    $ref: './paths/auth/login.yaml'
+  /forgot-password:
+    $ref: './paths/auth/forgot-password.yaml'
+  /reset-password/{uuid}:
+    $ref: './paths/auth/reset-password.yaml'
+  /update-token:
+    $ref: './paths/auth/update-token.yaml'
+
+  /fields:
+    $ref: './paths/fields/fields-collection.yaml'
+  /fields/{id}:
+    $ref: './paths/fields/fields-item.yaml'
+  /fields/{id}/show:
+    $ref: './paths/fields/fields-item-show.yaml'
+  /fields/{id}/restore:
+    $ref: './paths/fields/fields-item-restore.yaml'
+
+  /custom-games:
+    $ref: './paths/custom-games/custom-games.yaml'
+  /wait-rooms/{roomUUID}:
+    $ref: './paths/custom-games/wait-room-item.yaml'
+  /wait-rooms/{roomUUID}/{userID}/kick:
+    $ref: './paths/custom-games/wait-room-kick.yaml'
+
+  /games/{gameUUID}:
+    $ref: './paths/games/game-item.yaml'
+  /games/{gameUUID}/function:
+    $ref: './paths/games/game-function.yaml'
+
+  /group-chats/{roomUUID}/mute/{userID}:
+    $ref: './paths/group-chats/mute.yaml'
+  /group-chats/{roomUUID}/unmute/{userID}:
+    $ref: './paths/group-chats/unmute.yaml'
+  /group-chats/{roomUUID}/messages:
+    $ref: './paths/group-chats/messages.yaml'
+  /group-chats/{roomUUID}/users-status:
+    $ref: './paths/group-chats/users-status.yaml'
+
+  /friends:
+    $ref: './paths/friends/friends-collection.yaml'
+  /friends/online:
+    $ref: './paths/friends/friends-online.yaml'
+  /friends/requests:
+    $ref: './paths/friends/friends-requests.yaml'
+  /friends/{id}/chat:
+    $ref: './paths/friends/friends-item-chat.yaml'
+  /friends/requests/{id}/accept:
+    $ref: './paths/friends/friends-requests-item-accept.yaml'
+  /friends/requests/{id}/reject:
+    $ref: './paths/friends/friends-requests-item-reject.yaml'
+  /friends/{id}:
+    $ref: './paths/friends/friends-item.yaml'
+
+  /users/{id}/report:
+    $ref: './paths/users/users-item-report.yaml'
+  /users/{id}/block:
+    $ref: './paths/users/users-item-block.yaml'
+  /users/{id}/unblock:
+    $ref: './paths/users/users-item-unblock.yaml'
+
+  /admin/admins:
+    $ref: './paths/admin/admins.yaml'
+  /admin/users:
+    $ref: './paths/admin/users.yaml'
+  /admin/reports:
+    $ref: './paths/admin/reports.yaml'
+  /admin/reports/{id}:
+    $ref: './paths/admin/reports-item.yaml'
+  /admin/users/{id}/ban:
+    $ref: './paths/admin/users-item-ban.yaml'
+  /admin/users/{id}/unban:
+    $ref: './paths/admin/users-item-unban.yaml'
+  /admin/users/{userID}/make-admin:
+    $ref: './paths/admin/users-item-make-admin.yaml'
+  /admin/users/{userID}/remove-admin:
+    $ref: './paths/admin/users-item-remove-admin.yaml'
+  /admin/users/{id}/add-remove-chat-restriction:
+    $ref: './paths/admin/users-item-chat-restriction.yaml'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        JWT issued by /register-guest, /register, /login, or refreshed via /update-token. Send
+        as `Authorization: Bearer <jwt>`.
+
+  # Central registry of every schema, for tools that resolve components.schemas by name (e.g.
+  # most C# generators). Each entry simply points at the same file the path operations
+  # reference directly, so bundling this document (e.g. `redocly bundle openapi.yaml`) produces
+  # one flat, deduplicated components.schemas section keyed by these names.
+  schemas:
+    MessageResponse:
+      $ref: './components/schemas/common.yaml#/MessageResponse'
+    ErrorResponse:
+      $ref: './components/schemas/common.yaml#/ErrorResponse'
+    DatabaseErrorResponse:
+      $ref: './components/schemas/common.yaml#/DatabaseErrorResponse'
+    AuthErrorResponse:
+      $ref: './components/schemas/common.yaml#/AuthErrorResponse'
+    ValidationErrorDetail:
+      $ref: './components/schemas/common.yaml#/ValidationErrorDetail'
+    ValidationErrorResponse:
+      $ref: './components/schemas/common.yaml#/ValidationErrorResponse'
+
+    Point:
+      $ref: './components/schemas/geometry.yaml#/Point'
+    Dimension:
+      $ref: './components/schemas/geometry.yaml#/Dimension'
+    Circle:
+      $ref: './components/schemas/geometry.yaml#/Circle'
+    DamageCircle:
+      $ref: './components/schemas/geometry.yaml#/DamageCircle'
+
+    Role:
+      $ref: './components/schemas/user.yaml#/Role'
+    User:
+      $ref: './components/schemas/user.yaml#/User'
+    UserRef:
+      $ref: './components/schemas/user.yaml#/UserRef'
+    UserContact:
+      $ref: './components/schemas/user.yaml#/UserContact'
+    SessionUser:
+      $ref: './components/schemas/user.yaml#/SessionUser'
+    RegisteredSessionUser:
+      $ref: './components/schemas/user.yaml#/RegisteredSessionUser'
+    GuestSessionUser:
+      $ref: './components/schemas/user.yaml#/GuestSessionUser'
+
+    RegisterGuestRequest:
+      $ref: './components/schemas/auth.yaml#/RegisterGuestRequest'
+    RegisterRequest:
+      $ref: './components/schemas/auth.yaml#/RegisterRequest'
+    LoginRequest:
+      $ref: './components/schemas/auth.yaml#/LoginRequest'
+    ForgotPasswordRequest:
+      $ref: './components/schemas/auth.yaml#/ForgotPasswordRequest'
+    ResetPasswordRequest:
+      $ref: './components/schemas/auth.yaml#/ResetPasswordRequest'
+    AuthTokenResponse:
+      $ref: './components/schemas/auth.yaml#/AuthTokenResponse'
+    BannedResponse:
+      $ref: './components/schemas/auth.yaml#/BannedResponse'
+    ForgotPasswordResponse:
+      $ref: './components/schemas/auth.yaml#/ForgotPasswordResponse'
+
+    ObjectType:
+      $ref: './components/schemas/field.yaml#/ObjectType'
+    PlayerSpawn:
+      $ref: './components/schemas/field.yaml#/PlayerSpawn'
+    FieldObjectInput:
+      $ref: './components/schemas/field.yaml#/FieldObjectInput'
+    FieldLayout:
+      $ref: './components/schemas/field.yaml#/FieldLayout'
+    Field:
+      $ref: './components/schemas/field.yaml#/Field'
+    FieldSummary:
+      $ref: './components/schemas/field.yaml#/FieldSummary'
+    CreateOrUpdateFieldRequest:
+      $ref: './components/schemas/field.yaml#/CreateOrUpdateFieldRequest'
+
+    Friend:
+      $ref: './components/schemas/friendship.yaml#/Friend'
+    FriendRequest:
+      $ref: './components/schemas/friendship.yaml#/FriendRequest'
+
+    ChatMessage:
+      $ref: './components/schemas/chat.yaml#/ChatMessage'
+    Chat:
+      $ref: './components/schemas/chat.yaml#/Chat'
+
+    ReportedUser:
+      $ref: './components/schemas/report.yaml#/ReportedUser'
+    Report:
+      $ref: './components/schemas/report.yaml#/Report'
+    CreateReportRequest:
+      $ref: './components/schemas/report.yaml#/CreateReportRequest'
+    BanUserRequest:
+      $ref: './components/schemas/report.yaml#/BanUserRequest'
+
+    ParticipantId:
+      $ref: './components/schemas/game.yaml#/ParticipantId'
+    GamePlayer:
+      $ref: './components/schemas/game.yaml#/GamePlayer'
+    GameObjectState:
+      $ref: './components/schemas/game.yaml#/GameObjectState'
+    GameField:
+      $ref: './components/schemas/game.yaml#/GameField'
+    GameState:
+      $ref: './components/schemas/game.yaml#/GameState'
+    SubmitFunctionRequest:
+      $ref: './components/schemas/game.yaml#/SubmitFunctionRequest'
+
+    CustomGameSummary:
+      $ref: './components/schemas/waiting-room.yaml#/CustomGameSummary'
+    WaitingRoomDetail:
+      $ref: './components/schemas/waiting-room.yaml#/WaitingRoomDetail'
+
+    ParticipantRef:
+      $ref: './components/schemas/group-chat.yaml#/ParticipantRef'
+    GroupChatMessage:
+      $ref: './components/schemas/group-chat.yaml#/GroupChatMessage'
+    GroupChatUserStatus:
+      $ref: './components/schemas/group-chat.yaml#/GroupChatUserStatus'

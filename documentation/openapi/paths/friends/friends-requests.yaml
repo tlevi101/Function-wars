@@ -1,0 +1,30 @@
+get:
+  tags:
+    - Friends
+  summary: List incoming friend requests
+  operationId: listFriendRequests
+  responses:
+    '200':
+      description: Pending incoming requests.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - requests
+            properties:
+              requests:
+                type: array
+                items:
+                  $ref: '../../components/schemas/friendship.yaml#/FriendRequest'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'
+    '404':
+      description: The user backing this token no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

@@ -1,0 +1,9 @@
+address: 'set seen'
+title: Mark friend chat as seen
+description: Marks every message from the given friend as seen in their shared chat.
+messages:
+  setSeen:
+    name: setSeen
+    title: Mark friend chat as seen
+    payload:
+      $ref: '../../components/schemas/chat-events.yaml#/SetSeenPayload'

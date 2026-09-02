@@ -1,0 +1,12 @@
+SessionUser:
+  description: >-
+    The identity carried in a client's JWT session. Discriminated by `type`: registered users
+    carry a numeric database id, guests carry a generated UUID string. Same union as
+    `documentation/openapi`'s `SessionUser`, restated here because AsyncAPI's schema dialect
+    requires `discriminator` to be the bare property name rather than OpenAPI 3.0's
+    `{propertyName, mapping}` object — the two member schemas below are the same physical
+    definitions the OpenAPI document uses, not a fork.
+  discriminator: type
+  oneOf:
+    - $ref: '../../../openapi/components/schemas/user.yaml#/RegisteredSessionUser'
+    - $ref: '../../../openapi/components/schemas/user.yaml#/GuestSessionUser'

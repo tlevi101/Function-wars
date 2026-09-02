@@ -1,0 +1,12 @@
+address: 'user banned'
+title: Opponent banned mid-game
+description: >-
+  Sent to the other player(s) in a game when a player is banned by an admin
+  (`PUT /admin/users/{id}/ban`) while the game is in progress. The game is ended as a side
+  effect. Distinct from `banned`, which is sent to the banned player themself.
+messages:
+  userBanned:
+    name: userBanned
+    title: Opponent banned mid-game
+    payload:
+      $ref: '../../../openapi/components/schemas/common.yaml#/MessageResponse'

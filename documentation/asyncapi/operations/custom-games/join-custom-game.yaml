@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/custom-games/join-custom-game.yaml'
+summary: Client joins an existing waiting room.
+tags:
+  - name: CustomGames

@@ -1,0 +1,61 @@
+CustomGameSummary:
+  type: object
+  description: A public, joinable custom-game waiting room, as listed via `GET /custom-games`.
+  required:
+    - owner
+    - roomUUID
+    - userCount
+    - capacity
+    - fieldID
+  properties:
+    owner:
+      $ref: './user.yaml#/SessionUser'
+    roomUUID:
+      type: string
+    userCount:
+      type: integer
+      format: int32
+      description: Number of players currently in the room.
+    capacity:
+      type: integer
+      format: int32
+      description: Maximum number of players, derived from the chosen field's spawn slot count.
+    fieldID:
+      type: integer
+      format: int32
+  additionalProperties: false
+
+WaitingRoomDetail:
+  type: object
+  description: Full detail of one waiting room, as returned by `GET /wait-rooms/{roomUUID}`.
+  required:
+    - roomUUID
+    - chatUUID
+    - owner
+    - players
+    - fieldID
+    - userCount
+    - capacity
+  properties:
+    roomUUID:
+      type: string
+    chatUUID:
+      type: string
+      description: Id of the associated group chat, joined automatically by every room member.
+    owner:
+      $ref: './user.yaml#/SessionUser'
+    players:
+      type: array
+      description: Every player currently in the room, including the owner.
+      items:
+        $ref: './user.yaml#/SessionUser'
+    fieldID:
+      type: integer
+      format: int32
+    userCount:
+      type: integer
+      format: int32
+    capacity:
+      type: integer
+      format: int32
+  additionalProperties: false

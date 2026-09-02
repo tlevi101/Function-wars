@@ -1,0 +1,29 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+
+get:
+  tags:
+    - CustomGames
+  summary: Get a waiting room
+  operationId: getWaitingRoom
+  responses:
+    '200':
+      description: Waiting room found.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - waitRoom
+            properties:
+              waitRoom:
+                $ref: '../../components/schemas/waiting-room.yaml#/WaitingRoomDetail'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '404':
+      description: No waiting room with this id (it may have been closed, e.g. the owner left).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

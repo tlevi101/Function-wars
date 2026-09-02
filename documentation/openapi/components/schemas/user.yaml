@@ -1,0 +1,208 @@
+Role:
+  type: string
+  description: Authorization role of a registered user. Guests never have a role.
+  enum:
+    - user
+    - admin
+    - super_admin
+  nullable: true
+
+User:
+  type: object
+  description: >-
+    A registered user account. The password hash is never serialized to clients; this is the
+    exact shape returned by every endpoint that exposes a full user record.
+  required:
+    - id
+    - name
+    - email
+    - banned
+    - banned_reason
+    - is_admin
+    - role
+    - chat_restriction
+  properties:
+    id:
+      type: integer
+      format: int32
+      description: Primary key.
+    name:
+      type: string
+      minLength: 3
+      maxLength: 20
+      description: Unique, case-sensitive username, 3-20 characters.
+    email:
+      type: string
+      format: email
+      description: Unique email address.
+    banned:
+      type: boolean
+      description: Whether the account is currently banned from playing/chatting.
+    banned_reason:
+      type: string
+      nullable: true
+      maxLength: 255
+      description: Reason supplied by an admin when banning the user. Null when not banned.
+    is_admin:
+      type: boolean
+      description: True for both 'admin' and 'super_admin' roles.
+    role:
+      $ref: './user.yaml#/Role'
+    chat_restriction:
+      type: boolean
+      description: When true, the user is blocked from sending chat messages (group chat and friend chat).
+  additionalProperties: false
+
+UserRef:
+  type: object
+  description: Minimal reference to a registered user, used wherever only identity is needed.
+  required:
+    - id
+    - name
+  properties:
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+  additionalProperties: false
+
+UserContact:
+  type: object
+  description: Registered user reference including contact email, used in admin-facing views.
+  required:
+    - id
+    - name
+    - email
+  properties:
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+  additionalProperties: false
+
+SessionUser:
+  type: object
+  description: >-
+    The identity carried in a client's JWT session, as attached by the auth middleware to
+    `req.user` and echoed back wherever a waiting-room roster is returned. Discriminated by
+    `type`: registered users carry a numeric database id, guests carry a generated UUID string
+    and cannot access most authenticated endpoints.
+
+    The discriminator values are the literal strings `"user"` and `"guest"` — note that
+    registered users are `"user"`, not `"registeredUser"` (see `User.toJSONForJWT()` in
+    `backend/models/user.js`, and the Angular client's `DecodedUserInterface`, which both use
+    `"user"`). A stale `type: 'registeredUser'` appears in
+    `backend/types/controllers/Interfaces.ts` but is a compile-time-only declaration that
+    nothing reads at runtime.
+  discriminator:
+    propertyName: type
+    mapping:
+      user: './user.yaml#/RegisteredSessionUser'
+      guest: './user.yaml#/GuestSessionUser'
+  oneOf:
+    - $ref: './user.yaml#/RegisteredSessionUser'
+    - $ref: './user.yaml#/GuestSessionUser'
+
+RegisteredSessionUser:
+  type: object
+  description: >-
+    JWT payload for a signed-in registered user, as produced by `User.toJSONForJWT()`. This is
+    also the exact object echoed onto the wire wherever a session identity is returned
+    (waiting-room `owner`/`players`, the `receive invite` socket event), so it carries the
+    signing-time extras `JWT_createdAt` and `iat` in addition to the account fields.
+  required:
+    - type
+    - id
+    - name
+    - email
+    - banned
+    - banned_reason
+    - is_admin
+    - role
+    - chat_restriction
+  properties:
+    type:
+      type: string
+      description: Discriminator. The literal string `user` — not `registeredUser`.
+      enum:
+        - user
+    id:
+      type: integer
+      format: int32
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    banned:
+      type: boolean
+    banned_reason:
+      type: string
+      nullable: true
+    is_admin:
+      type: boolean
+    role:
+      $ref: './user.yaml#/Role'
+    chat_restriction:
+      type: boolean
+    JWT_createdAt:
+      type: string
+      format: date-time
+      description: >-
+        Timestamp stamped into the payload at signing time. Redundant with the standard `iat`
+        claim and read by nothing; present in every token the current backend issues. Not
+        listed as required so a reimplementation may drop it.
+    iat:
+      type: integer
+      format: int64
+      description: >-
+        Standard JWT "issued at" claim, added by the signing library. Always present on a
+        decoded token, so it appears on session objects echoed back in responses too.
+  additionalProperties: false
+
+GuestSessionUser:
+  type: object
+  description: >-
+    JWT payload for an anonymous guest player, as produced by `POST /register-guest`. Guests are
+    excluded from most write endpoints. Like `RegisteredSessionUser`, this object is echoed
+    verbatim wherever a session identity is returned, so it carries `JWT_createdAt`/`iat` as
+    well as the redundant `guest` flag.
+  required:
+    - type
+    - id
+    - name
+  properties:
+    type:
+      type: string
+      description: Discriminator. The literal string `guest`.
+      enum:
+        - guest
+    id:
+      type: string
+      format: uuid
+      description: Randomly generated guest identifier (not a database id).
+    name:
+      type: string
+      description: "Display name, always prefixed with 'Guest: '."
+    guest:
+      type: boolean
+      description: >-
+        Always `true`. Redundant with `type`, but the current Angular client's
+        `DecodedGuestInterface` declares it, so a reimplementation should keep emitting it for
+        compatibility. No server-side code branches on it.
+      enum:
+        - true
+    JWT_createdAt:
+      type: string
+      format: date-time
+      description: See `RegisteredSessionUser.JWT_createdAt`.
+    iat:
+      type: integer
+      format: int64
+      description: See `RegisteredSessionUser.iat`.
+  additionalProperties: false

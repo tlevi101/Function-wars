@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/friend-chat/receive-message.yaml'
+summary: Server pushes a live friend chat message.
+tags:
+  - name: FriendChat

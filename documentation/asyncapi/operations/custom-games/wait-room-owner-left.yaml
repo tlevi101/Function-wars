@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/custom-games/wait-room-owner-left.yaml'
+summary: Server notifies non-owner room members the owner left.
+tags:
+  - name: CustomGames

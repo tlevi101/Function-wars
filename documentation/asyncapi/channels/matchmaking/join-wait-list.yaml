@@ -1,0 +1,12 @@
+address: 'join wait list'
+title: Join wait list
+description: >-
+  Joins the global quick-match queue. If the queue reaches 2, 3, or 4 players (checked in that
+  priority order against admin-owned fields sized for that player count), a game is created
+  immediately and every matched player receives `joined game`. If there is no playable admin
+  field at all, the caller instead receives an `error` event.
+messages:
+  joinWaitList:
+    name: joinWaitList
+    title: Join wait list
+    description: No payload.

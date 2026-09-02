@@ -1,0 +1,32 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FriendshipId'
+
+get:
+  tags:
+    - Friends
+  summary: Get (or lazily create) the 1:1 chat with a friend
+  description: If no chat row exists yet for this friendship, an empty one is created and returned.
+  operationId: getFriendChat
+  responses:
+    '200':
+      description: Chat found or created.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - chat
+            properties:
+              chat:
+                $ref: '../../components/schemas/chat.yaml#/Chat'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'
+    '404':
+      description: Caller not found, target user not found, or no accepted friendship between them.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

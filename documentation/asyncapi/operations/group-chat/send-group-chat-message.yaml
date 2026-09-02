@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/group-chat/send-group-chat-message.yaml'
+summary: Client sends a message to its current group chat.
+tags:
+  - name: GroupChat

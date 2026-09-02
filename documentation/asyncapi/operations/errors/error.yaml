@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/errors/error.yaml'
+summary: Server reports an error for a socket action that has no HTTP-style response.
+tags:
+  - name: Errors

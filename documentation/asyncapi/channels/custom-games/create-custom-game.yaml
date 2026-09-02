@@ -1,0 +1,12 @@
+address: 'create custom game'
+title: Create custom game
+description: >-
+  Creates a new waiting room owned by the caller and its attached group chat. Confirmed back to
+  the caller via `waiting room created`. If `friendIDs` is given, each online friend is sent a
+  `receive invite`.
+messages:
+  createCustomGame:
+    name: createCustomGame
+    title: Create custom game
+    payload:
+      $ref: '../../components/schemas/custom-game-events.yaml#/CreateCustomGamePayload'

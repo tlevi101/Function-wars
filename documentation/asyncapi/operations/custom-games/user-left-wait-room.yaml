@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/custom-games/user-left-wait-room.yaml'
+summary: Server notifies remaining room members that a player left.
+tags:
+  - name: CustomGames

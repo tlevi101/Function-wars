@@ -1,0 +1,39 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/RoomUUID'
+  - $ref: '../../components/parameters/common.yaml#/ParticipantId'
+
+post:
+  tags:
+    - GroupChats
+  summary: Mute a participant
+  description: Mutes are per-room and per-caller; they silence a participant only for the caller.
+  operationId: muteGroupChatUser
+  responses:
+    '200':
+      description: User muted.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: User muted.
+    '400':
+      description: Mute failed (e.g. caller or target not resolvable in the chat roster).
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: The caller is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Group chat not found, or the target user is not in this group chat.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

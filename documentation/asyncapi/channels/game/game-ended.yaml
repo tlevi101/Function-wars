@@ -1,0 +1,11 @@
+address: 'game ended'
+title: Game ended (opponent left)
+description: >-
+  Sent to the remaining player when their opponent's game is torn down by them navigating away
+  (rather than the game ending normally via `game over`).
+messages:
+  gameEnded:
+    name: gameEnded
+    title: Game ended
+    payload:
+      $ref: '../../../openapi/components/schemas/common.yaml#/MessageResponse'

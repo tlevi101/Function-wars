@@ -1,0 +1,11 @@
+address: 'game over'
+title: Game over
+description: >-
+  Broadcast to both players when a `POST /games/{gameUUID}/function` submission ends the game.
+  The game is removed from the server's live game list at the same time.
+messages:
+  gameOver:
+    name: gameOver
+    title: Game over
+    payload:
+      $ref: '../../components/schemas/game-events.yaml#/GameOverPayload'

@@ -1,0 +1,8 @@
+address: 'user left wait room'
+title: User left waiting room
+description: Broadcast to the remaining members of a waiting room when a player leaves (e.g. navigates away).
+messages:
+  userLeftWaitRoom:
+    name: userLeftWaitRoom
+    title: User left waiting room
+    description: No payload.

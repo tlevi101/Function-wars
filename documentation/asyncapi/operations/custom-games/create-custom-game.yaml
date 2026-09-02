@@ -1,0 +1,6 @@
+action: receive
+channel:
+  $ref: '../../channels/custom-games/create-custom-game.yaml'
+summary: Client creates a custom-game waiting room.
+tags:
+  - name: CustomGames

@@ -1,0 +1,9 @@
+address: 'waiting room created'
+title: Waiting room created
+description: Confirms `create custom game` back to the room's creator.
+messages:
+  waitingRoomCreated:
+    name: waitingRoomCreated
+    title: Waiting room created
+    payload:
+      $ref: '../../components/schemas/custom-game-events.yaml#/WaitingRoomCreatedPayload'

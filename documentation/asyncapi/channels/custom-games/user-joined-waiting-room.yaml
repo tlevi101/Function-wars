@@ -1,0 +1,8 @@
+address: 'user joined waiting room'
+title: User joined waiting room
+description: Broadcast to every other member of a waiting room when a new player joins.
+messages:
+  userJoinedWaitingRoom:
+    name: userJoinedWaitingRoom
+    title: User joined waiting room
+    description: No payload.

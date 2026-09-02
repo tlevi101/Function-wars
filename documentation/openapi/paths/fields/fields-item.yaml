@@ -1,0 +1,115 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/FieldId'
+
+get:
+  tags:
+    - Fields
+  summary: Get a field
+  description: >-
+    Access is restricted to the owner (non-admin fields) or any admin (admin fields) — see the
+    403 response.
+  operationId: getField
+  responses:
+    '200':
+      description: Field found.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - field
+            properties:
+              field:
+                $ref: '../../components/schemas/field.yaml#/Field'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: >-
+        Caller is a guest, or the field is an admin field and the caller is not an admin, or the
+        field is a personal field owned by someone else.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No such user (token) or no such field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+
+put:
+  tags:
+    - Fields
+  summary: Update a field
+  description: Access rules are identical to `GET /fields/{id}`.
+  operationId: updateField
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/field.yaml#/CreateOrUpdateFieldRequest'
+  responses:
+    '200':
+      description: Field updated.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - field
+            properties:
+              field:
+                $ref: '../../components/schemas/field.yaml#/Field'
+            additionalProperties: false
+    '400':
+      $ref: '../../components/responses/common.yaml#/ValidationFailed'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or does not own/administer this field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No such user (token) or no such field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+
+delete:
+  tags:
+    - Fields
+  summary: Soft-delete or permanently delete a field
+  description: >-
+    The first call soft-deletes the field (sets `deletedAt`, recoverable via
+    `PUT /fields/{id}/restore`). Calling delete again on an already soft-deleted field
+    permanently destroys it.
+  operationId: deleteField
+  responses:
+    '200':
+      description: Field soft-deleted or destroyed.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Field deleted.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or does not own/administer this field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: No such user (token) or no such field.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

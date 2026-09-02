@@ -1,0 +1,28 @@
+get:
+  tags:
+    - Auth
+  summary: Refresh the current JWT
+  description: >-
+    Re-issues a JWT for the current registered user, picking up any account changes (e.g. a
+    newly granted admin role) since the last token was signed.
+  operationId: updateToken
+  responses:
+    '200':
+      description: Token refreshed.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/auth.yaml#/AuthTokenResponse'
+          example:
+            message: Token updated
+            jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'
+    '404':
+      description: The user backing this token no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

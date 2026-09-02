@@ -1,0 +1,25 @@
+get:
+  tags:
+    - Friends
+  summary: List friends
+  description: Accepted friendships only, sorted by unread message count descending.
+  operationId: listFriends
+  responses:
+    '200':
+      description: Friend list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - friends
+            properties:
+              friends:
+                type: array
+                items:
+                  $ref: '../../components/schemas/friendship.yaml#/Friend'
+            additionalProperties: false
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      $ref: '../../components/responses/common.yaml#/GuestForbidden'

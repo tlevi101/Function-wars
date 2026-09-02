@@ -1,0 +1,13 @@
+address: 'send group chat message'
+title: Send group chat message
+description: >-
+  Sends a message to the caller's current group chat (waiting room or in-game). Silently dropped
+  if the caller is not currently in any group chat, or is chat-restricted
+  (`User.chat_restriction`). Delivered live to other members via `receive group message`,
+  excluding members who have muted or blocked the sender.
+messages:
+  sendGroupChatMessage:
+    name: sendGroupChatMessage
+    title: Send group chat message
+    payload:
+      $ref: '../../components/schemas/chat-events.yaml#/SendGroupChatMessagePayload'

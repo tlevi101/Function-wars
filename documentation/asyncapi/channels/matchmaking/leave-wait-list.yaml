@@ -1,0 +1,8 @@
+address: 'leave wait list'
+title: Leave wait list
+description: Leaves the global quick-match queue.
+messages:
+  leaveWaitList:
+    name: leaveWaitList
+    title: Leave wait list
+    description: No payload.

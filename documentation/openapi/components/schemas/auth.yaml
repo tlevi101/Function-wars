@@ -1,0 +1,130 @@
+RegisterGuestRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      minLength: 3
+      maxLength: 20
+      description: "Display name for the guest session. Will be prefixed with 'Guest: ' server-side."
+  additionalProperties: false
+
+RegisterRequest:
+  type: object
+  required:
+    - name
+    - email
+    - password
+    - passwordAgain
+  properties:
+    name:
+      type: string
+      minLength: 3
+      maxLength: 20
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 20
+    passwordAgain:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 20
+      description: Must be identical to `password`.
+  additionalProperties: false
+
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      format: password
+  additionalProperties: false
+
+ForgotPasswordRequest:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+  additionalProperties: false
+
+ResetPasswordRequest:
+  type: object
+  required:
+    - password
+    - passwordAgain
+  properties:
+    password:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 20
+    passwordAgain:
+      type: string
+      format: password
+      minLength: 8
+      maxLength: 20
+      description: Must be identical to `password`.
+  additionalProperties: false
+
+AuthTokenResponse:
+  type: object
+  description: Returned whenever a new JWT is issued (register, login, guest register, token refresh).
+  required:
+    - message
+    - jwt
+  properties:
+    message:
+      type: string
+      example: Login successful
+    jwt:
+      type: string
+      description: "Signed JWT to send as `Authorization: Bearer <jwt>` on subsequent requests."
+  additionalProperties: false
+
+BannedResponse:
+  type: object
+  description: Returned instead of a normal error when the acting/target account is banned.
+  required:
+    - message
+    - banned_reason
+  properties:
+    message:
+      type: string
+      example: User banned
+    banned_reason:
+      type: string
+      nullable: true
+  additionalProperties: false
+
+ForgotPasswordResponse:
+  type: object
+  description: >-
+    Confirms a password-reset email was sent. In test environments (`NODE_ENV=test`) the
+    server skips sending mail and returns the reset request's `uuid` directly instead, since
+    there is no mailbox to inspect.
+  required:
+    - message
+  properties:
+    message:
+      type: string
+      example: Email sent
+    uuid:
+      type: string
+      format: uuid
+      description: Only present when `NODE_ENV=test`. The path segment for `PUT /reset-password/{uuid}`.
+  additionalProperties: false

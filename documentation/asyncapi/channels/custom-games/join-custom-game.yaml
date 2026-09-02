@@ -1,0 +1,12 @@
+address: 'join custom game'
+title: Join custom game
+description: >-
+  Joins an existing waiting room and its group chat. Responds to the caller with either
+  `waiting room joined` (success, including the no-op case of already being in the room) or
+  `error` (room not found, room full, or private room without an invite).
+messages:
+  joinCustomGame:
+    name: joinCustomGame
+    title: Join custom game
+    payload:
+      $ref: '../../components/schemas/custom-game-events.yaml#/RoomUUIDPayload'

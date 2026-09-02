@@ -1,0 +1,39 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/UserId'
+
+post:
+  tags:
+    - Users
+  summary: Report a user
+  operationId: reportUser
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/report.yaml#/CreateReportRequest'
+  responses:
+    '200':
+      description: Report submitted.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Report sent.
+    '400':
+      description: Description missing.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or is attempting to report themselves.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      $ref: '../../components/responses/common.yaml#/NotFound'

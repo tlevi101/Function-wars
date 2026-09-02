@@ -1,0 +1,7 @@
+action: send
+channel:
+  $ref: '../../channels/game/user-banned.yaml'
+summary: Server notifies the other player their opponent was banned.
+tags:
+  - name: Game
+  - name: Moderation

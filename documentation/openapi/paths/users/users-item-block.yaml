@@ -1,0 +1,32 @@
+parameters:
+  - $ref: '../../components/parameters/common.yaml#/UserId'
+
+post:
+  tags:
+    - Users
+  summary: Block a user
+  description: Blocked users' group chat messages are hidden from the caller and they cannot see the caller in matchmaking-relevant status checks.
+  operationId: blockUser
+  responses:
+    '200':
+      description: User blocked.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: User blocked.
+    '401':
+      $ref: '../../components/responses/common.yaml#/Unauthorized'
+    '403':
+      description: Caller is a guest, or is attempting to block themselves.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'
+    '404':
+      description: Caller not found, or target user not found.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/ErrorResponse'

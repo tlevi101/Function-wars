@@ -1,0 +1,16 @@
+get:
+  tags:
+    - Meta
+  summary: Health check
+  description: Unauthenticated liveness check. Always returns 200 while the server is up.
+  operationId: getHealth
+  security: []
+  responses:
+    '200':
+      description: The server is up.
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas/common.yaml#/MessageResponse'
+          example:
+            message: Welcome to the backend

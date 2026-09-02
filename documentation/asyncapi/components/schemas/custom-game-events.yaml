@@ -1,0 +1,45 @@
+CreateCustomGamePayload:
+  type: object
+  description: Requests creation of a new private/public waiting room for a chosen field.
+  required:
+    - fieldID
+    - isPrivate
+  properties:
+    fieldID:
+      type: integer
+      format: int32
+      description: Id of the field to play on. Determines the room's player capacity.
+    isPrivate:
+      type: boolean
+      description: When true, only invited friends (see `friendIDs`) may join.
+    friendIDs:
+      type: array
+      description: Friend user ids to invite immediately. Only meaningful when `isPrivate` is true.
+      items:
+        type: integer
+        format: int32
+  additionalProperties: false
+
+RoomUUIDPayload:
+  type: object
+  description: Identifies a waiting room to act on.
+  required:
+    - roomUUID
+  properties:
+    roomUUID:
+      type: string
+  additionalProperties: false
+
+WaitingRoomCreatedPayload:
+  type: object
+  description: Confirms room creation back to the creator, with both the room and its attached group chat.
+  required:
+    - roomUUID
+    - groupChatUUID
+  properties:
+    roomUUID:
+      type: string
+    groupChatUUID:
+      type: string
+      description: "Id of the room's group chat, always `chat-<roomUUID>`."
+  additionalProperties: false

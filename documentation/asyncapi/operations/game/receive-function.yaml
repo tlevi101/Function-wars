@@ -1,0 +1,6 @@
+action: send
+channel:
+  $ref: '../../channels/game/receive-function.yaml'
+summary: Server broadcasts a submitted turn's computed trajectory and damage.
+tags:
+  - name: Game

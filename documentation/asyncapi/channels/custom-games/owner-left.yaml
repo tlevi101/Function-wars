@@ -1,0 +1,16 @@
+address: 'owner left'
+title: Room owner left (room destroyed)
+description: >-
+  Sent to every socket still tracked by a waiting room at the moment it is torn down
+  (`WaitingRoom.destroy()`).
+
+  It reaches the same audience as `wait room owner left`, which the same teardown flow emits
+  immediately beforehand: the departing owner has already been removed from the room's socket
+  list by `leaveWaitingRoom()` before `deleteWaitingRoom()` runs, so neither event reaches the
+  owner. The two are redundant on the wire — the current frontend listens only for
+  `wait room owner left` — but both are genuinely emitted, so a client may handle either.
+messages:
+  ownerLeft:
+    name: ownerLeft
+    title: Room owner left
+    description: No payload.

@@ -1,0 +1,86 @@
+FunctionPoints:
+  type: object
+  description: >-
+    The trajectory of a submitted function, split at the player's position into the side that
+    travels toward negative x and the side that travels toward positive x.
+  required:
+    - leftSide
+    - rightSide
+  properties:
+    leftSide:
+      type: array
+      items:
+        $ref: '../../../openapi/components/schemas/geometry.yaml#/Point'
+    rightSide:
+      type: array
+      items:
+        $ref: '../../../openapi/components/schemas/geometry.yaml#/Point'
+  additionalProperties: false
+
+FunctionDamages:
+  type: object
+  description: >-
+    Obstacle damage caused by this turn's function, if either side of the trajectory collided
+    with an obstacle. A side is omitted (or null) when that side of the trajectory did not hit
+    anything.
+  properties:
+    leftSide:
+      allOf:
+        - $ref: '../../../openapi/components/schemas/geometry.yaml#/DamageCircle'
+      nullable: true
+    rightSide:
+      allOf:
+        - $ref: '../../../openapi/components/schemas/geometry.yaml#/DamageCircle'
+      nullable: true
+  additionalProperties: false
+
+JoinedGamePayload:
+  type: object
+  description: Sent to every player in a lobby the instant a game is created from it (custom game start, or wait-list matchmaking filling a game).
+  required:
+    - room
+    - players
+    - field
+  properties:
+    room:
+      type: string
+      description: The new game's uuid. Join this Socket.IO room to receive further game events.
+    players:
+      type: array
+      items:
+        $ref: '../../../openapi/components/schemas/game.yaml#/GamePlayer'
+    field:
+      $ref: '../../../openapi/components/schemas/game.yaml#/GameField'
+  additionalProperties: false
+
+ReceiveFunctionPayload:
+  type: object
+  description: Broadcast to both players after a non-final function submission (`POST /games/{gameUUID}/function`).
+  required:
+    - points
+    - damages
+    - length
+  properties:
+    points:
+      $ref: '#/FunctionPoints'
+    damages:
+      $ref: '#/FunctionDamages'
+    length:
+      type: number
+      format: double
+      description: Total travelled length of the function's trajectory, in field-space pixels.
+  additionalProperties: false
+
+GameOverPayload:
+  type: object
+  description: Broadcast to both players when a function submission ends the game.
+  required:
+    - points
+    - message
+  properties:
+    points:
+      $ref: '#/FunctionPoints'
+    message:
+      type: string
+      example: 'Game over, Winner is Alice'
+  additionalProperties: false
