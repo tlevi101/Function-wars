@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FunctionWars.Api/FunctionWars.Api.csproj" />
+    <Project Path="src/FunctionWars.Domain/FunctionWars.Domain.csproj" />
+    <Project Path="src/FunctionWars.Infrastructure/FunctionWars.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FunctionWars.Api.Tests/FunctionWars.Api.Tests.csproj" />
+    <Project Path="tests/FunctionWars.Domain.Tests/FunctionWars.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

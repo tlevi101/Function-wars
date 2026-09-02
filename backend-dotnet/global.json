@@ -1,0 +1,17 @@
+{
+  "$comment": [
+    "Keeps the host SDK (Rider builds) and the container SDK (docker compose) agreeing on",
+    "what 'net10.0' means. Rider uses whatever pacman installed; the container image ships a",
+    "different feature band. Without this, the two can diverge and you get 'works in Rider,",
+    "fails in Docker'.",
+    "",
+    "rollForward 'latestFeature' accepts any 10.0.x SDK at or above the 100 band, so both the",
+    "Arch package and the mcr.microsoft.com/dotnet/sdk:10.0 image satisfy it, while a stray",
+    ".NET 9 or 11 SDK would be rejected with a clear error instead of silently building."
+  ],
+  "sdk": {
+    "version": "10.0.100",
+    "rollForward": "latestFeature",
+    "allowPrerelease": false
+  }
+}

@@ -1,0 +1,80 @@
+# Local development environment for the ASP.NET backend.
+#
+# Scope: this stack covers backend-dotnet/ ONLY. The Node backend in ../backend and its
+# systemd/tarball deploy are untouched, and nothing here is wired into CI.
+#
+#   docker compose up --build
+#
+#   api      http://localhost:5001
+#   adminer  http://localhost:8080   (server: db, user: functionwars, db: function_wars)
+#   db       localhost:3307          (3307, not 3306, so it can't collide with a host MySQL)
+#
+# No .NET SDK is needed on the host — everything runs in these containers.
+
+name: functionwars-dotnet
+
+services:
+  db:
+    # MariaDB to match production (see documentation/todos/CODE-CHANGES.md §2).
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:-function_wars}
+      MARIADB_USER: ${DB_USERNAME:-functionwars}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-functionwars}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      # Ships with the mariadb image; --connect proves it accepts connections rather
+      # than merely having a running process, so `api` doesn't start against a
+      # half-initialised database on first boot.
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/FunctionWars.Api/Dockerfile
+      target: dev
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      # dotnet watch uses inotify against the bind mount. That works natively on Linux;
+      # set DOTNET_USE_POLLING_FILE_WATCHER=1 only if hot reload ever stops triggering.
+      DOTNET_USE_POLLING_FILE_WATCHER: "false"
+    ports:
+      - "${API_PORT:-5001}:8080"
+    volumes:
+      # Source is mounted, not copied — edit on the host, dotnet watch rebuilds in-container.
+      - .:/src
+      # Kept out of the bind mount so it survives rebuilds and isn't clobbered by the mount.
+      - nuget:/nuget
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:5
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
+  nuget:

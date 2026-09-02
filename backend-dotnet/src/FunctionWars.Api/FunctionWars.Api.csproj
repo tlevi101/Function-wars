@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Web host: controllers, hubs, DI. Shared build settings: ../../Directory.Build.props -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\FunctionWars.Domain\FunctionWars.Domain.csproj" />
+    <ProjectReference Include="..\FunctionWars.Infrastructure\FunctionWars.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <!--
+    Shared run configuration: brings up the whole dev stack (db + api + adminer).
+    Lives in .run/ so it is committed and shared, unlike .idea/ workspace settings.
+
+    If Rider shows this as invalid, it is almost always `server-name` not matching your
+    Docker connection: open the config and pick your Docker server from the dropdown
+    (Settings > Build, Execution, Deployment > Docker).
+  -->
+  <configuration default="false" name="Dev stack (docker compose)" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="sourceFilePath" value="docker-compose.yml" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

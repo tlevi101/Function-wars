@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Game rules, geometry and function evaluation live here.
+
+    This project intentionally has NO PackageReference and NO ProjectReference entries.
+    Keep it that way: with no reference to EF Core or ASP.NET, the compiler makes it
+    impossible for domain logic to reach for the database or HTTP context, and the
+    domain tests can run without a host or a database.
+
+    Shared build settings come from ../../Directory.Build.props.
+  -->
+
+</Project>

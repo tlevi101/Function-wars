@@ -1,0 +1,17 @@
+# Keep build output and local secrets out of the build context.
+**/bin/
+**/obj/
+**/out/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.suo
+
+.env
+.git/
+.gitignore
+
+Dockerfile*
+docker-compose*.yml
+README.md

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Persistence and outbound integrations. Shared build settings: ../../Directory.Build.props -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\FunctionWars.Domain\FunctionWars.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
